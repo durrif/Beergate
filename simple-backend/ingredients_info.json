@@ -1,0 +1,196 @@
+{
+  "malts": {
+    "pale ale": {
+      "name": "Malta Pale Ale",
+      "description": "Malta base fundamental en cervecería. Color dorado claro (2.5-3.5 EBC). Sabor limpio, ligeramente dulce con notas a galleta y pan tostado. Excelente poder diastático para conversión de almidones. Perfecta para: Pale Ales, IPAs, Bitters británicas, cervezas americanas. Aporta cuerpo medio y permite que brillen los lúpulos. Representa el 80-100% de la receta en estilos Pale Ale.",
+      "color_ebc": "2.5-3.5",
+      "styles": ["Pale Ale", "IPA", "Bitter", "American Ale"]
+    },
+    "pilsner": {
+      "name": "Malta Pilsner",
+      "description": "Malta base más pálida disponible (2-3 EBC). Sabor extremadamente limpio, neutro y delicado con ligeras notas a miel. Ideal para cervezas donde se busca pureza y claridad. Perfecta para: Pilsners checas y alemanas, Lagers, Kölsch, cervezas belgas claras. Su neutralidad permite destacar el carácter del lúpulo y la levadura. Requiere maceración más larga que Pale Ale.",
+      "color_ebc": "2-3",
+      "styles": ["Pilsner", "Lager", "Kölsch", "Belgian Blonde"]
+    },
+    "munich": {
+      "name": "Malta Munich",
+      "description": "Malta tostada que aporta color ámbar-rojizo (15-25 EBC) y sabor intenso a malta, pan y galleta. Notas dulces, a caramelo tostado y nuez. Puede usarse como malta base o como especialidad (5-40%). Perfecta para: Märzen, Oktoberfest, Bock, Dunkels, Brown Ales. Aporta cuerpo robusto, dulzor maltoso pronunciado y mejora la retención de espuma. Tipo I es más clara que Tipo II.",
+      "color_ebc": "15-25",
+      "styles": ["Märzen", "Oktoberfest", "Bock", "Brown Ale", "Dunkel"]
+    },
+    "vienna": {
+      "name": "Malta Vienna",
+      "description": "Malta kilneada más intensamente que Pale, menos que Munich (7-10 EBC). Sabor tostado suave, dulce, con notas a pan, galleta y caramelo ligero. Color ámbar dorado. Perfecta para: Vienna Lager, Märzen, Amber Ales, Oktoberfest. Puede usarse 100% como base o 20-50% en combinación. Aporta dulzor maltoso elegante sin ser pesado. Equilibra perfectamente con lúpulos nobles.",
+      "color_ebc": "7-10",
+      "styles": ["Vienna Lager", "Märzen", "Amber Ale", "Festbier"]
+    },
+    "wheat": {
+      "name": "Malta de Trigo",
+      "description": "Malta de trigo (no cebada). Sin cáscara, alto contenido en proteína. Sabor suave, ligeramente ácido, refrescante. Aporta turbidez característica y espuma cremosa, densa y persistente. Perfecta para: Weizen, Hefeweizen, Witbier, Berliner Weisse (50-70% de la receta). Textura sedosa en boca. Combinación clásica con sabores a plátano y clavo de la levadura weizen. Dificulta el filtrado.",
+      "color_ebc": "3-4",
+      "styles": ["Hefeweizen", "Witbier", "Weizen", "Berliner Weisse"]
+    },
+    "crystal": {
+      "name": "Malta Crystal/Caramelo",
+      "description": "Malta caramelizada en tambor húmedo. Rango 10-150 EBC según intensidad. Sabores de caramelo, toffee, frutos secos, pasas (según color). Aporta dulzor residual, cuerpo, color y mejora retención de espuma. NO requiere maceración. Perfecta para: Pale Ales, IPAs, Stouts, Porters (5-15%). Crystal 60L es la más versátil. Mayor número = más dulce y oscura. Exceso genera empalago.",
+      "color_ebc": "20-300",
+      "styles": ["Pale Ale", "IPA", "Stout", "Porter", "Scottish Ale"]
+    },
+    "caramel": {
+      "name": "Malta Caramelo",
+      "description": "Similar a Crystal pero proceso europeo. Sabores intensos a caramelo, melaza, toffee y frutos secos. Color ámbar-marrón (20-80 EBC). Aporta dulzor complejo, cuerpo denso y mejora la percepción de maltosidad. Perfecta para: Bocks, Dunkels, Brown Ales, Belgian Dubbel (5-20%). Complementa bien con Munich. Puede dominar si se excede. Aporta color rojizo intenso.",
+      "color_ebc": "20-80",
+      "styles": ["Bock", "Dunkel", "Brown Ale", "Belgian Dubbel"]
+    },
+    "chocolate": {
+      "name": "Malta Chocolate",
+      "description": "Malta altamente tostada (900-1200 EBC) sin amargor excesivo. Sabores intensos a chocolate negro, café tostado, nuez. Color marrón-negro. Aporta complejidad y redondez. Perfecta para: Stouts, Porters, Brown Ales oscuras (2-10%). Demasiada puede generar astringencia. No confundir con Black Patent (más amarga). Versión sin cáscara (dehusked) reduce astringencia. Excelente para balance en Imperial Stouts.",
+      "color_ebc": "900-1200",
+      "styles": ["Stout", "Porter", "Brown Ale", "Schwarzbier"]
+    },
+    "cara": {
+      "name": "Malta CaraMunich/CaraRed",
+      "description": "Malta caramelo alemana tostada. Sabores intensos a caramelo, pan tostado, galleta. Color rojizo intenso (40-80 EBC). Aporta cuerpo, dulzor y mejora espuma. CaraRed: más color rojo. Perfecta para: Amber Lagers, Red Ales, Bocks (5-15%). Menos dulce que Crystal equivalente. Complementa perfectamente con Munich y Vienna. Popular en cervezas alemanas tradicionales.",
+      "color_ebc": "40-80",
+      "styles": ["Amber Lager", "Red Ale", "Bock", "Doppelbock"]
+    },
+    "biscuit": {
+      "name": "Malta Biscuit",
+      "description": "Malta europea tostada suavemente. Sabor característico a galleta, pan recién horneado, nuez. Color dorado-ámbar (40-50 EBC). Aporta complejidad sin dulzor. Perfecta para: Belgian Ales, Brown Ales, Pale Ales (5-15%). Mejora percepción de 'malty' sin añadir dulzor residual. Excelente para dar profundidad. Similar a Victory/Biscuit Malt. Combinación clásica en Belgian Dubbel y Tripel.",
+      "color_ebc": "40-50",
+      "styles": ["Belgian Dubbel", "Brown Ale", "Pale Ale", "ESB"]
+    },
+    "amber": {
+      "name": "Malta Amber",
+      "description": "Malta británica tostada. Sabor intenso a galleta, nuez, toffee. Color ámbar-dorado (50-70 EBC). Más tostada que Pale, menos que Brown. Aporta sabor maltoso pronunciado y cuerpo. Perfecta para: ESB, Bitter, Mild, Old Ales (10-30%). Puede usarse como malta base en cervezas oscuras. Seca y tostada, no dulce. Carácter británico tradicional. Excelente en Scottish Ales.",
+      "color_ebc": "50-70",
+      "styles": ["ESB", "Bitter", "Mild", "Old Ale", "Scottish Ale"]
+    },
+    "melano": {
+      "name": "Malta Melanoidin",
+      "description": "Malta especial europea. Sabor intenso a malta horneada, pan de centeno, galleta. Color rojo intenso (50-70 EBC). Rica en melanoidinas que mejoran sabor, color, cuerpo y estabilidad de espuma. Perfecta para: Amber Lagers, Bocks, Red Ales alemanas (5-20%). Simula cervezas de decocción sin hacer decocción. Aporta complejidad maltosa. Popular en cervezas artesanales para dar profundidad.",
+      "color_ebc": "50-70",
+      "styles": ["Amber Lager", "Bock", "Red Ale", "Altbier"]
+    },
+    "aroma": {
+      "name": "Malta Aromatic",
+      "description": "Malta belga intensamente tostada. Sabor muy pronunciado a malta, nuez, galleta, pan tostado. Color dorado intenso (40-50 EBC). Aporta intenso carácter maltoso sin dulzor. Perfecta para: Belgian Ales, Trappist, Abbey Ales (5-15%). Muy aromática. Añade complejidad y profundidad. Similar a Biscuit pero más intensa. Excelente en Dubbel. Pequeñas cantidades dan gran impacto aromático.",
+      "color_ebc": "40-50",
+      "styles": ["Belgian Dubbel", "Abbey Ale", "Tripel", "Belgian Strong"]
+    },
+    "carapils": {
+      "name": "Carapils/Dextrin Malt",
+      "description": "Malta especial sin color (3-5 EBC). NO aporta sabor ni color, solo dextrinas no fermentables. Mejora cuerpo, sensación en boca y retención de espuma sin añadir dulzor. Perfecta para: Pilsners, Lagers ligeras, cervezas bajas en alcohol (5-10%). Esencial para cuerpo en cerveza Light. También llamada Cara-Pils o Dextrin Malt. No requiere maceración. Aumenta estabilidad de espuma.",
+      "color_ebc": "3-5",
+      "styles": ["Pilsner", "Light Lager", "Kölsch", "American Lager"]
+    }
+  },
+  "hops": {
+    "cascade": {
+      "name": "Lúpulo Cascade",
+      "description": "Lúpulo americano clásico. Aromas cítricos intensos (pomelo, limón), florales y especiados. Amargor limpio y equilibrado. Alpha 4.5-7%. Perfecta para: American Pale Ale, IPA, Amber Ale. Icónico en Sierra Nevada Pale Ale. Uso: Amargor, sabor y aroma. Excelente dry-hopping. Carácter frutal aumenta con dry-hop. Combinación clásica: Cascade + Centennial.",
+      "alpha_acid": "4.5-7%",
+      "origin": "USA",
+      "styles": ["American Pale Ale", "IPA", "Amber Ale"]
+    },
+    "centennial": {
+      "name": "Lúpulo Centennial",
+      "description": "Lúpulo americano versátil. Aromas cítricos (limón, lima), florales, pino. Amargor pronunciado y limpio. Alpha 9.5-11.5%. Perfecta para: American IPA, Pale Ale, ESB. 'Super Cascade' - similar pero más intenso. Uso: Amargor, sabor, aroma. Excelente balance cítrico/resinoso. Popular en West Coast IPA. Combinación clásica: Centennial + Chinook.",
+      "alpha_acid": "9.5-11.5%",
+      "origin": "USA",
+      "styles": ["IPA", "Pale Ale", "ESB"]
+    },
+    "chinook": {
+      "name": "Lúpulo Chinook",
+      "description": "Lúpulo americano potente. Aromas intensos a pino, resina, especias, pomelo. Amargor robusto. Alpha 11-14%. Perfecta para: IPA, Imperial IPA, Pale Ale. Carácter resinoso distintivo. Uso: Principalmente amargor, también aroma. Puede dominar en exceso. Excelente en American IPA. Combinación clásica: Chinook + Cascade. Notas herbales-especiadas únicas.",
+      "alpha_acid": "11-14%",
+      "origin": "USA",
+      "styles": ["IPA", "Imperial IPA", "Pale Ale"]
+    },
+    "citra": {
+      "name": "Lúpulo Citra",
+      "description": "Lúpulo americano moderno. Aromas explosivos a cítricos tropicales (mango, lichi, maracuyá), pomelo, lima. Alpha 11-13%. Perfecta para: New England IPA, Hazy IPA, Pale Ale. Uno de los más aromáticos. Uso: Principalmente aroma y dry-hop. Carácter frutal intenso sin amargor áspero. Muy popular en IPAs modernas. Combinación: Citra + Mosaic.",
+      "alpha_acid": "11-13%",
+      "origin": "USA",
+      "styles": ["NEIPA", "Hazy IPA", "Pale Ale", "IPA"]
+    },
+    "mosaic": {
+      "name": "Lúpulo Mosaic",
+      "description": "Lúpulo americano complejo. Aromas a frutas tropicales, bayas, pino, cítricos, hierba. Perfil multicapa. Alpha 11.5-13.5%. Perfecta para: IPA, NEIPA, Pale Ale. Extremadamente aromático y versátil. Uso: Sabor, aroma, dry-hop. Combinación perfecta con Citra. Popular en IPAs artesanales. Carácter único 'mosaico' de aromas. Excelente solo o combinado.",
+      "alpha_acid": "11.5-13.5%",
+      "origin": "USA",
+      "styles": ["IPA", "NEIPA", "Pale Ale"]
+    },
+    "simcoe": {
+      "name": "Lúpulo Simcoe",
+      "description": "Lúpulo americano versátil. Aromas a pino, frutas de la pasión, cítricos, tierra. Amargor limpio. Alpha 12-14%. Perfecta para: IPA, Double IPA, Pale Ale. Carácter resinoso distintivo. Uso: Amargor, sabor, aroma. Excelente en dry-hop. Popular en West Coast IPA. Notas de maracuyá únicas. Combinación: Simcoe + Amarillo.",
+      "alpha_acid": "12-14%",
+      "origin": "USA",
+      "styles": ["IPA", "Double IPA", "Pale Ale"]
+    },
+    "amarillo": {
+      "name": "Lúpulo Amarillo",
+      "description": "Lúpulo americano aromático. Aromas florales intensos, naranja, pomelo, albaricoque. Amargor moderado y suave. Alpha 8-11%. Perfecta para: Pale Ale, IPA, Wheat Beer. Muy aromático, bajo amargor áspero. Uso: Principalmente sabor y aroma. Carácter floral-frutal elegante. Popular en American Pale Ale. Combinación: Amarillo + Cascade. Excelente en late-additions.",
+      "alpha_acid": "8-11%",
+      "origin": "USA",
+      "styles": ["Pale Ale", "IPA", "Wheat Beer"]
+    },
+    "saaz": {
+      "name": "Lúpulo Saaz",
+      "description": "Lúpulo noble checo. Aromas suaves, herbales, florales, especiados, terrosos. Amargor delicado. Alpha 2.5-4.5%. Perfecta para: Pilsner checa, Bohemian Lager, Belgian Ale. Lúpulo clásico de Pilsen. Uso: Sabor y aroma principalmente. Muy bajo amargor. Carácter elegante y refinado. Esencial en Pilsner Urquell. Combinación: Saaz solo o con Hallertau. Representa tradición europea.",
+      "alpha_acid": "2.5-4.5%",
+      "origin": "República Checa",
+      "styles": ["Pilsner", "Bohemian Lager", "Belgian Ale"]
+    },
+    "hallertau": {
+      "name": "Lúpulo Hallertau",
+      "description": "Lúpulo noble alemán. Aromas suaves, florales, herbales, especiados. Amargor suave y elegante. Alpha 3.5-5.5%. Perfecta para: German Lager, Pilsner, Wheat Beer, Kölsch. Lúpulo tradicional alemán. Uso: Amargor, sabor, aroma. Carácter refinado y delicado. Esencial en cervecería alemana. Combinación: Hallertau + Tettnang. Variantes: Mittelfrüh, Tradition, Blanc.",
+      "alpha_acid": "3.5-5.5%",
+      "origin": "Alemania",
+      "styles": ["German Lager", "Pilsner", "Hefeweizen", "Kölsch"]
+    }
+  },
+  "yeasts": {
+    "us-05": {
+      "name": "Levadura US-05 (Safale)",
+      "description": "Levadura ale americana seca. Fermentación limpia, neutral, sin ésteres frutales. Atenúa 78-82%. Temperatura ideal: 15-24°C. Perfecta para: American Pale Ale, IPA, Amber Ale, Stout. Resalta lúpulos sin interferir. Floculación media-alta. Sedimenta bien. Rápida y confiable. Equivalente líquida: WLP001/Wyeast 1056. Ideal para principiantes. Versátil para múltiples estilos americanos.",
+      "type": "Ale americana",
+      "attenuation": "78-82%",
+      "temp": "15-24°C",
+      "styles": ["American Pale Ale", "IPA", "Amber Ale", "Stout"]
+    },
+    "s-04": {
+      "name": "Levadura S-04 (Safale)",
+      "description": "Levadura ale británica seca. Perfil levemente frutal (manzana, pera). Atenúa 75-80%. Temperatura: 15-24°C. Perfecta para: English Bitter, ESB, Porter, Stout. Carácter británico clásico. Floculación muy alta. Clarifica rápidamente. Deja cuerpo redondeado. Ésteres moderados. Equivalente líquida: Wyeast 1098. Ideal para cervezas inglesas tradicionales. Resalta maltas.",
+      "type": "Ale británica",
+      "attenuation": "75-80%",
+      "temp": "15-24°C",
+      "styles": ["English Bitter", "ESB", "Porter", "Stout"]
+    },
+    "safale": {
+      "name": "Levaduras Safale (Fermentis)",
+      "description": "Familia de levaduras secas profesionales. Incluye: S-04 (británica), US-05 (americana), S-33 (belga), K-97 (alemana), BE-256 (Abbey). Ventajas: No requiere starter, larga vida útil, resultados consistentes. Rápida rehidratación. Calidad profesional. Ideal para homebrewing. Cada variante optimizada para estilos específicos. Altamente viables y confiables.",
+      "type": "Familia de levaduras secas",
+      "styles": ["Variable según cepa"]
+    },
+    "saflager": {
+      "name": "Levaduras Saflager (Fermentis)",
+      "description": "Familia de levaduras lager secas. Incluye: W-34/70 (alemana), S-23 (alemana, rápida), S-189 (suiza). Fermentación baja 8-15°C. Limpias, crispantes, perfil neutro. Ventajas: No requiere starter, consistentes. Perfectas para: Pilsner, Lager, Bock, Märzen. Requieren fermentación fría y lagering. Atenúan bien. Sedimentan compacto. Ideales para lagers caseras de calidad.",
+      "type": "Familia lager",
+      "temp": "8-15°C",
+      "styles": ["Pilsner", "Lager", "Bock", "Märzen"]
+    },
+    "wyeast": {
+      "name": "Levaduras Wyeast",
+      "description": "Levaduras líquidas premium en Smack Pack. Amplio catálogo (100+ cepas). Incluye: 1056 (American Ale), 1098 (British Ale), 3787 (Belgian), 2124 (Bohemian Lager). Activación integrada. Alta viabilidad. Pureza garantizada. Requiere starter para densidades altas. Más ésteres y complejidad que secas. Favoritas de brewpubs. Perfiles únicos y auténticos. Fecha de caducidad corta.",
+      "type": "Familia líquidas",
+      "styles": ["Variable según cepa"]
+    },
+    "white labs": {
+      "name": "Levaduras White Labs",
+      "description": "Levaduras líquidas premium en vial. Catálogo extenso (80+ cepas). Incluye: WLP001 (California Ale), WLP002 (English Ale), WLP300 (Hefeweizen), WLP830 (German Lager). Alta concentración celular. Pureza excepcional. Requiere starter recomendado. Perfiles auténticos de estilos tradicionales. Calidad laboratorio. Favoritas profesionales. Variabilidad mínima lote a lote. Fecha caducidad 4 meses.",
+      "type": "Familia líquidas",
+      "styles": ["Variable según cepa"]
+    }
+  }
+}

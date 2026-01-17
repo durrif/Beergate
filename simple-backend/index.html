@@ -1,0 +1,3681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión completa de inventario cervecero con IA, elaboración en vivo, fermentación con iSpindel y radio integrada">
+    <meta name="theme-color" content="#d4a574">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80'>🍺</text></svg>">
+    <title>🍺 Beergate - Mi Inventario Cervecero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1410 0%, #2d2419 50%, #3d2f1f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: #f4a259;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #d4a574;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #d4a574 0%, #c8963e 100%);
+            color: #1a1410;
+        }
+        
+        .content {
+            background: linear-gradient(to bottom, #f9f6f0 0%, #ebe4d8 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid #d4a574;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #48bb78;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .inventory-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .inventory-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .inventory-card .quantity {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .inventory-card .category {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .recipe-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .badge-award {
+            background: #ffd700;
+            color: #333;
+        }
+        
+        .badge-trending {
+            background: #f56565;
+            color: white;
+        }
+        
+        .badge-available {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Estilos para categorías de maltas */
+        .category-section {
+            margin-bottom: 30px;
+            background: rgba(212, 165, 116, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #d4a574;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2d2419;
+        }
+
+        .category-toggle {
+            font-size: 1.2em;
+            color: #d4a574;
+        }
+
+        /* Alertas de stock */
+        .alerts-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #d4a574;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .alert-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #f56565;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-critical {
+            border-left-color: #f56565;
+        }
+
+        .alert-warning {
+            border-left-color: #ed8936;
+        }
+
+        .alert-info {
+            border-left-color: #4299e1;
+        }
+
+        /* Tabla de inventario estructurada */
+        .inventory-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+        }
+
+        .inventory-table th {
+            background: linear-gradient(135deg, #d4a574 0%, #c8963e 100%);
+            color: #1a1410;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #2d2419;
+        }
+
+        .inventory-table th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .inventory-table th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        .inventory-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .inventory-table tr:hover td {
+            background: #f7fafc;
+        }
+
+        .inventory-table tr:last-child td:first-child {
+            border-bottom-left-radius: 8px;
+        }
+
+        .inventory-table tr:last-child td:last-child {
+            border-bottom-right-radius: 8px;
+        }
+
+        .editable-field {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .editable-field:hover {
+            background: #edf2f7;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            border: 2px solid #d4a574;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .stock-ok {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .stock-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .stock-critical {
+            background: #fc8181;
+            color: white;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #3182ce;
+        }
+
+        .btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #e53e3e;
+        }
+
+        /* Tooltips informativos con IA */
+        .ingredient-name {
+            position: relative;
+            cursor: help;
+        }
+
+        .ingredient-name:hover {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: #d4a574;
+        }
+
+        .tooltip {
+            position: fixed;
+            background: linear-gradient(135deg, #2d2419 0%, #3d2f1f 100%);
+            color: #f9f6f0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #d4a574;
+            max-width: 400px;
+            font-size: 0.9em;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            color: #d4a574;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .tooltip-desc {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .tooltip-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #d4a574;
+        }
+
+        .tooltip-tag {
+            background: rgba(212, 165, 116, 0.3);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            color: #d4a574;
+        }
+
+        /* Sistema de carga de archivos */
+        .upload-zone {
+            border: 3px dashed #d4a574;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(212, 165, 116, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone:hover {
+            background: rgba(212, 165, 116, 0.15);
+            border-color: #c8963e;
+        }
+
+        .upload-zone.dragging {
+            background: rgba(212, 165, 116, 0.25);
+            border-color: #c8963e;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .file-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .processing-indicator {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4299e1;
+            color: white;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .extracted-items {
+            margin-top: 20px;
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .extracted-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #48bb78;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍺 Beergate</h1>
+            <p>Tu asistente de inventario cervecero</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('inventory')">📦 Inventario</button>
+            <button class="tab" onclick="showTab('purchase')">➕ Nueva Compra</button>
+            <button class="tab" onclick="showTab('brew-session')">🔥 Elaboración en Vivo</button>
+            <button class="tab" onclick="showTab('fermentation')">🧪 Fermentación (iSpindel)</button>
+            <button class="tab" onclick="showTab('radio')">📻 Radio</button>
+            <button class="tab" onclick="showTab('recommendations')">⭐ Recetas Recomendadas</button>
+            <button class="tab" onclick="showTab('ai-assistant')">🤖 Asistente IA</button>
+        </div>
+        
+        <div class="content">
+            <!-- INVENTARIO -->
+            <div id="inventory" class="section active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">Mi Inventario Actual</h2>
+                    <button class="btn btn-success" onclick="showTab('purchase'); document.querySelectorAll('.tab')[1].classList.add('active');">
+                        ➕ Añadir Ingredientes
+                    </button>
+                </div>
+                
+                <div class="stats" id="stats">
+                    <div class="stat-card">
+                        <div class="number" id="total-items">0</div>
+                        <div class="label">Ingredientes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="total-value">0€</div>
+                        <div class="label">Valor Total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="total-purchases">0</div>
+                        <div class="label">Compras</div>
+                    </div>
+                </div>
+
+                <!-- Alertas de Stock -->
+                <div class="alerts-section" id="alerts-section" style="display: none;">
+                    <h3 style="margin-bottom: 15px; color: #2d2419;">⚠️ Alertas de Inventario</h3>
+                    <div id="alerts-container"></div>
+                </div>
+                
+                <!-- Maltas Base -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('base')">
+                        <span class="category-title">🌾 Maltas Base</span>
+                        <span class="category-toggle" id="toggle-base">▼</span>
+                    </div>
+                    <div id="category-base">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad (kg)</th>
+                                    <th>Precio (€/kg)</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-base"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Maltas Especiales -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('special')">
+                        <span class="category-title">✨ Maltas Especiales</span>
+                        <span class="category-toggle" id="toggle-special">▼</span>
+                    </div>
+                    <div id="category-special">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad (kg)</th>
+                                    <th>Precio (€/kg)</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-special"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Otros Cereales -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('others')">
+                        <span class="category-title">🌽 Otros Cereales</span>
+                        <span class="category-toggle" id="toggle-others">▼</span>
+                    </div>
+                    <div id="category-others">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad (kg)</th>
+                                    <th>Precio (€/kg)</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-others"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Lúpulos -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('hops')">
+                        <span class="category-title">🌿 Lúpulos</span>
+                        <span class="category-toggle" id="toggle-hops">▼</span>
+                    </div>
+                    <div id="category-hops">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad (g)</th>
+                                    <th>Precio (€/100g)</th>
+                                    <th>Proveedor</th>
+                                    <th>Caducidad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-hops"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Levaduras -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('yeast')">
+                        <span class="category-title">🧬 Levaduras</span>
+                        <span class="category-toggle" id="toggle-yeast">▼</span>
+                    </div>
+                    <div id="category-yeast">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad (pkt)</th>
+                                    <th>Precio (€/unidad)</th>
+                                    <th>Proveedor</th>
+                                    <th>Caducidad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-yeast"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Otros Ingredientes -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('other')">
+                        <span class="category-title">📦 Otros Ingredientes</span>
+                        <span class="category-toggle" id="toggle-other">▼</span>
+                    </div>
+                    <div id="category-other">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio (€)</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-other"></tbody>
+                        </table>
+                    </div>
+                </div>
+                    <!-- Se llena con JS -->
+                </div>
+            </div>
+            
+            <!-- NUEVA COMPRA -->
+            <div id="purchase" class="section">
+                <h2>Registrar Nueva Compra</h2>
+                
+                <!-- Sistema de carga de archivos -->
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">📤</div>
+                    <h3>Sube tu Factura o Captura</h3>
+                    <p>Arrastra aquí o haz click para subir</p>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        Soporta: PDF, imágenes (JPG, PNG), Word, capturas de pantalla
+                    </p>
+                    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,image/*" style="display: none;" multiple>
+                </div>
+
+                <div id="file-preview" class="file-preview" style="display: none;">
+                    <h4>Archivos cargados:</h4>
+                    <div id="files-list"></div>
+                    <button class="btn" onclick="analyzeInvoices()">🔍 Analizar Facturas</button>
+                </div>
+
+                <div id="processing" style="display: none; text-align: center;">
+                    <div class="processing-indicator">
+                        <span>⏳ Procesando facturas...</span>
+                    </div>
+                </div>
+
+                <div id="extracted-items" class="extracted-items" style="display: none;">
+                    <h3>✅ Items Extraídos de las Facturas</h3>
+                    <p style="margin-bottom: 15px;">Revisa y confirma los datos antes de guardar</p>
+                    <div id="extracted-list"></div>
+                </div>
+
+                <hr style="margin: 30px 0; border: none; border-top: 2px solid #e2e8f0;">
+                
+                <!-- Formulario manual (como backup) -->
+                <details>
+                    <summary style="cursor: pointer; font-size: 1.1em; font-weight: bold; margin-bottom: 20px;">
+                        📝 O introduce manualmente
+                    </summary>
+                
+                <form id="purchase-form">
+                    <div class="form-group">
+                        <label>📅 Fecha</label>
+                        <input type="date" id="purchase-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🏪 Proveedor</label>
+                        <input type="text" id="supplier" placeholder="Ej: Maltosaa, Cervezodromo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📝 Notas de la factura</label>
+                        <textarea id="invoice-notes" rows="4" placeholder="Notas adicionales..."></textarea>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">Ingredientes Comprados</h3>
+                    
+                    <div id="items-container">
+                        <div class="item-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" placeholder="Nombre del ingrediente" class="item-name" required>
+                            <select class="item-category" onchange="updateUnit(this)" required>
+                                <option value="">Categoría</option>
+                                <option value="malt">🌾 Malta</option>
+                                <option value="hop">🌿 Lúpulo</option>
+                                <option value="yeast">🧬 Levadura</option>
+                                <option value="other">📦 Otro</option>
+                            </select>
+                            <input type="number" step="0.01" placeholder="Cantidad" class="item-quantity" required>
+                            <select class="item-unit">
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="l">litros</option>
+                                <option value="ml">ml</option>
+                                <option value="pkt">paquete</option>
+                                <option value="unidad">unidad</option>
+                            </select>
+                            <input type="number" step="0.01" placeholder="Precio €/unidad" class="item-cost">
+                            <input type="date" placeholder="Caducidad" class="item-expiry" title="Fecha de caducidad (lúpulos/levaduras)">
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn" onclick="addItemRow()" style="margin-bottom: 20px;">➕ Añadir Línea</button>
+                    
+                    <div class="form-group">
+                        <label>💰 Coste Total (€)</label>
+                        <input type="number" step="0.01" id="total-cost" placeholder="0.00">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Guardar Compra</button>
+                </form>
+                </details>
+                
+                <!-- Ayuda para archivos GIMP -->
+                <details style="margin-top: 20px; padding: 15px; background: rgba(212, 165, 116, 0.1); border: 1px dashed #d4a574; border-radius: 8px;">
+                <summary style="cursor: pointer; font-weight: bold; color: #d4a574;">❓ ¿Tienes un archivo .xcf de GIMP?</summary>
+                <div style="margin-top: 10px; line-height: 1.6;">
+                    <p><strong>Para convertir tu archivo GIMP a imagen:</strong></p>
+                    <ol style="margin-left: 20px;">
+                        <li>Abre el archivo .xcf en GIMP</li>
+                        <li>Ve a <strong>Archivo → Exportar como...</strong></li>
+                        <li>Cambia la extensión a <strong>.png</strong> o <strong>.jpg</strong></li>
+                        <li>Haz clic en <strong>Exportar</strong></li>
+                        <li>Sube el archivo PNG/JPG aquí arriba ⬆️</li>
+                    </ol>
+                    <p style="margin-top: 10px; color: #d4a574;">
+                        💡 <strong>Tip:</strong> Si tienes la factura original en PDF, súbela directamente - funciona mejor para OCR.
+                    </p>
+                </div>
+                </details>
+            </div>
+            
+            <!-- FERMENTACIÓN CON ISPINDEL -->
+            <div id="fermentation" class="section">
+                <h2>🧪 Monitoreo de Fermentación con iSpindel</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <!-- Card Temperatura -->
+                    <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 10px;">🌡️ Temperatura</div>
+                        <div id="ispindel-temp" style="font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace;">--°C</div>
+                    </div>
+                    
+                    <!-- Card Gravedad -->
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 10px;">📊 Gravedad Específica</div>
+                        <div id="ispindel-gravity" style="font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace;">1.---</div>
+                    </div>
+                    
+                    <!-- Card Ángulo -->
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 10px;">📐 Ángulo</div>
+                        <div id="ispindel-tilt" style="font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace;">--°</div>
+                    </div>
+                    
+                    <!-- Card Batería -->
+                    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <div style="font-size: 16px; opacity: 0.9; margin-bottom: 10px;">🔋 Batería</div>
+                        <div id="ispindel-battery" style="font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace;">--.--V</div>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Fermentación -->
+                <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0;">📈 Evolución de Fermentación (últimas 48h)</h3>
+                    <canvas id="fermentation-chart" width="800" height="400"></canvas>
+                </div>
+                
+                <!-- Estado y Alertas -->
+                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0;">⚠️ Alertas y Estado</h3>
+                    <div id="fermentation-alerts" style="min-height: 100px;">
+                        <div style="text-align: center; color: #999; padding: 30px;">
+                            Cargando datos del iSpindel...
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <strong>📡 iSpindel Verde</strong><br>
+                        <small style="color: #666;">Última actualización: <span id="ispindel-lastupdate">--</span></small><br>
+                        <small style="color: #666;">Señal WiFi: <span id="ispindel-rssi">--</span> dBm</small>
+                    </div>
+                    
+                    <button onclick="refreshIspindelData()" class="btn btn-success" style="width: 100%; margin-top: 15px; padding: 12px; font-size: 16px;">
+                        🔄 Actualizar Datos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- MÚSICA INTELIGENTE -->
+            <div id="radio" class="section">
+                <h2>🎵 Música para Elaborar</h2>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>🧠 Modo Inteligente:</strong> La música se adapta automáticamente a la hora del día y tu fase de elaboración
+                </div>
+                
+                <!-- Reproductor Principal -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                    <div id="now-playing" style="font-size: 24px; margin-bottom: 20px;">
+                        🎵 <span id="mood-name">Selecciona un ambiente</span>
+                    </div>
+                    <div id="current-mood-description" style="font-size: 14px; opacity: 0.9; margin-bottom: 15px;"></div>
+                    
+                    <div style="font-size: 48px; margin: 30px 0;">
+                        <span id="radio-icon">📻</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
+                        <button id="play-btn" onclick="playRadio()" class="btn" style="font-size: 24px; padding: 20px 40px; background: #4CAF50; display: none;">
+                            ▶️ Play
+                        </button>
+                        <button id="pause-btn" onclick="pauseRadio()" class="btn" style="font-size: 24px; padding: 20px 40px; background: #ff6b6b; display: none;">
+                            ⏸️ Pause
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <label style="display: block; margin-bottom: 15px; font-size: 18px;">🔊 Volumen</label>
+                        <input type="range" id="radio-volume" min="0" max="100" value="70" 
+                               onchange="updateRadioVolume(this.value)" 
+                               style="width: 80%; max-width: 400px; height: 8px;">
+                        <div id="volume-value" style="margin-top: 10px; font-size: 20px;">70%</div>
+                    </div>
+                </div>
+                
+                <!-- Ambientes Musicales -->
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0;">🎭 Ambientes según tu Momento</h3>
+                    
+                    <div id="mood-suggestions" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <!-- Se llena con JavaScript -->
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                        <!-- Mañana Activa -->
+                        <div class="mood-card" onclick="selectMood('morning')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">☀️</div>
+                            <div style="font-size: 20px; font-weight: bold;">Mañana Activa</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Rock, indie y energía (6h-12h)</div>
+                        </div>
+                        
+                        <!-- Tarde Concentración -->
+                        <div class="mood-card" onclick="selectMood('afternoon')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">☕</div>
+                            <div style="font-size: 20px; font-weight: bold;">Tarde Concentración</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Lofi, jazz y ambiente (12h-18h)</div>
+                        </div>
+                        
+                        <!-- Noche Relajada -->
+                        <div class="mood-card" onclick="selectMood('evening')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🌙</div>
+                            <div style="font-size: 20px; font-weight: bold;">Noche Relajada</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Ambient, clásica y chill (18h-24h)</div>
+                        </div>
+                        
+                        <!-- Hervor Intenso -->
+                        <div class="mood-card" onclick="selectMood('boiling')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🔥</div>
+                            <div style="font-size: 20px; font-weight: bold;">Hervor Intenso</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Rock, metal y energía alta</div>
+                        </div>
+                        
+                        <!-- Maceración Zen -->
+                        <div class="mood-card" onclick="selectMood('mashing')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🧘</div>
+                            <div style="font-size: 20px; font-weight: bold;">Maceración Zen</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Clásica y meditativa</div>
+                        </div>
+                        
+                        <!-- Limpieza Feliz -->
+                        <div class="mood-card" onclick="selectMood('cleaning')" style="cursor: pointer; padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; transition: transform 0.2s;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">🧼</div>
+                            <div style="font-size: 20px; font-weight: bold;">Limpieza Feliz</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Pop, reggae y buen rollo</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    .mood-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                    }
+                </style>
+            </div>
+            
+            <!-- ELABORACIÓN EN VIVO -->
+            <div id="brew-session" class="section">
+                <h2>🔥 Sesión de Elaboración en Tiempo Real</h2>
+                
+                <!-- Selección de Receta -->
+                <div id="recipe-selector" style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3>1️⃣ Selecciona la Receta a Elaborar</h3>
+                    <select id="brew-recipe-select" style="width: 100%; padding: 12px; font-size: 16px; margin: 10px 0;">
+                        <option value="">-- Selecciona una receta --</option>
+                    </select>
+                    <button onclick="loadBrewRecipe()" class="btn btn-success" style="width: 100%; padding: 15px; font-size: 18px;">
+                        ▶️ Cargar Receta
+                    </button>
+                </div>
+
+                <!-- Control de Sesión -->
+                <div id="brew-control" style="display: none; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 18px; opacity: 0.9; margin-bottom: 10px;">⏱️ Tiempo Total: <span id="total-timer-display">00:00:00</span></div>
+                    <h1 id="brew-timer-display" style="font-size: 72px; margin: 20px 0; font-family: 'Courier New', monospace; text-shadow: 3px 3px 6px rgba(0,0,0,0.3);">00:00:00</h1>
+                    <div style="font-size: 24px; margin-bottom: 20px;" id="current-step-name">Preparando...</div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="startBrewTimer()" class="btn btn-success" style="font-size: 20px; padding: 15px 30px;">
+                            ▶️ Iniciar
+                        </button>
+                        <button onclick="pauseBrewTimer()" class="btn" style="font-size: 20px; padding: 15px 30px; background: #ffa500;">
+                            ⏸️ Pausar
+                        </button>
+                        <button onclick="resumeBrewTimer()" class="btn" style="font-size: 20px; padding: 15px 30px; background: #4CAF50;">
+                            ▶️ Reanudar
+                        </button>
+                        <button onclick="stopBrewSession()" class="btn" style="font-size: 20px; padding: 15px 30px; background: #dc3545;">
+                            ⏹️ Finalizar
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 10px;">🔊 Volumen de Alertas:</label>
+                        <input type="range" id="alert-volume" min="0" max="100" value="80" 
+                               onchange="updateAlertVolume(this.value)" 
+                               style="width: 300px; max-width: 100%;">
+                        <span id="volume-display" style="margin-left: 10px; font-size: 18px;">80%</span>
+                    </div>
+                </div>
+
+                <!-- Pasos de la Elaboración -->
+                <div id="brew-steps-container" style="display: none;">
+                    <h3>📋 Pasos de la Elaboración</h3>
+                    <div id="brew-steps-list" style="background: white; padding: 20px; border-radius: 10px;">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Notas de la Sesión -->
+                <div id="brew-notes-section" style="display: none; margin-top: 20px;">
+                    <h3>📝 Notas de Elaboración</h3>
+                    <textarea id="brew-notes" 
+                              placeholder="Anota temperaturas, observaciones, tiempos reales, etc..." 
+                              style="width: 100%; min-height: 150px; padding: 15px; border-radius: 10px; border: 2px solid #ddd; font-size: 16px;"></textarea>
+                    <button onclick="saveBrewNotes()" class="btn" style="margin-top: 10px;">
+                        💾 Guardar Notas
+                    </button>
+                </div>
+            </div>
+            
+            <!-- RECOMENDACIONES -->
+            <div id="recommendations" class="section">
+                <h2>📊 Mis Recetas y Estadísticas</h2>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>🔗 Tu perfil Brewer's Friend:</strong>
+                            <a href="https://www.brewersfriend.com/homebrew/brewer/384964/durrif" target="_blank">
+                                Ver perfil completo
+                            </a>
+                        </div>
+                        <button class="btn" onclick="syncRecipes()">🔄 Sincronizar Recetas</button>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas -->
+                <div id="recipe-stats" class="stats" style="margin-bottom: 30px;">
+                    <!-- Se llena con JS -->
+                </div>
+                
+                <!-- Insights de Estilos -->
+                <div id="style-insights" style="margin-bottom: 30px;">
+                    <h3>🏆 Estilos que Más Elaboras</h3>
+                    <div id="style-chart" style="background: #f7fafc; padding: 20px; border-radius: 10px;">
+                        <!-- Se llena con JS -->
+                    </div>
+                </div>
+                
+                <!-- Lista de Recetas -->
+                <h3>📚 Tus Recetas</h3>
+                <div id="recommendations-list">
+                    <p style="text-align: center; color: #999; padding: 40px;">
+                        Cargando recetas...
+                    </p>
+                </div>
+            </div>
+
+            <!-- ASISTENTE IA -->
+            <div id="ai-assistant" class="section">
+                <h2>🤖 Asistente Cervecero con IA</h2>
+                
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 10px 0; color: white;">✨ ¿Qué quieres elaborar hoy?</h3>
+                    <p style="margin: 0; opacity: 0.9;">
+                        Cuéntame qué estilo de cerveza quieres hacer y te ayudaré con:
+                    </p>
+                    <ul style="margin: 10px 0 0 20px; opacity: 0.9;">
+                        <li>Análisis y correcciones del estilo</li>
+                        <li>Recomendación de lúpulos según tu inventario</li>
+                        <li>Ingredientes que caducan pronto (¡úsalos primero!)</li>
+                        <li>Recetas de campeones de concursos mundiales</li>
+                        <li>Ajuste de sales para tu agua de Valsaín</li>
+                        <li>Cálculo automático de cantidades</li>
+                    </ul>
+                </div>
+
+                <!-- Chat Area -->
+                <div id="chat-container" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 20px; min-height: 400px; max-height: 600px; overflow-y: auto;">
+                    <div id="chat-messages">
+                        <div class="ai-message" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <strong style="color: #667eea;">🤖 Asistente:</strong>
+                            <p style="margin: 10px 0 0 0;">¡Hola! Soy tu asistente cervecero. Tengo acceso a tu inventario completo, las fechas de caducidad de tus ingredientes y el análisis de agua de Valsaín.</p>
+                            <p style="margin: 10px 0 0 0;">Dime qué estilo de cerveza quieres hacer o pídeme una receta de aprovechamiento con ingredientes que caducan pronto.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="user-prompt" 
+                             placeholder="Ej: Quiero hacer una IPA americana con Citra y Mosaic. ¿Qué me recomiendas?" 
+                             style="flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 10px; resize: vertical; min-height: 80px; font-size: 16px;"></textarea>
+                    <button onclick="askAI()" 
+                            class="btn btn-success" 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 15px 30px; height: fit-content; white-space: nowrap;">
+                        🚀 Consultar IA
+                    </button>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="ai-loading" style="display: none; text-align: center; padding: 20px; color: #667eea;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+                    <p>Analizando tu inventario y buscando la mejor receta...</p>
+                </div>
+
+                <!-- Recipe Display Area -->
+                <div id="ai-recipe-result" style="margin-top: 20px;">
+                    <!-- Aquí se mostrará la receta generada -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentConversationId = null;  // Guardar conversation_id actual
+        let currentRecipeData = null;  // Guardar datos de receta actual
+        
+        // Navegación entre tabs
+        function showTab(tabName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'inventory') loadInventory();
+            if (tabName === 'recommendations') loadRecommendations();
+            if (tabName === 'fermentation') refreshIspindelData();
+        }
+        
+        // Categorías de malta según estándares cerveceros
+        const MALT_CATEGORIES = {
+            base: ['Pale Ale', 'Pilsner', 'Pilsen', 'Lager', 'Vienna', 'Munich', 'Maris Otter', 'Golden Promise'],
+            special: ['Crystal', 'Caramel', 'Chocolate', 'Cara', 'Biscuit', 'Aromatic', 'Aroma', 'Melanoidin', 'Melano', 'Special B', 'Brown Malt', 'Amber'],
+            others: ['Wheat', 'Trigo', 'Roasted', 'Barley', 'Cebada', 'Flaked', 'Oat', 'Avena', 'Rye', 'Centeno', 'Corn', 'Maíz', 'Rice', 'Arroz']
+        };
+
+        function getMaltCategory(name) {
+            const nameLower = name.toLowerCase();
+            for (const [category, keywords] of Object.entries(MALT_CATEGORIES)) {
+                if (keywords.some(keyword => nameLower.includes(keyword.toLowerCase()))) {
+                    return category;
+                }
+            }
+            return 'others';
+        }
+
+        function toggleCategory(category) {
+            const content = document.getElementById(`category-${category}`);
+            const toggle = document.getElementById(`toggle-${category}`);
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = '▶';
+            }
+        }
+
+        // Cargar inventario
+        async function loadInventory() {
+            try {
+                const response = await fetch(`${API_URL}/inventory`);
+                const data = await response.json();
+                
+                // Actualizar estadísticas
+                document.getElementById('total-items').textContent = data.total_items;
+                document.getElementById('total-value').textContent = data.total_value.toFixed(2) + '€';
+                
+                // Obtener número de compras
+                const purchasesRes = await fetch(`${API_URL}/purchases`);
+                const purchasesData = await purchasesRes.json();
+                document.getElementById('total-purchases').textContent = purchasesData.total_purchases;
+                
+                // Clasificar ingredientes por categoría
+                const categorized = {
+                    base: [],
+                    special: [],
+                    others: [],
+                    hops: [],
+                    yeast: [],
+                    other: []
+                };
+
+                data.items.forEach(item => {
+                    if (item.category === 'hop') {
+                        categorized.hops.push(item);
+                    } else if (item.category === 'yeast') {
+                        categorized.yeast.push(item);
+                    } else if (item.category === 'other') {
+                        categorized.other.push(item);
+                    } else if (item.category === 'malt') {
+                        const maltCategory = getMaltCategory(item.name);
+                        categorized[maltCategory].push(item);
+                    } else {
+                        categorized.other.push(item);
+                    }
+                });
+
+                // Renderizar por categoría
+                ['base', 'special', 'others', 'hops', 'yeast', 'other'].forEach(category => {
+                    renderCategoryInventory(category, categorized[category]);
+                });
+
+                // Generar alertas
+                generateAlerts(data.items);
+                
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                alert('Error al cargar inventario');
+            }
+        }
+
+        function renderCategoryInventory(category, items) {
+            const tbody = document.getElementById(`inventory-${category}`);
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999; padding: 20px;">No hay items en esta categoría</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = items.map(item => {
+                const stockClass = item.quantity > 5 ? 'stock-ok' : item.quantity > 2 ? 'stock-low' : 'stock-critical';
+                const stockLabel = item.quantity > 5 ? 'OK' : item.quantity > 2 ? 'Bajo' : 'Crítico';
+                
+                // Determinar la categoría para el tooltip
+                let tooltipCategory = 'malt';
+                if (category === 'hops') tooltipCategory = 'hops';
+                else if (category === 'yeast') tooltipCategory = 'yeast';
+                else if (category === 'other') tooltipCategory = 'other';
+                
+                // Calcular precio correcto según categoría
+                let displayPrice = item.cost;
+                if (category === 'hops') {
+                    // Para lúpulos, cost es precio por 100g
+                    displayPrice = item.cost;
+                } else if (category === 'yeast') {
+                    // Para levaduras, cost es precio por paquete
+                    displayPrice = item.cost;
+                }
+                
+                // Formatear fecha de caducidad si existe
+                const expiryDisplay = item.expiry_date ? 
+                    new Date(item.expiry_date).toLocaleDateString('es-ES') : 
+                    '-';
+                
+                // Calcular si está próximo a caducar (30 días)
+                let expiryClass = '';
+                if (item.expiry_date) {
+                    const daysToExpiry = Math.floor((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysToExpiry < 0) expiryClass = 'stock-critical';
+                    else if (daysToExpiry < 30) expiryClass = 'stock-low';
+                    else expiryClass = 'stock-ok';
+                }
+                
+                return `
+                    <tr>
+                        <td>
+                            <strong class="ingredient-name" 
+                                    onmouseenter="showTooltip(event, '${item.name.replace(/'/g, "\\'")}', '${tooltipCategory}')"
+                                    onmouseleave="hideTooltip()">
+                                ${item.name}
+                            </strong>
+                        </td>
+                        <td>
+                            <span class="editable-field" onclick="editField('${item.id}', 'quantity', ${item.quantity})">
+                                ${item.quantity.toFixed(2)}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="editable-field" onclick="editField('${item.id}', 'cost', ${displayPrice})">
+                                ${displayPrice.toFixed(2)}${category === 'hops' ? ` <small>(${(displayPrice * 10).toFixed(2)}€/kg)</small>` : ''}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="editable-field" onclick="editField('${item.id}', 'supplier', '${item.supplier || 'N/A'}')">
+                                ${item.supplier || 'N/A'}
+                            </span>
+                        </td>
+                        ${(category === 'hops' || category === 'yeast') ? `
+                        <td>
+                            <span class="stock-badge ${expiryClass}" style="cursor: pointer;" 
+                                  onclick="editField('${item.id}', 'expiry_date', '${item.expiry_date || ''}')">
+                                ${expiryDisplay}
+                            </span>
+                        </td>
+                        ` : ''}
+                        <td><span class="stock-badge ${stockClass}">${stockLabel}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon btn-edit" onclick="openEditModal('${item.id}')" title="Editar todo">✏️</button>
+                                <button class="btn-icon btn-delete" onclick="deleteItem('${item.id}')" title="Eliminar">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function generateAlerts(items) {
+            const alertsContainer = document.getElementById('alerts-container');
+            const alertsSection = document.getElementById('alerts-section');
+            
+            const alerts = [];
+
+            // Alertas para maltas base con stock crítico
+            items.forEach(item => {
+                const category = getMaltCategory(item.name);
+                if (category === 'base' && item.quantity < 3) {
+                    alerts.push({
+                        type: 'critical',
+                        icon: '🚨',
+                        message: `<strong>${item.name}</strong> está en stock crítico (${item.quantity.toFixed(2)} kg)`,
+                        action: 'Reabastecer urgente'
+                    });
+                } else if (item.quantity < 5 && item.quantity >= 2) {
+                    alerts.push({
+                        type: 'warning',
+                        icon: '⚠️',
+                        message: `<strong>${item.name}</strong> tiene stock bajo (${item.quantity.toFixed(2)} kg)`,
+                        action: 'Considerar reposición'
+                    });
+                }
+            });
+
+            if (alerts.length === 0) {
+                alertsSection.style.display = 'none';
+                return;
+            }
+
+            alertsSection.style.display = 'block';
+            alertsContainer.innerHTML = alerts.map(alert => `
+                <div class="alert-item alert-${alert.type}">
+                    <div>
+                        <span style="font-size: 1.2em; margin-right: 10px;">${alert.icon}</span>
+                        <span>${alert.message}</span>
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">${alert.action}</div>
+                </div>
+            `).join('');
+        }
+
+        async function editField(itemId, field, currentValue) {
+            const newValue = prompt(`Editar ${field}:`, currentValue);
+            if (newValue === null || newValue === currentValue) return;
+
+            try {
+                const parsedValue = field === 'supplier' ? newValue : parseFloat(newValue);
+                const response = await fetch(`${API_URL}/inventory/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: parsedValue })
+                });
+
+                if (response.ok) {
+                    loadInventory();
+                } else {
+                    alert('Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar');
+            }
+        }
+
+        async function deleteItem(itemId) {
+            if (!confirm('¿Eliminar este ingrediente del inventario?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/inventory/${itemId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadInventory();
+                } else {
+                    alert('Error al eliminar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar');
+            }
+        }
+
+        async function openEditModal(itemId) {
+            // Buscar el item en el inventario actual
+            const response = await fetch(`${API_URL}/inventory`);
+            const data = await response.json();
+            const item = data.items.find(i => i.id === itemId);
+            
+            if (!item) {
+                alert('Item no encontrado');
+                return;
+            }
+
+            // Crear modal simple con prompts
+            const newQuantity = prompt(`Cantidad (${item.unit}):`, item.quantity);
+            if (newQuantity === null) return;
+            
+            const newCost = prompt('Costo (€/unidad):', item.cost);
+            if (newCost === null) return;
+            
+            const newSupplier = prompt('Proveedor:', item.supplier || 'Por definir');
+            if (newSupplier === null) return;
+
+            const updates = {
+                quantity: parseFloat(newQuantity),
+                cost: parseFloat(newCost),
+                supplier: newSupplier
+            };
+
+            // Añadir fecha de caducidad si es lúpulo o levadura
+            if (item.category === 'hop' || item.category === 'yeast') {
+                const newExpiry = prompt('Fecha de caducidad (YYYY-MM-DD):', item.expiry_date || '');
+                if (newExpiry !== null && newExpiry.trim() !== '') {
+                    updates.expiry_date = newExpiry;
+                }
+            }
+
+            try {
+                const updateResponse = await fetch(`${API_URL}/inventory/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+
+                if (updateResponse.ok) {
+                    loadInventory();
+                    alert('✅ Item actualizado correctamente');
+                } else {
+                    alert('Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar');
+            }
+        }
+        
+        function getCategoryEmoji(category) {
+            const emojis = {
+                malt: '🌾',
+                hop: '🌿',
+                yeast: '🧬',
+                other: '📦'
+            };
+            return emojis[category] || '📦';
+        }
+        
+        // Actualizar unidad según categoría
+        function updateUnit(selectElement) {
+            const row = selectElement.closest('.item-row');
+            const unitSelect = row.querySelector('.item-unit');
+            const category = selectElement.value;
+            
+            // Establecer unidad predeterminada según categoría
+            if (category === 'malt') {
+                unitSelect.value = 'kg';
+            } else if (category === 'hop') {
+                unitSelect.value = 'g';
+            } else if (category === 'yeast') {
+                unitSelect.value = 'pkt';
+            } else {
+                unitSelect.value = 'unidad';
+            }
+        }
+        
+        // Añadir línea de item
+        function addItemRow() {
+            const container = document.getElementById('items-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.style = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Nombre del ingrediente" class="item-name" required>
+                <select class="item-category" onchange="updateUnit(this)" required>
+                    <option value="">Categoría</option>
+                    <option value="malt">🌾 Malta</option>
+                    <option value="hop">🌿 Lúpulo</option>
+                    <option value="yeast">🧬 Levadura</option>
+                    <option value="other">📦 Otro</option>
+                </select>
+                <input type="number" step="0.01" placeholder="Cantidad" class="item-quantity" required>
+                <select class="item-unit">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="l">litros</option>
+                    <option value="ml">ml</option>
+                    <option value="pkt">paquete</option>
+                    <option value="unidad">unidad</option>
+                </select>
+                <input type="number" step="0.01" placeholder="Precio €/unidad" class="item-cost">
+                <input type="date" placeholder="Caducidad" class="item-expiry" title="Fecha de caducidad (lúpulos/levaduras)">
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()" style="padding: 12px;">🗑️</button>
+            `;
+            container.appendChild(newRow);
+        }
+        
+        // Guardar compra
+        document.getElementById('purchase-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const supplier = document.getElementById('supplier').value;
+            const items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                const name = row.querySelector('.item-name').value;
+                const category = row.querySelector('.item-category').value;
+                const quantity = parseFloat(row.querySelector('.item-quantity').value);
+                const unit = row.querySelector('.item-unit').value;
+                const cost = parseFloat(row.querySelector('.item-cost').value) || 0;
+                const expiry_date = row.querySelector('.item-expiry')?.value || null;
+                
+                if (name && category && quantity) {
+                    items.push({ name, category, quantity, unit, cost, expiry_date, supplier });
+                }
+            });
+            
+            if (items.length === 0) {
+                alert('Añade al menos un ingrediente');
+                return;
+            }
+            
+            const purchase = {
+                date: document.getElementById('purchase-date').value,
+                supplier: document.getElementById('supplier').value,
+                items: items,
+                total_cost: parseFloat(document.getElementById('total-cost').value) || 0,
+                notes: document.getElementById('invoice-notes').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/purchases`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(purchase)
+                });
+                
+                if (response.ok) {
+                    alert('✅ Compra guardada e inventario actualizado!');
+                    document.getElementById('purchase-form').reset();
+                    document.getElementById('items-container').innerHTML = `
+                        <div class="item-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" placeholder="Nombre del ingrediente" class="item-name" required>
+                            <select class="item-category" onchange="updateUnit(this)" required>
+                                <option value="">Categoría</option>
+                                <option value="malt">🌾 Malta</option>
+                                <option value="hop">🌿 Lúpulo</option>
+                                <option value="yeast">🧬 Levadura</option>
+                                <option value="other">📦 Otro</option>
+                            </select>
+                            <input type="number" step="0.01" placeholder="Cantidad" class="item-quantity" required>
+                            <select class="item-unit">
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="l">litros</option>
+                                <option value="ml">ml</option>
+                                <option value="pkt">paquete</option>
+                                <option value="unidad">unidad</option>
+                            </select>
+                            <input type="number" step="0.01" placeholder="Precio €/unidad" class="item-cost">
+                            <button type="button" onclick="this.parentElement.remove()" style="background: #dc3545; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer;">🗑️</button>
+                        </div>
+                    `;
+                    // Volver a inventario
+                    showTab('inventory');
+                    document.querySelectorAll('.tab')[0].classList.add('active');
+                } else {
+                    alert('Error al guardar la compra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            }
+        });
+        
+        // Sincronizar recetas desde Brewer's Friend
+        async function syncRecipes() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Sincronizando...';
+            
+            try {
+                const response = await fetch(`${API_URL}/recipes/sync`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('❌ ' + data.error);
+                } else {
+                    alert(`✅ Sincronizadas ${data.total} recetas!`);
+                    loadRecommendations();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al sincronizar recetas');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 Sincronizar Recetas';
+            }
+        }
+        
+        // Calcular coste de una receta
+        function calculateRecipeCost(recipe) {
+            let maltsCost = 0;
+            let hopsCost = 0;
+            let yeastCost = 0;
+            
+            // Maltas
+            if (recipe.malts && Array.isArray(recipe.malts)) {
+                recipe.malts.forEach(malt => {
+                    const inventoryItem = inventory.find(i => 
+                        i.name.toLowerCase().includes(malt.name.toLowerCase()) || 
+                        malt.name.toLowerCase().includes(i.name.toLowerCase())
+                    );
+                    if (inventoryItem && inventoryItem.cost) {
+                        maltsCost += malt.amount_kg * inventoryItem.cost;
+                    }
+                });
+            }
+            
+            // Lúpulos
+            if (recipe.hops && Array.isArray(recipe.hops)) {
+                recipe.hops.forEach(hop => {
+                    const inventoryItem = inventory.find(i => 
+                        i.name.toLowerCase().includes(hop.name.toLowerCase()) || 
+                        hop.name.toLowerCase().includes(i.name.toLowerCase())
+                    );
+                    if (inventoryItem && inventoryItem.cost) {
+                        hopsCost += (hop.amount_g / 1000) * inventoryItem.cost;
+                    }
+                });
+            }
+            
+            // Levadura
+            if (recipe.yeast) {
+                const yeastName = recipe.yeast.name || '';
+                const inventoryItem = inventory.find(i => 
+                    i.name.toLowerCase().includes(yeastName.toLowerCase()) || 
+                    yeastName.toLowerCase().includes(i.name.toLowerCase())
+                );
+                if (inventoryItem && inventoryItem.cost) {
+                    // Extraer cantidad si está en el string (ej: "2 paquetes")
+                    const amountMatch = recipe.yeast.amount?.match(/(\d+\.?\d*)/);
+                    const amount = amountMatch ? parseFloat(amountMatch[1]) : 1;
+                    yeastCost += amount * inventoryItem.cost;
+                }
+            }
+            
+            return {
+                malts: maltsCost.toFixed(2),
+                hops: hopsCost.toFixed(2),
+                yeast: yeastCost.toFixed(2),
+                total: (maltsCost + hopsCost + yeastCost).toFixed(2)
+            };
+        }
+        
+        // Cargar recomendaciones
+        async function loadRecommendations() {
+            try {
+                // Obtener insights
+                const insightsRes = await fetch(`${API_URL}/recipes/insights`);
+                const insights = await insightsRes.json();
+                
+                // Obtener recetas
+                const recipesRes = await fetch(`${API_URL}/recipes`);
+                const recipesData = await recipesRes.json();
+                
+                // Mostrar estadísticas
+                displayStats(insights);
+                
+                // Mostrar insights de estilos
+                displayStyleInsights(insights);
+                
+                // Mostrar recetas
+                displayRecipes(recipesData.recipes);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('recommendations-list').innerHTML = `
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; text-align: center;">
+                        <p><strong>⚠️ Aún no hay recetas sincronizadas</strong></p>
+                        <p>Haz clic en "Sincronizar Recetas" para obtener tus recetas de Brewer's Friend</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayStats(insights) {
+            const statsDiv = document.getElementById('recipe-stats');
+            if (!insights || insights.error) {
+                statsDiv.innerHTML = '';
+                return;
+            }
+            
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${insights.total_recipes || 0}</div>
+                    <div class="label">Recetas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${insights.styles?.total_styles || 0}</div>
+                    <div class="label">Estilos Diferentes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${insights.averages?.abv || 0}%</div>
+                    <div class="label">ABV Promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${insights.averages?.ibu || 0}</div>
+                    <div class="label">IBU Promedio</div>
+                </div>
+            `;
+        }
+        
+        function displayStyleInsights(insights) {
+            const chartDiv = document.getElementById('style-chart');
+            if (!insights || !insights.styles || insights.error) {
+                chartDiv.innerHTML = '<p style="text-align: center; color: #999;">No hay datos de estilos</p>';
+                return;
+            }
+            
+            const topStyles = insights.styles.most_common || [];
+            const maxCount = topStyles[0] ? topStyles[0][1] : 1;
+            
+            let html = '';
+            topStyles.slice(0, 8).forEach(([style, count]) => {
+                const percentage = (count / maxCount) * 100;
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: bold;">${style}</span>
+                            <span style="color: #667eea;">${count} recetas</span>
+                        </div>
+                        <div style="background: #e2e8f0; height: 20px; border-radius: 10px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: ${percentage}%; transition: width 0.5s;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            chartDiv.innerHTML = html;
+        }
+        
+        function displayRecipes(recipes) {
+            const container = document.getElementById('recommendations-list');
+            
+            if (!recipes || recipes.length === 0) {
+                container.innerHTML = `
+                    <div style="background: #f7fafc; padding: 40px; border-radius: 10px; text-align: center;">
+                        <p style="color: #999;">No hay recetas disponibles</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            recipes.slice(0, 20).forEach(recipe => {
+                const hasFullDetails = recipe.malts && recipe.hops && recipe.yeast;
+                
+                // CALCULAR COSTE TOTAL
+                const cost = calculateRecipeCost(recipe);
+                
+                html += `
+                    <div class="recipe-card" style="padding: 20px;">
+                        <h3>🍺 ${recipe.name || 'Sin nombre'}</h3>
+                        <div style="margin: 10px 0;">
+                            <span class="badge" style="background: #667eea; color: white;">${recipe.style || 'Unknown'}</span>
+                            ${recipe.type ? `<span class="badge" style="background: #805ad5; color: white;">${recipe.type}</span>` : ''}
+                            ${recipe.batch_size ? `<span class="badge" style="background: #38b2ac; color: white;">📦 ${recipe.batch_size}L</span>` : ''}
+                            ${recipe.abv ? `<span class="badge" style="background: #48bb78; color: white;">ABV: ${recipe.abv}%</span>` : ''}
+                            ${recipe.ibu ? `<span class="badge" style="background: #f56565; color: white;">IBU: ${recipe.ibu}</span>` : ''}
+                            ${recipe.srm ? `<span class="badge" style="background: #ed8936; color: white;">SRM: ${recipe.srm}</span>` : ''}
+                        </div>
+                        
+                        ${cost.total > 0 ? `
+                            <!-- COSTE TOTAL -->
+                            <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 15px; border-radius: 8px; margin: 15px 0; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 14px; color: #2d3436; margin-bottom: 5px;">💰 Coste Estimado:</div>
+                                        <div style="display: flex; gap: 15px; font-size: 12px; color: #636e72;">
+                                            ${cost.malts > 0 ? `<span>🌾 ${cost.malts}€</span>` : ''}
+                                            ${cost.hops > 0 ? `<span>🌿 ${cost.hops}€</span>` : ''}
+                                            ${cost.yeast > 0 ? `<span>🧬 ${cost.yeast}€</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 28px; font-weight: bold; color: #d63031;">${cost.total}€</div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${hasFullDetails ? `
+                            <!-- Maltas -->
+                            ${recipe.malts && recipe.malts.length > 0 ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #8b6914; padding: 5px 0;">
+                                        🌾 Maltas (${recipe.malts.length})
+                                    </summary>
+                                    <ul style="margin: 10px 0; padding-left: 20px;">
+                                        ${recipe.malts.map(m => `
+                                            <li>${m.name}: ${m.amount_kg}kg (${m.percentage}%) ${m.notes ? `- ${m.notes}` : ''}</li>
+                                        `).join('')}
+                                    </ul>
+                                </details>
+                            ` : ''}
+                            
+                            <!-- Lúpulos -->
+                            ${recipe.hops && recipe.hops.length > 0 ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #48bb78; padding: 5px 0;">
+                                        🌿 Lúpulos (${recipe.hops.length})
+                                    </summary>
+                                    <ul style="margin: 10px 0; padding-left: 20px;">
+                                        ${recipe.hops.map(h => `
+                                            <li><strong>${h.name}</strong>: ${h.amount_g}g @ ${h.time_min}min (${h.use})${h.notes ? ` - ${h.notes}` : ''}</li>
+                                        `).join('')}
+                                    </ul>
+                                </details>
+                            ` : ''}
+                            
+                            <!-- Levadura -->
+                            ${recipe.yeast ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #ed8936; padding: 5px 0;">
+                                        🧫 Levadura
+                                    </summary>
+                                    <div style="margin: 10px 0; padding-left: 20px;">
+                                        <p><strong>${recipe.yeast.name}</strong></p>
+                                        <p>Cantidad: ${recipe.yeast.amount}</p>
+                                        ${recipe.yeast.temp_min ? `<p>Temperatura: ${recipe.yeast.temp_min}-${recipe.yeast.temp_max}°C</p>` : ''}
+                                        ${recipe.yeast.notes ? `<p style="font-style: italic; color: #666;">${recipe.yeast.notes}</p>` : ''}
+                                    </div>
+                                </details>
+                            ` : ''}
+                            
+                            <!-- Maceración -->
+                            ${recipe.mash ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #f56565; padding: 5px 0;">
+                                        🌡️ Maceración
+                                    </summary>
+                                    <div style="margin: 10px 0; padding-left: 20px;">
+                                        <p>Temperatura: ${recipe.mash.temperature}°C</p>
+                                        <p>Tiempo: ${recipe.mash.time} minutos</p>
+                                        ${recipe.mash.water_liters ? `<p>Agua: ${recipe.mash.water_liters} litros</p>` : ''}
+                                        ${recipe.mash.ph_target ? `<p>pH objetivo: ${recipe.mash.ph_target}</p>` : ''}
+                                    </div>
+                                </details>
+                            ` : ''}
+                            
+                            <!-- Ajustes de Agua -->
+                            ${recipe.water_adjustments ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #38b2ac; padding: 5px 0;">
+                                        💧 Ajustes de Agua (${recipe.water_adjustments.source})
+                                    </summary>
+                                    <div style="margin: 10px 0; padding-left: 20px;">
+                                        ${recipe.water_adjustments.salts_needed ? `
+                                            <ul>
+                                                ${recipe.water_adjustments.salts_needed.map(salt => `
+                                                    <li><strong>${salt.name}</strong>: ${salt.amount} - <em>${salt.purpose}</em></li>
+                                                `).join('')}
+                                            </ul>
+                                        ` : ''}
+                                    </div>
+                                </details>
+                            ` : ''}
+                            
+                            <!-- Notas -->
+                            ${recipe.notes ? `
+                                <details style="margin: 15px 0;">
+                                    <summary style="cursor: pointer; font-weight: bold; color: #805ad5; padding: 5px 0;">
+                                        📝 Notas
+                                    </summary>
+                                    <p style="margin: 10px 0; padding-left: 20px; font-style: italic; color: #555;">${recipe.notes}</p>
+                                </details>
+                            ` : ''}
+                            
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                                <button onclick='loadBrewSessionFromRecipe(${JSON.stringify(recipe)})' class="btn btn-primary" style="margin-right: 10px;">
+                                    🔥 Cargar en Elaboración en Vivo
+                                </button>
+                                ${recipe.created_by ? `<small style="color: #999;">Creada por ${recipe.created_by}</small>` : ''}
+                            </div>
+                        ` : `
+                            <!-- Receta sin detalles completos -->
+                            ${recipe.url ? `<a href="${recipe.url}" target="_blank" style="color: #667eea;">Ver receta completa →</a>` : ''}
+                        `}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Cargar sesión desde receta de recomendadas
+        function loadBrewSessionFromRecipe(recipe) {
+            // Cambiar a pestaña Elaboración en Vivo
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById('brew-session').classList.add('active');
+            document.querySelectorAll('.tab')[2].classList.add('active'); // Tab de Elaboración
+            
+            // Cargar receta en sesión
+            setupBrewSession(recipe);
+        }
+        
+        // Cargar recetas (versión anterior)
+        async function loadRecommendationsOld() {
+            try {
+                const response = await fetch(`${API_URL}/recommendations`);
+                const data = await response.json();
+                
+                const container = document.getElementById('recommendations-list');
+                container.innerHTML = `
+                    <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3>📊 Ingredientes Disponibles</h3>
+                        <div style="margin-top: 10px;">
+                            ${Object.entries(data.available_ingredients).map(([name, qty]) => 
+                                `<span class="badge" style="background: #48bb78; color: white;">${name}: ${qty}</span>`
+                            ).join(' ')}
+                        </div>
+                    </div>
+                    
+                    <h3>🏆 Recetas Ganadoras de Premios</h3>
+                    <p style="color: #999; margin: 20px 0;">Próximamente: integración con recetas premiadas y trending de Brewer's Friend</p>
+                    
+                    <div class="recipe-card">
+                        <h3>🍺 American IPA - West Coast Style</h3>
+                        <div style="margin: 10px 0;">
+                            <span class="badge badge-award">🏆 GABF Gold 2023</span>
+                            <span class="badge badge-trending">🔥 Trending</span>
+                            <span class="badge badge-available">✅ Puedes elaborar</span>
+                        </div>
+                        <p style="margin-top: 10px; color: #666;">
+                            Receta clásica de IPA con lúpulos Cascade, Centennial y Chinook. 
+                            Amargor pronunciado y aroma cítrico.
+                        </p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Inicializar
+        document.getElementById('purchase-date').valueAsDate = new Date();
+        loadInventory();
+
+        // ===== SISTEMA DE CARGA Y ANÁLISIS DE FACTURAS =====
+        
+        let uploadedFiles = [];
+
+        // Configurar zona de drop
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragging');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragging');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragging');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            uploadedFiles = Array.from(files);
+            displayFiles();
+        }
+
+        function displayFiles() {
+            const filesList = document.getElementById('files-list');
+            const preview = document.getElementById('file-preview');
+            
+            if (uploadedFiles.length === 0) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            preview.style.display = 'block';
+            filesList.innerHTML = uploadedFiles.map((file, idx) => `
+                <div class="file-item">
+                    <div>
+                        <strong>${getFileIcon(file.type)} ${file.name}</strong>
+                        <span style="color: #666; margin-left: 10px;">(${(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button class="btn-icon btn-delete" onclick="removeFile(${idx})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function getFileIcon(type) {
+            if (type.includes('pdf')) return '📄';
+            if (type.includes('image')) return '🖼️';
+            if (type.includes('word') || type.includes('document')) return '📝';
+            return '📎';
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            displayFiles();
+        }
+
+        async function analyzeInvoices() {
+            if (uploadedFiles.length === 0) {
+                alert('Sube al menos un archivo primero');
+                return;
+            }
+
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('extracted-items').style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                uploadedFiles.forEach((file, idx) => {
+                    formData.append('files', file);
+                });
+
+                const response = await fetch(`${API_URL}/analyze-invoice`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                } else if (data.items && data.items.length > 0) {
+                    displayExtractedItems(data);
+                } else {
+                    alert('No se pudieron extraer items de las facturas. Intenta introducir manualmente.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al analizar facturas. Usa la entrada manual como alternativa.');
+            } finally {
+                document.getElementById('processing').style.display = 'none';
+            }
+        }
+
+        function displayExtractedItems(data) {
+            const extractedDiv = document.getElementById('extracted-items');
+            const listDiv = document.getElementById('extracted-list');
+            
+            extractedDiv.style.display = 'block';
+            
+            listDiv.innerHTML = data.items.map((item, idx) => `
+                <div class="extracted-item">
+                    <div style="flex: 1;">
+                        <strong>${item.name}</strong>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            ${item.quantity} ${item.unit} • ${item.category} • ${item.cost}€
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn-icon btn-edit" onclick="editExtractedItem(${idx})" title="Editar">✏️</button>
+                        <button class="btn-icon btn-delete" onclick="removeExtractedItem(${idx})" title="Quitar">❌</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Añadir botón para confirmar y guardar
+            listDiv.innerHTML += `
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-success" onclick="saveExtractedItems(${JSON.stringify(data).replace(/"/g, '&quot;')})">
+                        ✅ Confirmar y Guardar en Inventario
+                    </button>
+                </div>
+            `;
+        }
+
+        async function saveExtractedItems(data) {
+            try {
+                const purchase = {
+                    date: new Date().toISOString().split('T')[0],
+                    supplier: data.supplier || 'Extraído de factura',
+                    items: data.items,
+                    total_cost: data.total || data.items.reduce((sum, item) => sum + (item.cost * item.quantity), 0),
+                    notes: `Importado automáticamente desde ${uploadedFiles.map(f => f.name).join(', ')}`
+                };
+
+                const response = await fetch(`${API_URL}/purchases`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(purchase)
+                });
+
+                if (response.ok) {
+                    alert('✅ Compra guardada e inventario actualizado!');
+                    uploadedFiles = [];
+                    document.getElementById('file-preview').style.display = 'none';
+                    document.getElementById('extracted-items').style.display = 'none';
+                    loadInventory();
+                } else {
+                    alert('Error al guardar la compra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar');
+            }
+        }
+
+        // Sistema de tooltips informativos con IA
+        let ingredientsInfo = {};
+        let tooltipElement = null;
+
+        async function loadIngredientsInfo() {
+            try {
+                const response = await fetch(`${API_URL}/ingredients-info`);
+                ingredientsInfo = await response.json();
+            } catch (error) {
+                console.error('Error cargando info de ingredientes:', error);
+            }
+        }
+
+        function createTooltip() {
+            if (!tooltipElement) {
+                tooltipElement = document.createElement('div');
+                tooltipElement.className = 'tooltip';
+                document.body.appendChild(tooltipElement);
+            }
+            return tooltipElement;
+        }
+
+        function findIngredientInfo(name, category) {
+            const nameLower = name.toLowerCase();
+            
+            // Buscar en maltas
+            if (category.includes('malt') || category.includes('cereal')) {
+                for (const [key, info] of Object.entries(ingredientsInfo.malts || {})) {
+                    if (nameLower.includes(key.toLowerCase()) || key.toLowerCase().includes(nameLower.split(' ')[0])) {
+                        return info;
+                    }
+                }
+            }
+            
+            // Buscar en lúpulos
+            if (category === 'hops') {
+                for (const [key, info] of Object.entries(ingredientsInfo.hops || {})) {
+                    if (nameLower.includes(key.toLowerCase()) || key.toLowerCase().includes(nameLower.split(' ')[0])) {
+                        return info;
+                    }
+                }
+            }
+            
+            // Buscar en levaduras
+            if (category === 'yeast') {
+                for (const [key, info] of Object.entries(ingredientsInfo.yeasts || {})) {
+                    if (nameLower.includes(key.toLowerCase()) || key.toLowerCase().includes(nameLower)) {
+                        return info;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        function showTooltip(event, name, category) {
+            const info = findIngredientInfo(name, category);
+            if (!info) return;
+
+            const tooltip = createTooltip();
+            
+            let metaTags = '';
+            if (info.color_ebc) metaTags += `<span class="tooltip-tag">EBC: ${info.color_ebc}</span>`;
+            if (info.alpha_acid) metaTags += `<span class="tooltip-tag">Alpha: ${info.alpha_acid}</span>`;
+            if (info.attenuation) metaTags += `<span class="tooltip-tag">Atenuación: ${info.attenuation}</span>`;
+            if (info.temp) metaTags += `<span class="tooltip-tag">Temp: ${info.temp}</span>`;
+            if (info.origin) metaTags += `<span class="tooltip-tag">Origen: ${info.origin}</span>`;
+            
+            let stylesHTML = '';
+            if (info.styles && info.styles.length > 0) {
+                stylesHTML = `<div class="tooltip-meta">${info.styles.map(s => `<span class="tooltip-tag">${s}</span>`).join('')}</div>`;
+            }
+
+            tooltip.innerHTML = `
+                <div class="tooltip-title">${info.name}</div>
+                <div class="tooltip-desc">${info.description}</div>
+                ${metaTags ? `<div class="tooltip-meta">${metaTags}</div>` : ''}
+                ${stylesHTML}
+            `;
+
+            // Posicionar tooltip cerca del cursor
+            const x = event.clientX;
+            const y = event.clientY;
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let left = x + 15;
+            let top = y + 15;
+            
+            // Ajustar si se sale de la pantalla
+            if (left + tooltipRect.width > window.innerWidth) {
+                left = x - tooltipRect.width - 15;
+            }
+            if (top + tooltipRect.height > window.innerHeight) {
+                top = y - tooltipRect.height - 15;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+            
+            // Mostrar con transición
+            setTimeout(() => tooltip.classList.add('show'), 10);
+        }
+
+        function hideTooltip() {
+            if (tooltipElement) {
+                tooltipElement.classList.remove('show');
+            }
+        }
+
+        // Cargar info de ingredientes al inicio
+        loadIngredientsInfo();
+        
+        // =============================================
+        // ASISTENTE IA
+        // =============================================
+        
+        async function askAI() {
+            const userPrompt = document.getElementById('user-prompt').value.trim();
+            
+            if (!userPrompt) {
+                alert('Por favor, escribe qué cerveza quieres hacer');
+                return;
+            }
+            
+            // Mostrar mensaje del usuario
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML += `
+                <div class="user-message" style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: right;">
+                    <strong style="color: #1976d2;">👤 Tú:</strong>
+                    <p style="margin: 10px 0 0 0;">${userPrompt}</p>
+                </div>
+            `;
+            
+            // Limpiar input
+            document.getElementById('user-prompt').value = '';
+            
+            // Mostrar loading
+            document.getElementById('ai-loading').style.display = 'block';
+            document.getElementById('ai-recipe-result').innerHTML = '';
+            
+            // Scroll al final del chat
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+            
+            try {
+                const response = await fetch(`${API_URL}/ai-recipe-recommender`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_prompt: userPrompt })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Ocultar loading
+                document.getElementById('ai-loading').style.display = 'none';
+                
+                // Guardar conversation_id y datos
+                currentConversationId = data.conversation_id;
+                currentRecipeData = {
+                    recipe: data.recommendation.recipe,
+                    water_adjustments: data.recommendation.water_adjustments,
+                    inventory_deductions: data.recommendation.inventory_deductions,
+                    conversation_id: data.conversation_id
+                };
+                
+                // Mostrar respuesta de la IA
+                displayAIResponse(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('ai-loading').style.display = 'none';
+                chatMessages.innerHTML += `
+                    <div class="ai-message" style="background: #ffebee; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        <strong style="color: #d32f2f;">⚠️ Error:</strong>
+                        <p style="margin: 10px 0 0 0;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayAIResponse(data) {
+            const chatMessages = document.getElementById('chat-messages');
+            const recommendation = data.recommendation;
+            
+            // Mensaje de análisis del estilo
+            chatMessages.innerHTML += `
+                <div class="ai-message" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <strong style="color: #667eea;">🤖 Asistente:</strong>
+                    <div style="margin: 10px 0;">
+                        <h4 style="color: #333; margin-bottom: 10px;">📊 Análisis de tu Solicitud</h4>
+                        <p style="background: #f8f9fa; padding: 10px; border-radius: 5px;">${recommendation.style_analysis}</p>
+                    </div>
+                    
+                    ${recommendation.recommended_style !== recommendation.style_analysis ? `
+                        <div style="margin: 10px 0;">
+                            <h4 style="color: #333; margin-bottom: 10px;">✨ Estilo Recomendado</h4>
+                            <p style="background: #e7f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #2196f3;">
+                                <strong>${recommendation.recommended_style}</strong>
+                            </p>
+                        </div>
+                    ` : ''}
+                    
+                    ${recommendation.expiring_priority && recommendation.expiring_priority.length > 0 ? `
+                        <div style="margin: 10px 0;">
+                            <h4 style="color: #ff6b6b; margin-bottom: 10px;">⚠️ Ingredientes Prioritarios (próximos a caducar)</h4>
+                            <ul style="background: #fff3cd; padding: 15px; border-radius: 5px; list-style-position: inside;">
+                                ${recommendation.expiring_priority.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin: 10px 0;">
+                        <h4 style="color: #333; margin-bottom: 10px;">🌿 Lúpulos Recomendados de tu Inventario</h4>
+                        <ul style="background: #e8f5e9; padding: 15px; border-radius: 5px; list-style-position: inside;">
+                            ${recommendation.hop_recommendations.map(hop => `<li>${hop}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    ${recommendation.competition_inspiration ? `
+                        <div style="margin: 10px 0;">
+                            <h4 style="color: #333; margin-bottom: 10px;">🏆 Inspiración de Competición</h4>
+                            <div style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 15px; border-radius: 5px; color: #333;">
+                                <p><strong>Concurso:</strong> ${recommendation.competition_inspiration.competition} (${recommendation.competition_inspiration.year})</p>
+                                <p><strong>Cervecero:</strong> ${recommendation.competition_inspiration.brewer}</p>
+                                <p><strong>Estilo:</strong> ${recommendation.competition_inspiration.style}</p>
+                                <p style="margin-top: 10px; font-style: italic;">${recommendation.competition_inspiration.notes}</p>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Mostrar receta completa
+            displayRecipe(recommendation.recipe, recommendation.water_adjustments, recommendation.inventory_deductions, data.conversation_id);
+            
+            // Scroll al final
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+        }
+        
+        function displayRecipe(recipe, waterAdjustments, inventoryDeductions, conversationId) {
+            const recipeHtml = `
+                <div style="background: linear-gradient(to bottom, #f9f6f0 0%, #ebe4d8 100%); border: 2px solid #d4a574; border-radius: 15px; padding: 30px; margin-top: 20px;">
+                    <h2 style="color: #8b6914; text-align: center; margin-bottom: 20px;">🍺 ${recipe.name}</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #d4a574;">${recipe.batch_size}L</div>
+                            <div style="color: #666; margin-top: 5px;">Tamaño</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #d4a574;">${recipe.abv}%</div>
+                            <div style="color: #666; margin-top: 5px;">ABV</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #d4a574;">${recipe.ibu}</div>
+                            <div style="color: #666; margin-top: 5px;">IBU</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #d4a574;">${recipe.srm}</div>
+                            <div style="color: #666; margin-top: 5px;">SRM</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: bold; color: #d4a574;">${recipe.og}</div>
+                            <div style="color: #666; margin-top: 5px;">OG</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: bold; color: #d4a574;">${recipe.fg}</div>
+                            <div style="color: #666; margin-top: 5px;">FG</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="color: #8b6914; margin: 20px 0 10px 0;">🌾 Maltas</h3>
+                    <table style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
+                        <thead style="background: #d4a574;">
+                            <tr>
+                                <th style="padding: 12px; text-align: left; color: white;">Malta</th>
+                                <th style="padding: 12px; text-align: center; color: white;">Cantidad (kg)</th>
+                                <th style="padding: 12px; text-align: center; color: white;">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recipe.malts.map(malt => `
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px;">${malt.name}</td>
+                                    <td style="padding: 12px; text-align: center;">${malt.amount_kg}</td>
+                                    <td style="padding: 12px; text-align: center;">${malt.percentage}%</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3 style="color: #8b6914; margin: 20px 0 10px 0;">🌿 Lúpulos</h3>
+                    <table style="width: 100%; background: white; border-radius: 10px; overflow: hidden;">
+                        <thead style="background: #d4a574;">
+                            <tr>
+                                <th style="padding: 12px; text-align: left; color: white;">Lúpulo</th>
+                                <th style="padding: 12px; text-align: center; color: white;">Cantidad (g)</th>
+                                <th style="padding: 12px; text-align: center; color: white;">Tiempo (min)</th>
+                                <th style="padding: 12px; text-align: center; color: white;">Uso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recipe.hops.map(hop => `
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 12px;">${hop.name}</td>
+                                    <td style="padding: 12px; text-align: center;">${hop.amount_g}</td>
+                                    <td style="padding: 12px; text-align: center;">${hop.time_min}</td>
+                                    <td style="padding: 12px; text-align: center;">${hop.use}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h3 style="color: #8b6914; margin: 20px 0 10px 0;">🧪 Levadura</h3>
+                    <div style="background: white; padding: 15px; border-radius: 10px;">
+                        <p><strong>Cepa:</strong> ${recipe.yeast.name}</p>
+                        <p><strong>Cantidad:</strong> ${recipe.yeast.amount} paquete(s)</p>
+                        <p><strong>Temperatura:</strong> ${recipe.yeast.temp_range}</p>
+                    </div>
+                    
+                    <h3 style="color: #8b6914; margin: 20px 0 10px 0;">🌡️ Maceración</h3>
+                    <div style="background: white; padding: 15px; border-radius: 10px;">
+                        <p><strong>Temperatura:</strong> ${recipe.mash.temperature}°C</p>
+                        <p><strong>Tiempo:</strong> ${recipe.mash.time} minutos</p>
+                        <p><strong>Agua de maceración:</strong> ${recipe.mash.water_liters} litros</p>
+                        <p><strong>Tiempo de hervor:</strong> ${recipe.boil_time} minutos</p>
+                    </div>
+                    
+                    <h3 style="color: #8b6914; margin: 20px 0 10px 0;">💧 Ajuste de Agua (Valsaín)</h3>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="color: #666; margin-bottom: 10px;">Perfil Objetivo:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                            <div>Ca²⁺: ${waterAdjustments.target_profile.calcium} ppm</div>
+                            <div>Mg²⁺: ${waterAdjustments.target_profile.magnesium} ppm</div>
+                            <div>Na⁺: ${waterAdjustments.target_profile.sodium} ppm</div>
+                            <div>Cl⁻: ${waterAdjustments.target_profile.chloride} ppm</div>
+                            <div>SO₄²⁻: ${waterAdjustments.target_profile.sulfate} ppm</div>
+                            <div>HCO₃⁻: ${waterAdjustments.target_profile.bicarbonate} ppm</div>
+                        </div>
+                        
+                        <h4 style="color: #666; margin: 15px 0 10px 0;">Sales a Añadir:</h4>
+                        ${waterAdjustments.salts_needed.map(salt => `
+                            <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 8px;">
+                                <strong>${salt.name}:</strong> ${salt.amount_g}${salt.amount_ml ? ` (${salt.amount_ml} ml)` : ''} g
+                                <br><small style="color: #666;">${salt.reason}</small>
+                            </div>
+                        `).join('')}
+                        
+                        <p style="margin-top: 15px;"><strong>pH objetivo:</strong> ${waterAdjustments.final_ph_target}</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="applyRecipeToInventory()" 
+                                class="btn btn-success" 
+                                style="padding: 15px 30px; font-size: 16px;">
+                            ✅ Aplicar Receta y Deducir Inventario
+                        </button>
+                        <button onclick="saveRecipeOnly()" 
+                                class="btn" 
+                                style="padding: 15px 30px; font-size: 16px;">
+                            💾 Solo Guardar Receta
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('ai-recipe-result').innerHTML = recipeHtml;
+        }
+        
+        async function applyRecipeToInventory() {
+            if (!currentRecipeData) {
+                alert('⚠️ No hay receta activa para aplicar');
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que quieres deducir estos ingredientes de tu inventario?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/apply-recipe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentRecipeData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                alert(`✅ ${data.message}\n\n` +
+                      `Receta ID: ${data.recipe_id}\n` +
+                      `Elaboración ID: ${data.brew_id}\n\n` +
+                      `Esta elaboración ha sido guardada en tu historial para análisis ML.`);
+                
+                // Limpiar datos actuales
+                currentRecipeData = null;
+                currentConversationId = null;
+                
+                // Recargar inventario
+                loadInventory();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al aplicar la receta al inventario');
+            }
+        }
+        
+        async function saveRecipeOnly() {
+            if (!currentRecipeData) {
+                alert('⚠️ No hay receta activa para guardar');
+                return;
+            }
+            
+            try {
+                // Crear copia sin deducir inventario
+                const saveData = {
+                    ...currentRecipeData,
+                    inventory_deductions: []  // No deducir
+                };
+                
+                const response = await fetch(`${API_URL}/apply-recipe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(saveData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                alert(`✅ Receta guardada correctamente\n\n` +
+                      `Receta ID: ${data.recipe_id}\n` +
+                      `Elaboración ID: ${data.brew_id}\n\n` +
+                      `Guardada en tu historial sin deducir inventario.`);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar la receta');
+            }
+        }
+
+        // =============================================
+        // MÓDULO DE ELABORACIÓN EN TIEMPO REAL
+        // =============================================
+        
+        let brewSession = {
+            active: false,
+            recipeId: null,
+            recipeName: null,
+            startTime: null,
+            elapsedSeconds: 0,
+            totalElapsedSeconds: 0, // Acumulado total
+            stepStartTime: null, // Tiempo de inicio del paso actual
+            stepElapsedSeconds: 0, // Tiempo del paso actual (se resetea)
+            isPaused: false,
+            currentStepIndex: 0,
+            steps: [],
+            timerInterval: null,
+            notes: ''
+        };
+
+        let audioContext = null;
+        let alertVolume = 0.8;
+        let voiceEnabled = true;
+
+        // Inicializar Audio Context
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Generar tono de alerta
+        function playAlertSound(frequency = 800, duration = 500) {
+            initAudioContext();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(alertVolume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        // Alerta sonora con patrón MEJORADO con diferentes buzzers
+        function playBrewAlert(pattern = 'single') {
+            const patterns = {
+                'single': [[800, 300]],
+                'double': [[800, 200], [800, 200]],
+                'triple': [[800, 150], [800, 150], [800, 150]],
+                'urgent': [[1000, 100], [1200, 100], [1000, 100], [1200, 100]],
+                'warning5min': [[600, 100], [600, 100], [800, 200]], // 5 min antes
+                'hopAddition': [[1000, 150], [800, 150], [1200, 300]], // Añadir lúpulo
+                'yeastPitch': [[500, 200], [700, 200], [900, 400]], // Levadura
+                'completed': [[600, 100], [800, 100], [1000, 100], [1200, 200]] // Paso completado
+            };
+            
+            const notes = patterns[pattern] || patterns['single'];
+            let delay = 0;
+            
+            notes.forEach(([freq, duration]) => {
+                setTimeout(() => playAlertSound(freq, duration), delay);
+                delay += duration + 100;
+            });
+        }
+
+        // Text-to-Speech para comandos de voz
+        function speak(text) {
+            if (!voiceEnabled || !('speechSynthesis' in window)) {
+                console.log('Voz:', text);
+                return;
+            }
+            
+            // Cancelar cualquier voz pendiente
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.volume = alertVolume;
+            utterance.rate = 0.9; // Velocidad más lenta para claridad
+            utterance.pitch = 1.0;
+            
+            // Intentar usar voz española si está disponible
+            const voices = window.speechSynthesis.getVoices();
+            const spanishVoice = voices.find(voice => voice.lang.startsWith('es'));
+            if (spanishVoice) {
+                utterance.voice = spanishVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Cargar voces disponibles
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                const voices = window.speechSynthesis.getVoices();
+                console.log('Voces disponibles:', voices.filter(v => v.lang.startsWith('es')).length);
+            };
+        }
+
+        function updateAlertVolume(value) {
+            alertVolume = value / 100;
+            document.getElementById('volume-display').textContent = value + '%';
+        }
+
+        // Cargar recetas para seleccionar
+        async function loadBrewRecipesList() {
+            try {
+                const response = await fetch(`${API_URL}/recipes`);
+                const data = await response.json();
+                const recipes = data.recipes || data;
+                
+                const select = document.getElementById('brew-recipe-select');
+                select.innerHTML = '<option value="">-- Selecciona una receta --</option>';
+                
+                recipes.forEach(recipe => {
+                    // Solo cargar recetas que tengan ID y estructura completa
+                    if (recipe.id && recipe.malts && recipe.hops) {
+                        const option = document.createElement('option');
+                        option.value = recipe.id;
+                        option.textContent = `${recipe.name} - ${recipe.style}`;
+                        option.dataset.recipe = JSON.stringify(recipe);
+                        select.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error cargando recetas:', error);
+            }
+        }
+
+        function loadBrewRecipe() {
+            const select = document.getElementById('brew-recipe-select');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                alert('Por favor selecciona una receta');
+                return;
+            }
+            
+            const recipe = JSON.parse(selectedOption.dataset.recipe);
+            setupBrewSession(recipe);
+        }
+
+        function setupBrewSession(recipe) {
+            // Generar pasos de la elaboración
+            const steps = [];
+            
+            // Paso 1: Preparación
+            steps.push({
+                id: 0,
+                name: 'Preparación',
+                description: 'Pesar maltas, preparar agua, desinfectar equipo',
+                duration: 0,
+                alertBefore: 0,
+                alertAt5Min: false,
+                type: 'preparation',
+                completed: false,
+                voiceMessage: 'Comenzando preparación. Pesa las maltas y prepara el agua',
+                ingredients: recipe.malts || []
+            });
+            
+            // Paso 2: Maceración
+            if (recipe.mash) {
+                steps.push({
+                    id: 1,
+                    name: `Maceración ${recipe.mash.temperature}°C`,
+                    description: `Mantener ${recipe.mash.temperature}°C durante ${recipe.mash.time} minutos`,
+                    duration: recipe.mash.time * 60,
+                    alertBefore: 300, // 5 min antes
+                    alertAt5Min: false,
+                    alertAt1Min: false,
+                    type: 'mash',
+                    completed: false,
+                    voiceMessage: `Maceración a ${recipe.mash.temperature} grados durante ${recipe.mash.time} minutos`,
+                    voiceWarning5Min: 'Quedan 5 minutos para terminar la maceración. Prepara el lavado de grano',
+                    temperature: recipe.mash.temperature
+                });
+            }
+            
+            // Paso 3: Lavado de grano
+            steps.push({
+                id: 2,
+                name: 'Lavado de Grano (Sparge)',
+                description: 'Lavar el grano con agua a 75-78°C',
+                duration: 20 * 60, // 20 min
+                alertBefore: 300,
+                alertAt5Min: false,
+                alertAt1Min: false,
+                type: 'sparge',
+                completed: false,
+                voiceMessage: 'Lavado de grano. Agua entre 75 y 78 grados',
+                voiceWarning5Min: '5 minutos para terminar el lavado. Prepara la olla de hervor'
+            });
+            
+            // Paso 4-N: Adiciones de lúpulo durante hervor
+            const boilTime = recipe.boil_time || 60;
+            const hopAdditions = (recipe.hops || [])
+                .filter(h => h.use === 'Boil')
+                .sort((a, b) => b.time_min - a.time_min); // Mayor a menor tiempo
+            
+            // Inicio del hervor
+            steps.push({
+                id: steps.length,
+                name: 'Inicio del Hervor',
+                description: `Llevar a ebullición e iniciar timer de ${boilTime} minutos`,
+                duration: 0,
+                alertBefore: 0,
+                type: 'boil-start',
+                completed: false
+            });
+            
+            // Adiciones durante hervor
+            hopAdditions.forEach((hop, index) => {
+                const timeFromStart = boilTime - hop.time_min;
+                steps.push({
+                    id: steps.length,
+                    name: `Lúpulo: ${hop.name} @ ${hop.time_min}min`,
+                    description: `Añadir ${hop.amount_g}g de ${hop.name}`,
+                    duration: 0,
+                    alertBefore: 300, // Alertar 5 min antes
+                    alertAt5Min: false,
+                    alertAt1Min: false,
+                    type: 'hop-addition',
+                    completed: false,
+                    scheduledAt: timeFromStart * 60,
+                    voiceMessage: `Añadir ahora ${hop.amount_g} gramos de lúpulo ${hop.name}`,
+                    voiceWarning5Min: `Atención: En 5 minutos añade ${hop.amount_g} gramos de ${hop.name}`,
+                    voiceWarning1Min: `¡1 minuto! Pesa ${hop.amount_g} gramos de ${hop.name}`,
+                    ingredient: hop
+                });
+            });
+            
+            // Fin del hervor
+            steps.push({
+                id: steps.length,
+                name: 'Fin del Hervor',
+                description: 'Apagar fuego, preparar enfriamiento',
+                duration: 0,
+                alertBefore: 120, // Alertar 2 min antes
+                type: 'boil-end',
+                completed: false,
+                scheduledAt: boilTime * 60
+            });
+            
+            // Whirlpool / Flameout hops
+            const whirlpoolHops = (recipe.hops || []).filter(h => h.time_min === 0 && h.use === 'Boil');
+            if (whirlpoolHops.length > 0) {
+                steps.push({
+                    id: steps.length,
+                    name: 'Lúpulos Whirlpool',
+                    description: whirlpoolHops.map(h => `${h.amount_g}g ${h.name}`).join(', '),
+                    duration: 10 * 60, // 10 min whirlpool
+                    alertBefore: 0,
+                    type: 'whirlpool',
+                    completed: false,
+                    ingredients: whirlpoolHops
+                });
+            }
+            
+            // Enfriamiento
+            steps.push({
+                id: steps.length,
+                name: 'Enfriamiento',
+                description: 'Enfriar mosto a temperatura de inoculación (18-22°C)',
+                duration: 0,
+                alertBefore: 0,
+                type: 'cooling',
+                completed: false,
+                targetTemp: 20
+            });
+            
+            // Inoculación
+            if (recipe.yeast) {
+                steps.push({
+                    id: steps.length,
+                    name: `Inoculación: ${recipe.yeast.name}`,
+                    description: `Hidratar/preparar ${recipe.yeast.amount} sobre(s) de levadura`,
+                    duration: 0,
+                    alertBefore: 1800, // Alertar 30 min antes (para hidratar)
+                    alertAt30Min: false,
+                    alertAt5Min: false,
+                    type: 'yeast',
+                    completed: false,
+                    voiceMessage: `Inocular ahora la levadura ${recipe.yeast.name}`,
+                    voiceWarning30Min: `Atención: En 30 minutos necesitarás la levadura. Comienza a hidratarla`,
+                    voiceWarning5Min: `5 minutos para inocular. Verifica la temperatura del mosto`,
+                    ingredient: recipe.yeast
+                });
+            }
+            
+            // Actualizar sesión
+            brewSession.active = true;
+            brewSession.recipeId = recipe.id;
+            brewSession.recipeName = recipe.name;
+            brewSession.steps = steps;
+            brewSession.currentStepIndex = 0;
+            brewSession.elapsedSeconds = 0;
+            
+            // Mostrar interfaz
+            document.getElementById('recipe-selector').style.display = 'none';
+            document.getElementById('brew-control').style.display = 'block';
+            document.getElementById('brew-steps-container').style.display = 'block';
+            document.getElementById('brew-notes-section').style.display = 'block';
+            
+            renderBrewSteps();
+            alert(`✅ Receta "${recipe.name}" cargada\n\nTotal de pasos: ${steps.length}\n\n¡Listo para comenzar!`);
+        }
+
+        function renderBrewSteps() {
+            const container = document.getElementById('brew-steps-list');
+            container.innerHTML = brewSession.steps.map((step, index) => {
+                const isCurrent = index === brewSession.currentStepIndex;
+                const isCompleted = step.completed;
+                const isPending = index > brewSession.currentStepIndex;
+                
+                let statusClass = isPending ? 'pending' : (isCompleted ? 'completed' : 'current');
+                let statusIcon = isPending ? '⏳' : (isCompleted ? '✅' : '▶️');
+                let bgColor = isPending ? '#f8f9fa' : (isCompleted ? '#d4edda' : '#fff3cd');
+                
+                return `
+                    <div style="background: ${bgColor}; padding: 15px; margin: 10px 0; border-radius: 10px; border-left: 5px solid ${isCompleted ? '#28a745' : (isCurrent ? '#ffc107' : '#ccc')};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <strong style="font-size: 18px;">${statusIcon} ${step.name}</strong>
+                                <p style="margin: 5px 0 0 0; color: #666;">${step.description}</p>
+                                ${step.duration > 0 ? `<small>⏱️ Duración: ${Math.floor(step.duration / 60)} min</small>` : ''}
+                                ${step.alertBefore > 0 ? `<small style="margin-left: 15px;">🔔 Alerta ${Math.floor(step.alertBefore / 60)} min antes</small>` : ''}
+                            </div>
+                            ${isCurrent && !isCompleted ? `
+                                <button onclick="completeCurrentStep()" class="btn btn-success" style="padding: 10px 20px;">
+                                    ✓ Completar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startBrewTimer() {
+            if (brewSession.timerInterval) {
+                return; // Ya está corriendo
+            }
+            
+            brewSession.startTime = Date.now();
+            brewSession.stepStartTime = Date.now();
+            brewSession.isPaused = false;
+            
+            brewSession.timerInterval = setInterval(() => {
+                if (!brewSession.isPaused) {
+                    // Tiempo total acumulado
+                    brewSession.totalElapsedSeconds = Math.floor((Date.now() - brewSession.startTime) / 1000);
+                    // Tiempo del paso actual (se resetea en cada paso)
+                    brewSession.stepElapsedSeconds = Math.floor((Date.now() - brewSession.stepStartTime) / 1000);
+                    updateTimerDisplay();
+                    checkAlerts();
+                }
+            }, 1000);
+            
+            const firstStep = brewSession.steps[brewSession.currentStepIndex];
+            document.getElementById('current-step-name').textContent = firstStep.name;
+            
+            playAlertSound(600, 200); // Sonido de inicio
+            
+            // Anuncio de inicio con voz
+            speak(`Iniciando elaboración de ${brewSession.recipeName}. ${firstStep.voiceMessage || firstStep.name}`);
+        }
+
+        function pauseBrewTimer() {
+            brewSession.isPaused = true;
+            speak('Timer pausado');
+            playAlertSound(400, 200);
+        }
+
+        function resumeBrewTimer() {
+            brewSession.isPaused = false;
+            // Ajustar tiempos para mantener el elapsed al reanudar
+            const now = Date.now();
+            brewSession.startTime = now - (brewSession.totalElapsedSeconds * 1000);
+            brewSession.stepStartTime = now - (brewSession.stepElapsedSeconds * 1000);
+            speak('Timer reanudado');
+            playAlertSound(600, 200);
+        }
+
+        function stopBrewSession() {
+            if (!confirm('¿Finalizar la sesión de elaboración? Se guardará el progreso.')) {
+                return;
+            }
+            
+            clearInterval(brewSession.timerInterval);
+            
+            // Guardar sesión
+            saveBrewSessionData();
+            
+            // Reset
+            brewSession = {
+                active: false,
+                recipeId: null,
+                recipeName: null,
+                startTime: null,
+                elapsedSeconds: 0,
+                totalElapsedSeconds: 0,
+                stepStartTime: null,
+                stepElapsedSeconds: 0,
+                isPaused: false,
+                currentStepIndex: 0,
+                steps: [],
+                timerInterval: null,
+                notes: ''
+            };
+            
+            // Ocultar interfaz
+            document.getElementById('recipe-selector').style.display = 'block';
+            document.getElementById('brew-control').style.display = 'none';
+            document.getElementById('brew-steps-container').style.display = 'none';
+            document.getElementById('brew-notes-section').style.display = 'none';
+            
+            playBrewAlert('triple');
+            alert('✅ Sesión finalizada y guardada');
+        }
+
+        function updateTimerDisplay() {
+            // Tiempo del paso actual (contador principal grande)
+            const hours = Math.floor(brewSession.stepElapsedSeconds / 3600);
+            const minutes = Math.floor((brewSession.stepElapsedSeconds % 3600) / 60);
+            const seconds = brewSession.stepElapsedSeconds % 60;
+            
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('brew-timer-display').textContent = display;
+            
+            // Tiempo total acumulado (display secundario arriba)
+            const totalHours = Math.floor(brewSession.totalElapsedSeconds / 3600);
+            const totalMinutes = Math.floor((brewSession.totalElapsedSeconds % 3600) / 60);
+            const totalSeconds = brewSession.totalElapsedSeconds % 60;
+            
+            const totalDisplay = `${String(totalHours).padStart(2, '0')}:${String(totalMinutes).padStart(2, '0')}:${String(totalSeconds).padStart(2, '0')}`;
+            document.getElementById('total-timer-display').textContent = totalDisplay;
+        }
+
+        function checkAlerts() {
+            const currentStep = brewSession.steps[brewSession.currentStepIndex];
+            
+            // Alerta de tiempo para paso actual
+            if (currentStep.duration > 0) {
+                const timeInStep = brewSession.stepElapsedSeconds; // Usar tiempo del paso actual
+                const timeRemaining = currentStep.duration - timeInStep;
+                
+                // Alerta 5 minutos antes
+                if (timeRemaining === 300 && currentStep.alertBefore >= 300 && !currentStep.alertAt5Min) {
+                    currentStep.alertAt5Min = true;
+                    playBrewAlert('warning5min');
+                    if (currentStep.voiceWarning5Min) {
+                        speak(currentStep.voiceWarning5Min);
+                    } else {
+                        speak(`Quedan 5 minutos para: ${currentStep.name}`);
+                    }
+                    showNotification('⚠️ 5 MINUTOS', currentStep.name);
+                }
+                
+                // Alerta 1 minuto antes
+                if (timeRemaining === 60 && !currentStep.alertAt1Min) {
+                    currentStep.alertAt1Min = true;
+                    playBrewAlert('double');
+                    if (currentStep.voiceWarning1Min) {
+                        speak(currentStep.voiceWarning1Min);
+                    } else {
+                        speak(`1 minuto para: ${currentStep.name}`);
+                    }
+                    showNotification('⚠️ 1 MINUTO', currentStep.name);
+                }
+                
+                // Alerta al completar
+                if (timeRemaining === 0 && !currentStep.timeUpAlerted) {
+                    currentStep.timeUpAlerted = true;
+                    playBrewAlert('urgent');
+                    if (currentStep.voiceMessage) {
+                        speak(`¡TIEMPO! ${currentStep.voiceMessage}`);
+                    }
+                    showNotification('🔔 ¡TIEMPO!', `Completar: ${currentStep.name}`);
+                }
+            }
+            
+            // Alertas programadas (para lúpulos durante hervor)
+            brewSession.steps.forEach(step => {
+                if (step.scheduledAt && brewSession.totalElapsedSeconds >= step.scheduledAt - 300) {
+                    // Alerta 5 minutos antes
+                    if (brewSession.totalElapsedSeconds === step.scheduledAt - 300 && !step.alertAt5Min) {
+                        step.alertAt5Min = true;
+                        playBrewAlert('warning5min');
+                        if (step.voiceWarning5Min) {
+                            speak(step.voiceWarning5Min);
+                        }
+                        showNotification('⚠️ 5 MIN', step.name);
+                    }
+                    
+                    // Alerta 1 minuto antes
+                    if (brewSession.totalElapsedSeconds === step.scheduledAt - 60 && !step.alertAt1Min) {
+                        step.alertAt1Min = true;
+                        playBrewAlert('double');
+                        if (step.voiceWarning1Min) {
+                            speak(step.voiceWarning1Min);
+                        }
+                        showNotification('⚠️ 1 MIN', step.name);
+                    }
+                    
+                    // Alerta al momento exacto
+                    if (brewSession.totalElapsedSeconds === step.scheduledAt && !step.completed) {
+                        playBrewAlert('hopAddition');
+                        if (step.voiceMessage) {
+                            speak(step.voiceMessage);
+                        }
+                        showNotification('🔔 ¡AHORA!', step.name);
+                    }
+                    
+                    // Alerta 30 min antes para levadura
+                    if (step.type === 'yeast' && brewSession.totalElapsedSeconds === step.scheduledAt - 1800 && !step.alertAt30Min) {
+                        step.alertAt30Min = true;
+                        playBrewAlert('warning5min');
+                        if (step.voiceWarning30Min) {
+                            speak(step.voiceWarning30Min);
+                        }
+                        showNotification('⚠️ 30 MIN', 'Hidratar levadura');
+                    }
+                }
+            });
+        }
+
+        function showNotification(title, message) {
+            // Notificación visual
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: message,
+                    icon: '🍺'
+                });
+            }
+            
+            // También mostrar en pantalla
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-size: 24px;
+                font-weight: bold;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.innerHTML = `<div style="font-size: 32px;">${title}</div><div style="font-size: 18px; margin-top: 5px;">${message}</div>`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function completeCurrentStep() {
+            const step = brewSession.steps[brewSession.currentStepIndex];
+            step.completed = true;
+            
+            playBrewAlert('completed');
+            speak('Paso completado');
+            
+            brewSession.currentStepIndex++;
+            
+            if (brewSession.currentStepIndex < brewSession.steps.length) {
+                const nextStep = brewSession.steps[brewSession.currentStepIndex];
+                document.getElementById('current-step-name').textContent = nextStep.name;
+                
+                // RESETEAR el contador del paso actual
+                brewSession.stepStartTime = Date.now();
+                brewSession.stepElapsedSeconds = 0;
+                
+                renderBrewSteps();
+                
+                // Anunciar siguiente paso
+                if (nextStep.voiceMessage) {
+                    setTimeout(() => speak('Siguiente paso: ' + nextStep.voiceMessage), 1000);
+                }
+            } else {
+                // Todos los pasos completados
+                playBrewAlert('triple');
+                speak('¡Felicitaciones! Elaboración completada con éxito');
+                showNotification('🎉 ¡ELABORACIÓN COMPLETADA!', brewSession.recipeName);
+                setTimeout(() => stopBrewSession(), 3000);
+            }
+        }
+
+        function saveBrewNotes() {
+            brewSession.notes = document.getElementById('brew-notes').value;
+            alert('✅ Notas guardadas');
+        }
+
+        async function saveBrewSessionData() {
+            const sessionData = {
+                recipe_id: brewSession.recipeId,
+                recipe_name: brewSession.recipeName,
+                duration_seconds: brewSession.elapsedSeconds,
+                steps_completed: brewSession.steps.filter(s => s.completed).length,
+                total_steps: brewSession.steps.length,
+                notes: brewSession.notes || document.getElementById('brew-notes').value,
+                date: new Date().toISOString()
+            };
+            
+            // Guardar en localStorage para persistencia
+            const sessions = JSON.parse(localStorage.getItem('brew_sessions') || '[]');
+            sessions.push(sessionData);
+            localStorage.setItem('brew_sessions', JSON.stringify(sessions));
+            
+            console.log('Sesión guardada:', sessionData);
+        }
+
+        // Pedir permisos de notificación
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        // Cargar recetas al mostrar la pestaña
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBrewRecipesList();
+        });
+        
+        // ========================================
+        // MÓDULO DE FERMENTACIÓN CON ISPINDEL
+        // ========================================
+        
+        let fermentationChart = null;
+        let ispindelData = {
+            current: null,
+            history: []
+        };
+        
+        async function refreshIspindelData() {
+            try {
+                // Obtener última lectura
+                const response = await fetch(`${API_URL}/ispindel/latest`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    ispindelData.current = result.current;
+                    updateIspindelDisplay(result.current);
+                    
+                    // Obtener histórico para gráfico
+                    const historyResponse = await fetch(`${API_URL}/ispindel/history?hours=48`);
+                    const historyResult = await historyResponse.json();
+                    
+                    if (historyResult.success) {
+                        ispindelData.history = historyResult.data;
+                        updateFermentationChart(historyResult.data);
+                    }
+                    
+                    // Analizar alertas
+                    checkFermentationAlerts(result.current, historyResult.data);
+                }
+            } catch (error) {
+                console.error('Error actualizando iSpindel:', error);
+                document.getElementById('fermentation-alerts').innerHTML = `
+                    <div style="padding: 20px; background: #fee; border-radius: 8px; color: #c00;">
+                        ⚠️ Error conectando con iSpindel. Verifica la conexión.
+                    </div>
+                `;
+            }
+        }
+        
+        function updateIspindelDisplay(data) {
+            document.getElementById('ispindel-temp').textContent = `${data.temperature.toFixed(1)}°C`;
+            document.getElementById('ispindel-gravity').textContent = data.gravity.toFixed(3);
+            document.getElementById('ispindel-tilt').textContent = `${data.tilt.toFixed(1)}°`;
+            document.getElementById('ispindel-battery').textContent = `${data.battery.toFixed(2)}V`;
+            
+            // Timestamp
+            const date = new Date(data.ts);
+            document.getElementById('ispindel-lastupdate').textContent = date.toLocaleString('es-ES');
+            document.getElementById('ispindel-rssi').textContent = data.rssi;
+        }
+        
+        function updateFermentationChart(history) {
+            const canvas = document.getElementById('fermentation-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (history.length === 0) {
+                ctx.fillStyle = '#999';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No hay datos históricos aún', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // Preparar datos
+            const gravities = history.map(d => d.gravity);
+            const temps = history.map(d => d.temperature);
+            const timestamps = history.map(d => new Date(d.timestamp));
+            
+            const minGravity = Math.min(...gravities) - 0.002;
+            const maxGravity = Math.max(...gravities) + 0.002;
+            const minTemp = Math.min(...temps) - 1;
+            const maxTemp = Math.max(...temps) + 1;
+            
+            const padding = 50;
+            const chartWidth = canvas.width - padding * 2;
+            const chartHeight = canvas.height - padding * 2;
+            
+            // Dibujar ejes
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+            
+            // Dibujar gravedad (línea roja)
+            ctx.strokeStyle = '#f5576c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            history.forEach((point, i) => {
+                const x = padding + (i / (history.length - 1)) * chartWidth;
+                const y = canvas.height - padding - ((point.gravity - minGravity) / (maxGravity - minGravity)) * chartHeight;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Dibujar temperatura (línea azul)
+            ctx.strokeStyle = '#4facfe';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            history.forEach((point, i) => {
+                const x = padding + (i / (history.length - 1)) * chartWidth;
+                const y = canvas.height - padding - ((point.temperature - minTemp) / (maxTemp - minTemp)) * chartHeight * 0.5;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Leyenda
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#f5576c';
+            ctx.fillText('● Gravedad', padding + 10, 25);
+            ctx.fillStyle = '#4facfe';
+            ctx.fillText('● Temperatura', padding + 120, 25);
+            
+            // Etiquetas ejes
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(maxGravity.toFixed(3), padding - 5, padding + 10);
+            ctx.fillText(minGravity.toFixed(3), padding - 5, canvas.height - padding + 5);
+            
+            ctx.textAlign = 'center';
+            ctx.fillText(timestamps[0].toLocaleDateString(), padding, canvas.height - padding + 20);
+            ctx.fillText(timestamps[timestamps.length - 1].toLocaleDateString(), canvas.width - padding, canvas.height - padding + 20);
+        }
+        
+        function checkFermentationAlerts(current, history) {
+            const alerts = [];
+            
+            // Batería baja
+            if (current.battery < 3.5) {
+                alerts.push({
+                    level: 'critical',
+                    icon: '🔋',
+                    message: `Batería CRÍTICA: ${current.battery.toFixed(2)}V. ¡Recargar urgente!`
+                });
+            } else if (current.battery < 3.7) {
+                alerts.push({
+                    level: 'warning',
+                    icon: '⚠️',
+                    message: `Batería baja: ${current.battery.toFixed(2)}V. Considera recargar pronto.`
+                });
+            }
+            
+            // Temperatura fuera de rango
+            if (current.temperature < 15 || current.temperature > 25) {
+                alerts.push({
+                    level: 'warning',
+                    icon: '🌡️',
+                    message: `Temperatura ${current.temperature.toFixed(1)}°C fuera del rango ideal (18-22°C)`
+                });
+            }
+            
+            // Fermentación terminada (gravedad estable últimas 12 lecturas)
+            if (history.length >= 12) {
+                const last12 = history.slice(-12);
+                const gravityVariation = Math.max(...last12.map(d => d.gravity)) - Math.min(...last12.map(d => d.gravity));
+                
+                if (gravityVariation < 0.001) {
+                    alerts.push({
+                        level: 'success',
+                        icon: '✅',
+                        message: `Fermentación estabilizada en ${current.gravity.toFixed(3)}. Considera embotellar.`
+                    });
+                }
+            }
+            
+            // Señal WiFi débil
+            if (current.rssi < -85) {
+                alerts.push({
+                    level: 'info',
+                    icon: '📡',
+                    message: `Señal WiFi débil (${current.rssi} dBm). Puede afectar la transmisión.`
+                });
+            }
+            
+            // Mostrar alertas
+            const alertsHtml = alerts.length > 0 ? alerts.map(alert => {
+                const colors = {
+                    critical: '#dc3545',
+                    warning: '#ffc107',
+                    success: '#28a745',
+                    info: '#17a2b8'
+                };
+                
+                return `
+                    <div style="padding: 15px; margin-bottom: 10px; background: ${colors[alert.level]}22; border-left: 4px solid ${colors[alert.level]}; border-radius: 5px;">
+                        <strong style="font-size: 20px;">${alert.icon}</strong>
+                        <span style="margin-left: 10px;">${alert.message}</span>
+                    </div>
+                `;
+            }).join('') : `
+                <div style="text-align: center; padding: 30px; color: #666;">
+                    ✅ Todo en orden. Fermentación progresando normalmente.
+                </div>
+            `;
+            
+            document.getElementById('fermentation-alerts').innerHTML = alertsHtml;
+        }
+        
+        // Auto-refresh cada 5 minutos
+        setInterval(() => {
+            const currentTab = document.querySelector('.tab.active');
+            if (currentTab && currentTab.textContent.includes('Fermentación')) {
+                refreshIspindelData();
+            }
+        }, 5 * 60 * 1000);
+        
+        // ========================================
+        // MÓDULO DE MÚSICA INTELIGENTE
+        // ========================================
+        
+        let radioPlayer = null;
+        let currentMood = null;
+        let isPlaying = false;
+        let currentPlaylist = [];
+        let currentTrackIndex = 0;
+        
+        // Playlists de YouTube Music (listas públicas de música libre)
+        const moodPlaylists = {
+            morning: {
+                name: 'Mañana Activa',
+                description: 'Rock, indie y energía para empezar el día',
+                tracks: [
+                    'https://stream.rcs.revma.com/ypqt40u0x1zuv',  // Rock FM
+                    'https://stream.laut.fm/indiespot'  // Indie
+                ]
+            },
+            afternoon: {
+                name: 'Tarde Concentración',
+                description: 'Lofi, jazz y ambiente para trabajar concentrado',
+                tracks: [
+                    'https://streams.radio.co/s8f8fc9b1e/listen',  // Lofi
+                    'https://jazz-wr01.ice.infomaniak.ch/jazz-wr01-128.mp3'  // Jazz
+                ]
+            },
+            evening: {
+                name: 'Noche Relajada',
+                description: 'Ambient, clásica y chill para la noche',
+                tracks: [
+                    'https://radioclasica-rne.rtveradio.es/',  // Clásica
+                    'https://streams.radio.co/s8f8fc9b1e/listen'  // Lofi night
+                ]
+            },
+            boiling: {
+                name: 'Hervor Intenso',
+                description: 'Rock y metal para el hervor',
+                tracks: [
+                    'https://stream.rcs.revma.com/ypqt40u0x1zuv',  // Rock
+                    'https://streams.ilovemusic.de/iloveradio14.mp3'  // Electronic
+                ]
+            },
+            mashing: {
+                name: 'Maceración Zen',
+                description: 'Clásica y meditativa para el macerado',
+                tracks: [
+                    'https://radioclasica-rne.rtveradio.es/',
+                    'https://jazz-wr01.ice.infomaniak.ch/jazz-wr01-128.mp3'
+                ]
+            },
+            cleaning: {
+                name: 'Limpieza Feliz',
+                description: 'Pop y reggae para limpiar con buen rollo',
+                tracks: [
+                    'https://stream.laut.fm/indiespot',
+                    'https://streams.ilovemusic.de/iloveradio14.mp3'
+                ]
+            }
+        };
+        
+        // Detectar el mood automáticamente
+        function detectCurrentMood() {
+            const hour = new Date().getHours();
+            
+            // Si hay sesión de elaboración activa, usar fase actual
+            if (brewSession && brewSession.isActive) {
+                const currentStep = brewSession.steps[brewSession.currentStepIndex];
+                if (currentStep) {
+                    const stepName = currentStep.name.toLowerCase();
+                    if (stepName.includes('macerado') || stepName.includes('mash')) return 'mashing';
+                    if (stepName.includes('hervor') || stepName.includes('boil')) return 'boiling';
+                    if (stepName.includes('limpieza') || stepName.includes('clean')) return 'cleaning';
+                }
+            }
+            
+            // Si no, usar hora del día
+            if (hour >= 6 && hour < 12) return 'morning';
+            if (hour >= 12 && hour < 18) return 'afternoon';
+            return 'evening';
+        }
+        
+        function updateMoodSuggestions() {
+            const suggested = detectCurrentMood();
+            const mood = moodPlaylists[suggested];
+            const hour = new Date().getHours();
+            let brewPhase = '';
+            
+            if (brewSession && brewSession.isActive) {
+                const currentStep = brewSession.steps[brewSession.currentStepIndex];
+                brewPhase = currentStep ? ` - ${currentStep.name}` : '';
+            }
+            
+            document.getElementById('mood-suggestions').innerHTML = `
+                <strong>💡 Sugerencia:</strong> ${mood.name} - ${mood.description}
+                <br><small>Hora: ${hour}:00${brewPhase}</small>
+            `;
+        }
+        
+        function selectMood(moodKey) {
+            currentMood = moodKey;
+            const mood = moodPlaylists[moodKey];
+            currentPlaylist = mood.tracks;
+            currentTrackIndex = 0;
+            
+            document.getElementById('mood-name').textContent = mood.name;
+            document.getElementById('current-mood-description').textContent = mood.description;
+            document.getElementById('play-btn').style.display = 'inline-block';
+            document.getElementById('pause-btn').style.display = 'none';
+            
+            // Auto-play
+            playRadio();
+        }
+        
+        function playRadio() {
+            if (!currentMood) {
+                // Auto-detectar mood
+                const suggested = detectCurrentMood();
+                selectMood(suggested);
+                return;
+            }
+            
+            // Crear o actualizar el reproductor
+            if (!radioPlayer) {
+                radioPlayer = new Audio();
+                radioPlayer.volume = document.getElementById('radio-volume').value / 100;
+                radioPlayer.addEventListener('error', () => {
+                    console.log('Error en stream, probando siguiente...');
+                    nextTrack();
+                });
+            }
+            
+            radioPlayer.src = currentPlaylist[currentTrackIndex];
+            radioPlayer.play().then(() => {
+                isPlaying = true;
+                document.getElementById('play-btn').style.display = 'none';
+                document.getElementById('pause-btn').style.display = 'inline-block';
+                document.getElementById('radio-icon').textContent = '🎶';
+                
+                const mood = moodPlaylists[currentMood];
+                document.getElementById('now-playing').innerHTML = `
+                    🔴 <strong>${mood.name}</strong> - En directo
+                `;
+            }).catch(error => {
+                console.error('Error reproduciendo:', error);
+                nextTrack();
+            });
+        }
+        
+        function pauseRadio() {
+            if (radioPlayer) {
+                radioPlayer.pause();
+                isPlaying = false;
+                document.getElementById('play-btn').style.display = 'inline-block';
+                document.getElementById('pause-btn').style.display = 'none';
+                document.getElementById('radio-icon').textContent = '📻';
+            }
+        }
+        
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % currentPlaylist.length;
+            if (isPlaying) {
+                playRadio();
+            }
+        }
+        
+        function updateRadioVolume(value) {
+            document.getElementById('volume-value').textContent = value + '%';
+            if (radioPlayer) {
+                radioPlayer.volume = value / 100;
+            }
+        }
+        
+        // Actualizar sugerencias cada minuto
+        setInterval(updateMoodSuggestions, 60000);
+
+        
+        // ========================================
+        // REGISTRAR SERVICE WORKER PARA PWA
+        // ========================================
+        
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('✅ Service Worker registrado', reg))
+                .catch(err => console.log('❌ Error Service Worker', err));
+        }
+        
+        // Inicializar
+        loadInventory();
+    </script>
+</body>
+</html>
+

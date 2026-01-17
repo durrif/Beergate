@@ -1,0 +1,41 @@
+{
+  "name": "Fuente Valsaín",
+  "location": "Hontanares de Eresma, Segovia",
+  "date": "19/01/2023",
+  "parameters": {
+    "ph": 6.1,
+    "calcium": 13.7,
+    "magnesium": 3.6,
+    "sodium": 12.28,
+    "chloride": 14.4,
+    "sulfate": 8.3,
+    "bicarbonate": 0,
+    "carbonate": 31.33,
+    "potassium": 2.4,
+    "nitrate": 17.0
+  },
+  "derived": {
+    "total_dissolved_solids": 102.4,
+    "conductivity": 0.16,
+    "sar": 0.76,
+    "total_hardness_ppm": 48.2,
+    "residual_alkalinity": 23.9
+  },
+  "units": {
+    "ph": "pH",
+    "calcium": "mg/l (ppm)",
+    "magnesium": "mg/l (ppm)",
+    "sodium": "mg/l (ppm)",
+    "chloride": "mg/l (ppm)",
+    "sulfate": "mg/l (ppm)",
+    "bicarbonate": "mg/l (ppm)",
+    "carbonate": "mg/l (ppm)",
+    "potassium": "mg/l (ppm)",
+    "nitrate": "mg/l (ppm)",
+    "total_dissolved_solids": "mg/l",
+    "conductivity": "dS/m",
+    "total_hardness_ppm": "ppm CaCO3",
+    "residual_alkalinity": "ppm CaCO3"
+  },
+  "notes": "Agua muy blanda, ideal para estilos ligeros como Pilsner. Requiere mineralización para la mayoría de estilos."
+}

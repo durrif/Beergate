@@ -1,0 +1,763 @@
+[
+  {
+    "date": "2026-01-16",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "MALTA MELANO",
+        "category": "malt",
+        "quantity": 1.0,
+        "unit": "kg",
+        "cost": 3.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA CRYSTAL 150",
+        "category": "malt",
+        "quantity": 1.0,
+        "unit": "kg",
+        "cost": 3.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA AROMA",
+        "category": "malt",
+        "quantity": 4.0,
+        "unit": "kg",
+        "cost": 12.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA BISCUIT",
+        "category": "malt",
+        "quantity": 2.0,
+        "unit": "kg",
+        "cost": 6.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA PALE ALE",
+        "category": "malt",
+        "quantity": 50.0,
+        "unit": "kg",
+        "cost": 150.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA VIENNA",
+        "category": "malt",
+        "quantity": 5.0,
+        "unit": "kg",
+        "cost": 15.0,
+        "notes": ""
+      },
+      {
+        "name": "CARAPILS",
+        "category": "malt",
+        "quantity": 2.0,
+        "unit": "kg",
+        "cost": 6.0,
+        "notes": ""
+      },
+      {
+        "name": "AMBER MALT",
+        "category": "malt",
+        "quantity": 1.0,
+        "unit": "kg",
+        "cost": 3.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA CARARED",
+        "category": "malt",
+        "quantity": 3.0,
+        "unit": "kg",
+        "cost": 9.0,
+        "notes": ""
+      },
+      {
+        "name": "MALTA MUNICH TIPO I",
+        "category": "malt",
+        "quantity": 5.0,
+        "unit": "kg",
+        "cost": 15.0,
+        "notes": ""
+      },
+      {
+        "name": "Clarificante CLARIFICANTE para CERVEZA -",
+        "category": "other",
+        "quantity": 1.0,
+        "unit": "10 PASTILLAS",
+        "cost": 3.0,
+        "notes": ""
+      },
+      {
+        "name": "Grifo para GRIFO para FERMENTADOR",
+        "category": "other",
+        "quantity": 1.0,
+        "unit": "unidad",
+        "cost": 3.0,
+        "notes": ""
+      }
+    ],
+    "total_cost": 7764.0,
+    "notes": "Importado automáticamente desde Pedido Cocinista.pdf",
+    "id": "purchase_1",
+    "created_at": "2026-01-16T19:44:29.465625"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "El Secreto de la Cerveza",
+    "items": [
+      {
+        "name": "Rakau",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-07-01"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_2",
+    "created_at": "2026-01-17T17:46:53.528877"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "El Secreto de la Cerveza",
+    "items": [
+      {
+        "name": "Athanum",
+        "category": "hop",
+        "quantity": 50.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2025-12-29"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_3",
+    "created_at": "2026-01-17T17:49:23.661280"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Pacific Jade",
+        "category": "hop",
+        "quantity": 80.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2024-12-01"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_4",
+    "created_at": "2026-01-17T17:51:11.979167"
+  },
+  {
+    "date": "2025-01-01",
+    "supplier": "El Secreto de la Cerveza",
+    "items": [
+      {
+        "name": "Pacific Jade",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-04-30"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_5",
+    "created_at": "2026-01-17T17:55:06.027342"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Pacific Jade",
+        "category": "hop",
+        "quantity": 80.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2024-12-01"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_6",
+    "created_at": "2026-01-17T17:56:46.902467"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Sorachi Ace",
+        "category": "hop",
+        "quantity": 30.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2024-10-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_7",
+    "created_at": "2026-01-17T18:05:27.079862"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Sorachi Ace",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-02-27",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_8",
+    "created_at": "2026-01-17T18:06:58.900371"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Pacific Gem",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-05-30",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_9",
+    "created_at": "2026-01-17T18:08:21.981702"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "El Secreto de la Cerveza",
+    "items": [
+      {
+        "name": "Nelson Sauvin",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-06-06",
+        "supplier": "El Secreto de la Cerveza"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_10",
+    "created_at": "2026-01-17T18:09:01.654791"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Mosaic",
+        "category": "hop",
+        "quantity": 15.0,
+        "unit": "g",
+        "cost": 4.5,
+        "notes": "",
+        "expiry_date": "2027-01-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_11",
+    "created_at": "2026-01-17T18:13:09.344382"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Idaho",
+        "category": "hop",
+        "quantity": 50.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-11-30",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_12",
+    "created_at": "2026-01-17T18:14:20.395646"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Amarillo",
+        "category": "hop",
+        "quantity": 40.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-09-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_13",
+    "created_at": "2026-01-17T18:15:25.314417"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Target",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-08-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_14",
+    "created_at": "2026-01-17T18:16:15.144194"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Centennial",
+        "category": "hop",
+        "quantity": 80.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2028-08-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_15",
+    "created_at": "2026-01-17T18:17:14.696901"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Challenger",
+        "category": "hop",
+        "quantity": 30.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2024-02-15",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_16",
+    "created_at": "2026-01-17T18:18:11.020758"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "El Secreto de la Cerveza",
+    "items": [
+      {
+        "name": "Simcoe",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2025-11-30",
+        "supplier": "El Secreto de la Cerveza"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_17",
+    "created_at": "2026-01-17T18:19:37.642392"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Saaz",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 12.0,
+        "notes": "",
+        "expiry_date": "2027-09-11",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_18",
+    "created_at": "2026-01-17T18:33:18.862116"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Spalt Select",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 12.0,
+        "notes": "",
+        "expiry_date": "2026-12-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_19",
+    "created_at": "2026-01-17T18:34:10.718374"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Ella",
+        "category": "hop",
+        "quantity": 100.0,
+        "unit": "g",
+        "cost": 0.0,
+        "notes": "",
+        "expiry_date": "2026-02-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_20",
+    "created_at": "2026-01-17T18:34:53.639318"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Sladek",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 13.0,
+        "notes": "",
+        "expiry_date": "2026-08-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_21",
+    "created_at": "2026-01-17T18:35:35.037042"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Perle",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 13.0,
+        "notes": "",
+        "expiry_date": "2028-01-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_22",
+    "created_at": "2026-01-17T18:36:35.674397"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Tettnanger",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 13.0,
+        "notes": "",
+        "expiry_date": "2026-12-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_23",
+    "created_at": "2026-01-17T18:37:37.412553"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Northern Brewer",
+        "category": "hop",
+        "quantity": 80.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-01-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_24",
+    "created_at": "2026-01-17T18:38:34.166775"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Saaz",
+        "category": "hop",
+        "quantity": 250.0,
+        "unit": "g",
+        "cost": 13.0,
+        "notes": "",
+        "expiry_date": "2029-12-17",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_25",
+    "created_at": "2026-01-17T18:39:46.039789"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Magnum",
+        "category": "hop",
+        "quantity": 20.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-01-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_26",
+    "created_at": "2026-01-17T18:40:35.478137"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Tradition",
+        "category": "hop",
+        "quantity": 60.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2026-12-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_27",
+    "created_at": "2026-01-17T18:41:36.963510"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Mandarina Bavaria",
+        "category": "hop",
+        "quantity": 50.0,
+        "unit": "g",
+        "cost": 3.0,
+        "notes": "",
+        "expiry_date": "2026-12-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_28",
+    "created_at": "2026-01-17T18:42:46.133769"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": " Verdant IPA Lallemand",
+        "category": "yeast",
+        "quantity": 11.0,
+        "unit": "g",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-05-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_29",
+    "created_at": "2026-01-17T18:48:54.648499"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Verdant IPA Lallemand",
+        "category": "yeast",
+        "quantity": 4.0,
+        "unit": "pkt",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2027-05-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_30",
+    "created_at": "2026-01-17T18:51:28.557761"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "American East Coast Ale Lallamand",
+        "category": "yeast",
+        "quantity": 1.0,
+        "unit": "pkt",
+        "cost": 5.0,
+        "notes": "",
+        "expiry_date": "2025-01-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_31",
+    "created_at": "2026-01-17T18:54:25.710517"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "M84 Bohemian Lager mangoves Jack",
+        "category": "yeast",
+        "quantity": 1.0,
+        "unit": "pkt",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2025-09-01",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_32",
+    "created_at": "2026-01-17T18:56:01.687338"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Saflager S-23",
+        "category": "yeast",
+        "quantity": 4.0,
+        "unit": "pkt",
+        "cost": 4.0,
+        "notes": "",
+        "expiry_date": "2025-12-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_33",
+    "created_at": "2026-01-17T18:59:43.970006"
+  },
+  {
+    "date": "2026-01-17",
+    "supplier": "Cocinista",
+    "items": [
+      {
+        "name": "Brewferm Lager",
+        "category": "hop",
+        "quantity": 5.0,
+        "unit": "pkt",
+        "cost": 3.0,
+        "notes": "",
+        "expiry_date": "2026-05-31",
+        "supplier": "Cocinista"
+      }
+    ],
+    "total_cost": 0.0,
+    "notes": "",
+    "id": "purchase_34",
+    "created_at": "2026-01-17T19:01:25.642544"
+  }
+]

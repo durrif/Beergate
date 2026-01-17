@@ -1,0 +1,89 @@
+{
+  "total_recipes": 20,
+  "styles": {
+    "most_common": [
+      [
+        "American IPA",
+        3
+      ],
+      [
+        "Vienna Lager",
+        3
+      ],
+      [
+        "American Pale Ale",
+        3
+      ],
+      [
+        "International Pale Lager",
+        3
+      ],
+      [
+        "Czech Premium Pale Lager",
+        2
+      ],
+      [
+        "German Pilsner (Pils)",
+        2
+      ],
+      [
+        "Saison",
+        1
+      ],
+      [
+        "English IPA",
+        1
+      ],
+      [
+        "Specialty IPA: Black IPA",
+        1
+      ],
+      [
+        "American Amber Ale",
+        1
+      ]
+    ],
+    "total_styles": 10,
+    "distribution": {
+      "Czech Premium Pale Lager": 2,
+      "American IPA": 3,
+      "Saison": 1,
+      "English IPA": 1,
+      "Vienna Lager": 3,
+      "American Pale Ale": 3,
+      "Specialty IPA: Black IPA": 1,
+      "German Pilsner (Pils)": 2,
+      "International Pale Lager": 3,
+      "American Amber Ale": 1
+    }
+  },
+  "types": {
+    "distribution": {
+      "All Grain": 20
+    }
+  },
+  "averages": {
+    "abv": 5.85,
+    "ibu": 36.2,
+    "srm": 8.8
+  },
+  "ranges": {
+    "abv": {
+      "min": 5.1,
+      "max": 7.31
+    },
+    "ibu": {
+      "min": 19.25,
+      "max": 75.2
+    },
+    "srm": {
+      "min": 3.62,
+      "max": 27.0
+    }
+  },
+  "preferences": {
+    "hop_forward": 3,
+    "high_alcohol": 2,
+    "dark_beers": 1
+  }
+}
