@@ -1,0 +1,24 @@
+{
+  "title": "Brewing",
+  "phases": {
+    "idle": "Idle", "mashing": "Mashing", "lautering": "Lautering",
+    "boiling": "Boiling", "chilling": "Chilling", "pitching": "Pitching",
+    "fermenting": "Fermenting", "conditioning": "Conditioning",
+    "packaging": "Packaging", "completed": "Completed"
+  },
+  "timer": {
+    "step": "Step", "total": "Total", "start": "Start",
+    "pause": "Pause", "resume": "Resume", "next_step": "Next step", "complete_step": "Complete step"
+  },
+  "session": {
+    "start_brew": "Start brewing", "end_brew": "End session",
+    "no_active": "No active brew session", "select_recipe": "Select a recipe to begin",
+    "actual_og": "Actual OG", "actual_fg": "Actual FG",
+    "actual_volume": "Actual volume (L)", "efficiency": "Efficiency"
+  },
+  "messages": {
+    "started": "Brew started", "phase_changed": "Phase: {{phase}}",
+    "step_completed": "Step completed!", "brew_completed": "Brew completed! 🍺",
+    "tts_step": "Step {{number}}: {{name}}"
+  }
+}

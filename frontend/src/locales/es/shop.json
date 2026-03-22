@@ -1,0 +1,36 @@
+{
+  "title": "Comparador de Precios",
+  "shops": {
+    "latiendadelcervecero": "La Tienda del Cervecero",
+    "cervezania": "Cervezanía",
+    "cocinista": "Cocinista",
+    "thebeertimes": "The Beer Times"
+  },
+  "fields": {
+    "price": "Precio",
+    "price_per_kg": "Precio/kg",
+    "shop": "Tienda",
+    "in_stock": "En stock",
+    "out_of_stock": "Agotado",
+    "last_updated": "Actualizado",
+    "best_price": "Mejor precio"
+  },
+  "actions": {
+    "search": "Buscar precios",
+    "buy": "Comprar",
+    "set_alert": "Alerta de precio",
+    "compare_recipe": "Comparar receta completa",
+    "refresh_prices": "Actualizar precios"
+  },
+  "alerts": {
+    "price_drop": "{{ingredient}} bajó un {{percent}}% en {{shop}}",
+    "back_in_stock": "{{ingredient}} vuelve a estar disponible en {{shop}}"
+  },
+  "messages": {
+    "searching": "Buscando precios...",
+    "no_results": "No se encontraron precios para «{{term}}»",
+    "cached": "Precios actualizados hace {{time}}",
+    "scraping": "Consultando tiendas online...",
+    "alert_set": "Alerta creada para {{ingredient}}"
+  }
+}

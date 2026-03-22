@@ -1,0 +1,193 @@
+# ESP32-S3-Box — Beergate Voice Assistant
+# Flash with: esphome run beergate-voice.yaml
+#
+# Architecture:
+#   ESP32-S3-Box  →  Voice Gateway (CT103:8000)  →  Beergate API (CT102:8080)
+#                     ├─ Whisper STT (CT103:10300)
+#                     └─ Piper TTS   (CT103:10200)
+
+substitutions:
+  device_name: beergate-voice
+  friendly_name: "Beergate Voice"
+  voice_gateway_url: "http://192.168.30.102:8000"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.arduino.memory_type: qio_opi
+
+esp32:
+  board: esp32-s3-box
+  framework:
+    type: esp-idf
+    version: recommended
+
+# ------------------------------------------------------------------
+# Network
+# ------------------------------------------------------------------
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: none
+  ap:
+    ssid: "${device_name}-fallback"
+    password: "beergate123"
+
+captive_portal:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+logger:
+  level: INFO
+
+# ------------------------------------------------------------------
+# I2S Audio — ESP32-S3-Box onboard mic + speaker
+# ------------------------------------------------------------------
+i2s_audio:
+  - id: i2s_shared
+    i2s_lrclk_pin: GPIO45   # WS
+    i2s_bclk_pin: GPIO17    # BCLK
+
+microphone:
+  - platform: i2s_audio
+    id: box_mic
+    adc_type: external
+    i2s_din_pin: GPIO16
+    channel: left
+    bits_per_sample: 16bit
+    i2s_audio_id: i2s_shared
+    pdm: false
+
+speaker:
+  - platform: i2s_audio
+    id: box_speaker
+    dac_type: external
+    i2s_dout_pin: GPIO15
+    channel: mono
+    i2s_audio_id: i2s_shared
+
+# ------------------------------------------------------------------
+# Voice Assistant — uses micro Wake Word + HTTP to gateway
+# ------------------------------------------------------------------
+micro_wake_word:
+  models:
+    - model: hey_jarvis
+  on_wake_word_detected:
+    - voice_assistant.start:
+
+voice_assistant:
+  id: va
+  microphone: box_mic
+  speaker: box_speaker
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  volume_multiplier: 2.0
+
+  on_listening:
+    - light.turn_on:
+        id: led_ring
+        effect: "Listening"
+    - logger.log: "Listening..."
+
+  on_stt_end:
+    - logger.log:
+        format: "Transcript: %s"
+        args: ['x.c_str()']
+
+  on_tts_start:
+    - logger.log:
+        format: "TTS: %s"
+        args: ['x.c_str()']
+
+  on_end:
+    - light.turn_off: led_ring
+
+  on_error:
+    - logger.log:
+        format: "Voice error: %s"
+        args: ['code.c_str()']
+    - light.turn_on:
+        id: led_ring
+        effect: "Error"
+    - delay: 2s
+    - light.turn_off: led_ring
+
+# ------------------------------------------------------------------
+# Status LED (GPIO39 on S3-Box)
+# ------------------------------------------------------------------
+light:
+  - platform: esp32_rmt_led_strip
+    id: led_ring
+    rgb_order: GRB
+    pin: GPIO39
+    num_leds: 1
+    chipset: SK6812
+    rmt_channel: 0
+    default_transition_length: 0s
+    effects:
+      - pulse:
+          name: "Listening"
+          min_brightness: 30%
+          max_brightness: 100%
+          transition_length: 0.5s
+          update_interval: 0.5s
+      - pulse:
+          name: "Error"
+          min_brightness: 0%
+          max_brightness: 100%
+          transition_length: 0.2s
+          update_interval: 0.2s
+
+# ------------------------------------------------------------------
+# Display — ILI9341 on ESP32-S3-Box
+# ------------------------------------------------------------------
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO6
+
+display:
+  - platform: ili9xxx
+    model: S3BOX
+    id: box_display
+    cs_pin: GPIO5
+    dc_pin: GPIO4
+    reset_pin: GPIO48
+    dimensions:
+      width: 320
+      height: 240
+    lambda: |-
+      it.fill(Color(0, 0, 0));
+      it.printf(160, 60, id(title_font), Color(255, 200, 0), TextAlign::CENTER, "BEERGATE");
+      it.printf(160, 100, id(body_font), Color(200, 200, 200), TextAlign::CENTER, "Voice Assistant");
+      it.printf(160, 150, id(body_font), Color(100, 200, 100), TextAlign::CENTER, "Di 'Hey Jarvis'");
+
+font:
+  - file: "gfonts://Roboto"
+    id: title_font
+    size: 28
+  - file: "gfonts://Roboto"
+    id: body_font
+    size: 18
+
+# ------------------------------------------------------------------
+# Touch buttons on ESP32-S3-Box (mute toggle)
+# ------------------------------------------------------------------
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Mute Button"
+    on_press:
+      - voice_assistant.stop:
+      - light.turn_off: led_ring
+      - logger.log: "Muted"

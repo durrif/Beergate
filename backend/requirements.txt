@@ -1,0 +1,56 @@
+# backend/requirements.txt
+# Beergate v2 — Python 3.12
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.3
+python-multipart==0.0.19
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+
+# Auth & Security
+bcrypt==4.2.1
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Rate limiting
+slowapi==0.1.9
+
+# Redis
+redis[hiredis]==5.2.1
+
+# AI SDKs
+anthropic==0.42.0
+openai==1.57.4
+
+# Web scraping
+httpx==0.28.1
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# PDF processing
+pdfplumber==0.11.4
+
+# Task queue
+celery[redis]==5.4.0
+
+# ML / matching
+sentence-transformers==3.3.1
+
+# Email (invitations)
+fastapi-mail==1.4.1
+
+# Utilities
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-dotenv==1.0.1
+email-validator==2.2.0
+httpx[http2]==0.28.1
+
+# Dev / testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1

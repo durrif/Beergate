@@ -1,0 +1,106 @@
+{
+  "app": {
+    "name": "Beergate",
+    "tagline": "Craft Brewery Control Room"
+  },
+  "nav": {
+    "dashboard": "Inicio",
+    "inventory": "Inventario",
+    "brewing": "Elaboración",
+    "fermentation": "Fermentación",
+    "recipes": "Recetas",
+    "shop": "Tienda",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "full_name": "Nombre completo",
+    "brewery_name": "Nombre de tu cervecería",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "no_account": "¿No tienes cuenta?",
+    "have_account": "¿Ya tienes cuenta?",
+    "invite_code": "Código de invitación",
+    "logging_in": "Entrando...",
+    "registering": "Registrando...",
+    "login_success": "¡Bienvenido de nuevo!",
+    "logout_success": "Sesión cerrada",
+    "session_expired": "Sesión expirada, por favor inicia sesión de nuevo"
+  },
+  "errors": {
+    "required": "Este campo es obligatorio",
+    "invalid_email": "Email inválido",
+    "password_too_short": "La contraseña debe tener al menos 8 caracteres",
+    "password_no_uppercase": "La contraseña debe tener al menos una mayúscula",
+    "password_no_digit": "La contraseña debe tener al menos un número",
+    "password_no_special": "La contraseña debe tener al menos un carácter especial",
+    "passwords_mismatch": "Las contraseñas no coinciden",
+    "network_error": "Error de red. Comprueba tu conexión.",
+    "server_error": "Error del servidor. Inténtalo de nuevo.",
+    "not_found": "No encontrado",
+    "unauthorized": "No autorizado"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "create": "Crear",
+    "update": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpiar",
+    "import": "Importar",
+    "export": "Exportar",
+    "refresh": "Actualizar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "view_all": "Ver todo",
+    "load_more": "Cargar más"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "deleting": "Eliminando...",
+    "success": "Éxito",
+    "error": "Error",
+    "empty": "Sin datos",
+    "no_results": "Sin resultados"
+  },
+  "time": {
+    "just_now": "Ahora mismo",
+    "minutes_ago": "{{count}} min atrás",
+    "hours_ago": "{{count}} h atrás",
+    "days_ago": "{{count}} días atrás",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  },
+  "units": {
+    "kg": "kg",
+    "g": "g",
+    "l": "L",
+    "ml": "ml",
+    "pkt": "paquete",
+    "unit": "ud",
+    "liters": "litros",
+    "minutes": "minutos",
+    "hours": "horas",
+    "days": "días",
+    "celsius": "°C"
+  },
+  "ai": {
+    "open_panel": "Abrir asistente IA",
+    "close_panel": "Cerrar asistente",
+    "placeholder": "Pregunta a Brewmaster...",
+    "thinking": "Pensando...",
+    "new_chat": "Nueva conversación"
+  }
+}

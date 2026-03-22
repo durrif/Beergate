@@ -1,0 +1,114 @@
+/* frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0A0A0B;
+    --bg-card: #141416;
+    --bg-elevated: #1C1C1F;
+    --bg-hover: #252528;
+    --accent-amber: #D4A04A;
+    --accent-amber-bright: #F59E0B;
+    --accent-copper: #B87333;
+    --accent-foam: #FFF8E7;
+    --text-primary: #F5F5F5;
+    --text-secondary: #A1A1AA;
+    --status-success: #22C55E;
+    --status-warning: #F59E0B;
+    --status-danger: #EF4444;
+    --status-info: #3B82F6;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(20, 20, 22, 0.8);
+
+    /* Shadcn CSS variables */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 240 3% 8%;
+    --card-foreground: 0 0% 96%;
+    --popover: 240 3% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 36 56% 56%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 240 3% 11%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 240 3% 8%;
+    --muted-foreground: 240 5% 64%;
+    --accent: 36 56% 56%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 96%;
+    --border: 240 3% 15%;
+    --input: 240 3% 11%;
+    --ring: 36 56% 56%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg-primary text-text-primary;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-card); }
+  ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+}
+
+@layer components {
+  /* Glassmorphism card */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Amber gradient text */
+  .amber-text {
+    background: linear-gradient(135deg, #D4A04A 0%, #F59E0B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Ambient brew overlay — changes per brew phase */
+  .ambient-idle { --ambient-color: rgba(212, 160, 74, 0.03); }
+  .ambient-mashing { --ambient-color: rgba(212, 130, 50, 0.06); }
+  .ambient-boiling { --ambient-color: rgba(239, 100, 50, 0.08); }
+  .ambient-fermenting { --ambient-color: rgba(59, 130, 246, 0.05); }
+
+  /* Sidebar item */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary
+           hover:text-text-primary hover:bg-bg-hover transition-all duration-200 cursor-pointer;
+  }
+  .sidebar-item.active {
+    @apply text-accent-amber bg-bg-elevated;
+    box-shadow: inset 3px 0 0 var(--accent-amber);
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* Hide scrollbar but keep scrollable */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}

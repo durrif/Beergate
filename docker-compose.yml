@@ -1,0 +1,79 @@
+# docker-compose.yml — Development (Beergate v2)
+# Production uses docker-compose.production.yml
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: beergate-v2-backend
+    restart: unless-stopped
+    ports:
+      - "8010:8000"  # Beergate backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://beergate:${POSTGRES_PASSWORD}@postgres:5432/beergate
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - TOGETHER_MODEL=${TOGETHER_MODEL:-meta-llama/Llama-3.3-70B-Instruct-Turbo}
+      - AI_PROVIDER_CHAIN=${AI_PROVIDER_CHAIN:-together,claude,ollama}
+      - OLLAMA_URL=${OLLAMA_URL:-http://192.168.30.102:11434}
+      - BREWERS_FRIEND_API_KEY=${BREWERS_FRIEND_API_KEY}
+      - ISPINDEL_WEBHOOK_SECRET=${ISPINDEL_WEBHOOK_SECRET}
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+      - ENVIRONMENT=development
+    volumes:
+      - ./backend:/app  # dev hot-reload mount
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - beergate-v2-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: beergate-v2-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=beergate
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=beergate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"  # Offset to avoid conflicts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beergate -d beergate"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - beergate-v2-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: beergate-v2-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # Offset to avoid conflicts
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - beergate-v2-network
+
+volumes:
+  postgres_data:
+
+networks:
+  beergate-v2-network:
+    driver: bridge

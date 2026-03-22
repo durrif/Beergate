@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="beerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4A04A"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.95"/>
+      <stop offset="15%" stop-color="#FFF8E7" stop-opacity="0.9"/>
+      <stop offset="20%" stop-color="#F59E0B" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#B87333"/>
+    </linearGradient>
+    <linearGradient id="foamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF5"/>
+      <stop offset="100%" stop-color="#FFF8E7"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0A0B"/>
+      <stop offset="100%" stop-color="#141416"/>
+    </linearGradient>
+    <clipPath id="glassClip">
+      <path d="M155 140 L155 380 Q155 420 195 420 L317 420 Q357 420 357 380 L357 140 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bgGrad)"/>
+  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#beerGrad)" stroke-width="3" opacity="0.3"/>
+
+  <!-- Glass body -->
+  <path d="M160 135 L150 390 Q148 435 200 438 L312 438 Q364 435 362 390 L352 135 Z" 
+        fill="#1C1C1F" stroke="url(#beerGrad)" stroke-width="2.5" opacity="0.9"/>
+
+  <!-- Beer liquid -->
+  <g clip-path="url(#glassClip)">
+    <rect x="155" y="180" width="202" height="240" fill="url(#glassGrad)" opacity="0.9"/>
+    <!-- Wave surface -->
+    <path d="M150 185 Q185 175 210 185 Q240 195 270 185 Q300 175 330 185 Q355 195 365 185 L365 200 Q330 190 300 200 Q270 210 240 200 Q210 190 185 200 Q155 210 150 200 Z" 
+          fill="#FFF8E7" opacity="0.25"/>
+    <!-- Bubbles -->
+    <circle cx="200" cy="350" r="4" fill="#FFF8E7" opacity="0.2"/>
+    <circle cx="230" cy="320" r="3" fill="#FFF8E7" opacity="0.15"/>
+    <circle cx="270" cy="360" r="5" fill="#FFF8E7" opacity="0.2"/>
+    <circle cx="290" cy="300" r="3.5" fill="#FFF8E7" opacity="0.15"/>
+    <circle cx="250" cy="380" r="3" fill="#FFF8E7" opacity="0.1"/>
+    <circle cx="310" cy="340" r="4" fill="#FFF8E7" opacity="0.15"/>
+  </g>
+
+  <!-- Foam -->
+  <g>
+    <ellipse cx="200" cy="175" rx="30" ry="18" fill="url(#foamGrad)" opacity="0.9"/>
+    <ellipse cx="256" cy="168" rx="35" ry="22" fill="url(#foamGrad)" opacity="0.95"/>
+    <ellipse cx="310" cy="174" rx="28" ry="17" fill="url(#foamGrad)" opacity="0.9"/>
+    <ellipse cx="230" cy="165" rx="25" ry="15" fill="url(#foamGrad)" opacity="0.85"/>
+    <ellipse cx="285" cy="166" rx="22" ry="14" fill="url(#foamGrad)" opacity="0.85"/>
+    <ellipse cx="256" cy="158" rx="20" ry="12" fill="#FFFDF5" opacity="0.7"/>
+  </g>
+
+  <!-- Glass handle -->
+  <path d="M352 200 Q395 200 395 260 Q395 320 352 320" 
+        fill="none" stroke="url(#beerGrad)" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Hop leaf accent (top-left) -->
+  <g transform="translate(100, 80) rotate(-25)">
+    <path d="M0 0 Q15 -20 30 0 Q15 20 0 0 Z" fill="#22C55E" opacity="0.7"/>
+    <path d="M12 -8 Q20 -25 28 -8" fill="none" stroke="#22C55E" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- "B" lettermark -->
+  <text x="256" y="315" text-anchor="middle" font-family="Inter, system-ui, sans-serif" 
+        font-weight="700" font-size="110" fill="url(#beerGrad)" opacity="0.35" 
+        letter-spacing="-2">B</text>
+
+  <!-- Subtle grain texture ring -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="#D4A04A" stroke-width="0.5" 
+          opacity="0.1" stroke-dasharray="2,4"/>
+</svg>

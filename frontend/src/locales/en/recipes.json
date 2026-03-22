@@ -1,0 +1,25 @@
+{
+  "title": "Recipes",
+  "fields": {
+    "name": "Name", "style": "Style", "batch_size": "Batch size",
+    "boil_time": "Boil time", "og": "Est. OG", "fg": "Est. FG",
+    "abv": "ABV", "ibu": "IBU", "srm": "SRM (color)", "notes": "Notes", "source": "Source"
+  },
+  "sections": {
+    "malts": "Malts", "hops": "Hops", "yeast": "Yeast",
+    "other": "Other ingredients", "mash": "Mash profile", "water": "Water adjustment"
+  },
+  "can_brew": {
+    "yes": "Ready to brew", "partial": "Missing some ingredients", "no": "Missing key ingredients"
+  },
+  "sources": { "manual": "Manual", "brewers_friend": "Brewer's Friend", "beerxml": "BeerXML" },
+  "actions": {
+    "brew_now": "Brew now", "sync_bf": "Sync Brewer's Friend",
+    "import_xml": "Import BeerXML", "create_recipe": "Create recipe"
+  },
+  "messages": {
+    "synced": "Recipes synced", "imported": "Recipe imported", "created": "Recipe created",
+    "updated": "Recipe updated", "deleted": "Recipe deleted",
+    "empty": "No recipes. Create your first recipe or import from Brewer's Friend."
+  }
+}

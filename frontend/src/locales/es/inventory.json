@@ -1,0 +1,54 @@
+{
+  "title": "Inventario",
+  "categories": {
+    "malta_base": "Malta Base",
+    "malta_especial": "Malta Especial",
+    "malta_otra": "Otras Maltas",
+    "lupulo": "Lúpulo",
+    "levadura": "Levadura",
+    "adjunto": "Adjuntos",
+    "otro": "Otros"
+  },
+  "fields": {
+    "name": "Nombre",
+    "category": "Categoría",
+    "quantity": "Cantidad",
+    "unit": "Unidad",
+    "min_stock": "Stock mínimo",
+    "expiry_date": "Fecha caducidad",
+    "supplier": "Proveedor",
+    "origin": "Origen",
+    "flavor_profile": "Perfil de sabor",
+    "lot_number": "Número de lote",
+    "notes": "Notas",
+    "purchase_price": "Precio compra"
+  },
+  "alerts": {
+    "low_stock": "Stock bajo",
+    "expiring_soon": "Caduca pronto",
+    "expired": "Caducado",
+    "out_of_stock": "Sin stock",
+    "days_left": "{{days}} días",
+    "expired_ago": "Caducó hace {{days}} días"
+  },
+  "actions": {
+    "add_ingredient": "Añadir ingrediente",
+    "edit_ingredient": "Editar ingrediente",
+    "delete_ingredient": "Eliminar ingrediente",
+    "adjust_stock": "Ajustar stock",
+    "view_details": "Ver detalles"
+  },
+  "messages": {
+    "added": "Ingrediente añadido",
+    "updated": "Ingrediente actualizado",
+    "deleted": "Ingrediente eliminado",
+    "confirm_delete": "¿Eliminar «{{name}}»? Esta acción no se puede deshacer.",
+    "empty": "Inventario vacío. Añade tu primer ingrediente.",
+    "no_results": "Ningún ingrediente coincide con la búsqueda."
+  },
+  "filters": {
+    "all_categories": "Todas las categorías",
+    "low_stock_only": "Solo stock bajo",
+    "expiring_only": "Solo próximos a caducar"
+  }
+}

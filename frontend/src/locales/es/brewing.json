@@ -1,0 +1,41 @@
+{
+  "title": "Elaboración",
+  "phases": {
+    "idle": "En reposo",
+    "mashing": "Macerado",
+    "lautering": "Filtrado",
+    "boiling": "Hervor",
+    "chilling": "Enfriado",
+    "pitching": "Pitchado",
+    "fermenting": "Fermentación",
+    "conditioning": "Acondicionado",
+    "packaging": "Envasado",
+    "completed": "Completada"
+  },
+  "timer": {
+    "step": "Paso",
+    "total": "Total",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "next_step": "Siguiente paso",
+    "complete_step": "Completar paso"
+  },
+  "session": {
+    "start_brew": "Iniciar elaboración",
+    "end_brew": "Finalizar elaboración",
+    "no_active": "No hay elaboración activa",
+    "select_recipe": "Selecciona una receta para comenzar",
+    "actual_og": "DI real",
+    "actual_fg": "DF real",
+    "actual_volume": "Volumen real (L)",
+    "efficiency": "Eficiencia"
+  },
+  "messages": {
+    "started": "Elaboración iniciada",
+    "phase_changed": "Fase: {{phase}}",
+    "step_completed": "¡Paso completado!",
+    "brew_completed": "¡Elaboración completada! 🍺",
+    "tts_step": "Paso {{number}}: {{name}}"
+  }
+}

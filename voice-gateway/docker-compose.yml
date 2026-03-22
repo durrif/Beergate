@@ -1,0 +1,27 @@
+services:
+  voice-gateway:
+    build: .
+    container_name: voice-gateway
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - WHISPER_HOST=wyoming-whisper
+      - WHISPER_PORT=10300
+      - PIPER_HOST=wyoming-piper
+      - PIPER_PORT=10200
+      - BEERGATE_API_URL=http://192.168.30.101:8080/api
+      - BEERGATE_AUTH_EMAIL=admin@beergate.es
+      - BEERGATE_AUTH_PASSWORD=beergate2025!
+      - PIPER_VOICE=es_ES-davefx-medium
+      - DEFAULT_LANGUAGE=es
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    networks:
+      - whisper_default
+      - piper_default
+
+networks:
+  whisper_default:
+    external: true
+  piper_default:
+    external: true

@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (don't track data)
+data-backup/
+
+# Build artifacts
+*.log
+
+# ESP32
+esp32/build/
+esp32/managed_components/
+esp32/sdkconfig.old
+esp32/existing-project/
+
+# Temp scripts (dev/debug)
+check_logs.py
+check_piper.py
+fix_piper.py
+deploy_resample.py
+switch_voice.py
+test_tts.py
+test_tts2.py
+
+# Celery
+celerybeat-schedule
+celerybeat-schedule.db

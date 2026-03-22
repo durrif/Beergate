@@ -1,0 +1,43 @@
+{
+  "assistant_name": "Brewmaster",
+  "welcome": "¡Hola! Soy Brewmaster, tu asistente cervecero. ¿En qué puedo ayudarte hoy?",
+  "context": {
+    "inventory": "Contexto: Inventario",
+    "brewing": "Contexto: Elaboración activa",
+    "fermentation": "Contexto: Fermentación",
+    "recipes": "Contexto: Recetas",
+    "shop": "Contexto: Tienda",
+    "dashboard": "Contexto: Dashboard"
+  },
+  "quick_actions": {
+    "inventory": [
+      "¿Qué puedo elaborar con lo que tengo?",
+      "¿Qué ingredientes caducan pronto?",
+      "¿Cuáles son mis niveles de stock más bajos?"
+    ],
+    "brewing": [
+      "¿Cuánto tiempo falta para este paso?",
+      "¿Cuál es la temperatura correcta para el macerado?",
+      "Pasa al siguiente paso"
+    ],
+    "fermentation": [
+      "¿Cómo va la fermentación?",
+      "Analiza la curva de gravedad",
+      "¿Cuándo estará lista para envasar?"
+    ],
+    "shop": [
+      "Busca el mejor precio para malta Pale Ale",
+      "¿Dónde comprar lúpulo Citra más barato?",
+      "Calcula el coste de mi próxima receta"
+    ],
+    "default": [
+      "Recomiéndame una receta con mi inventario",
+      "¿Cuál es el estado de mi cervecería?",
+      "Ayúdame a planificar mi próxima elaboración"
+    ]
+  },
+  "errors": {
+    "stream_failed": "Error al conectar con el asistente. Inténtalo de nuevo.",
+    "no_response": "Sin respuesta del asistente."
+  }
+}

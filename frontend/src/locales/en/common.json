@@ -1,0 +1,53 @@
+{
+  "app": { "name": "Beergate", "tagline": "Craft Brewery Control Room" },
+  "nav": {
+    "dashboard": "Home", "inventory": "Inventory", "brewing": "Brewing",
+    "fermentation": "Fermentation", "recipes": "Recipes", "shop": "Shop", "settings": "Settings"
+  },
+  "auth": {
+    "login": "Sign in", "logout": "Sign out", "register": "Register",
+    "email": "Email", "password": "Password", "confirm_password": "Confirm password",
+    "full_name": "Full name", "brewery_name": "Your brewery name",
+    "forgot_password": "Forgot password?", "no_account": "Don't have an account?",
+    "have_account": "Already have an account?", "invite_code": "Invitation code",
+    "logging_in": "Signing in...", "registering": "Registering...",
+    "login_success": "Welcome back!", "logout_success": "Signed out",
+    "session_expired": "Session expired, please sign in again"
+  },
+  "errors": {
+    "required": "This field is required", "invalid_email": "Invalid email",
+    "password_too_short": "Password must be at least 8 characters",
+    "password_no_uppercase": "Password must have at least one uppercase letter",
+    "password_no_digit": "Password must have at least one number",
+    "password_no_special": "Password must have at least one special character",
+    "passwords_mismatch": "Passwords don't match",
+    "network_error": "Network error. Check your connection.",
+    "server_error": "Server error. Please try again.",
+    "not_found": "Not found", "unauthorized": "Unauthorized"
+  },
+  "actions": {
+    "save": "Save", "cancel": "Cancel", "delete": "Delete", "edit": "Edit",
+    "add": "Add", "create": "Create", "update": "Update", "search": "Search",
+    "filter": "Filter", "clear": "Clear", "import": "Import", "export": "Export",
+    "refresh": "Refresh", "back": "Back", "next": "Next", "previous": "Previous",
+    "confirm": "Confirm", "close": "Close", "view_all": "View all", "load_more": "Load more"
+  },
+  "status": {
+    "loading": "Loading...", "saving": "Saving...", "deleting": "Deleting...",
+    "success": "Success", "error": "Error", "empty": "No data", "no_results": "No results"
+  },
+  "time": {
+    "just_now": "Just now", "minutes_ago": "{{count}} min ago",
+    "hours_ago": "{{count}} h ago", "days_ago": "{{count}} days ago",
+    "today": "Today", "yesterday": "Yesterday"
+  },
+  "units": {
+    "kg": "kg", "g": "g", "l": "L", "ml": "ml", "pkt": "packet",
+    "unit": "unit", "liters": "liters", "minutes": "minutes",
+    "hours": "hours", "days": "days", "celsius": "°C"
+  },
+  "ai": {
+    "open_panel": "Open AI assistant", "close_panel": "Close assistant",
+    "placeholder": "Ask Brewmaster...", "thinking": "Thinking...", "new_chat": "New conversation"
+  }
+}

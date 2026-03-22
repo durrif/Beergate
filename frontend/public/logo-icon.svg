@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4A04A"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="lg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8E7" stop-opacity="0.9"/>
+      <stop offset="20%" stop-color="#F59E0B" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#B87333"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF5"/>
+      <stop offset="100%" stop-color="#FFF8E7"/>
+    </linearGradient>
+  </defs>
+  <!-- Glass -->
+  <path d="M9 6 L8.2 24 Q8 27 11.5 27.2 L20.5 27.2 Q24 27 23.8 24 L23 6 Z" 
+        fill="#1C1C1F" stroke="url(#ag)" stroke-width="1" opacity="0.9"/>
+  <!-- Beer -->
+  <rect x="9.5" y="11" width="13" height="15" rx="1.5" fill="url(#lg)" opacity="0.85"/>
+  <!-- Foam -->
+  <ellipse cx="12.5" cy="11" rx="3" ry="1.8" fill="url(#fg)" opacity="0.9"/>
+  <ellipse cx="16" cy="10.2" rx="3.5" ry="2.2" fill="url(#fg)" opacity="0.95"/>
+  <ellipse cx="19.5" cy="10.8" rx="2.8" ry="1.6" fill="url(#fg)" opacity="0.9"/>
+  <!-- Handle -->
+  <path d="M23 9.5 Q27 9.5 27 15.5 Q27 21 23 21" fill="none" stroke="url(#ag)" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+</svg>

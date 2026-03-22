@@ -1,0 +1,48 @@
+{
+  "title": "Recetas",
+  "fields": {
+    "name": "Nombre",
+    "style": "Estilo",
+    "batch_size": "Volumen de lote",
+    "boil_time": "Tiempo de hervor",
+    "og": "DI estimada",
+    "fg": "DF estimada",
+    "abv": "ABV",
+    "ibu": "IBU",
+    "srm": "SRM (color)",
+    "notes": "Notas",
+    "source": "Origen"
+  },
+  "sections": {
+    "malts": "Maltas",
+    "hops": "Lúpulos",
+    "yeast": "Levadura",
+    "other": "Otros ingredientes",
+    "mash": "Perfil de macerado",
+    "water": "Ajuste de agua"
+  },
+  "can_brew": {
+    "yes": "Puedes elaborarla",
+    "partial": "Te faltan algunos ingredientes",
+    "no": "Faltan ingredientes clave"
+  },
+  "sources": {
+    "manual": "Manual",
+    "brewers_friend": "Brewer's Friend",
+    "beerxml": "BeerXML"
+  },
+  "actions": {
+    "brew_now": "Elaborar ahora",
+    "sync_bf": "Sincronizar Brewer's Friend",
+    "import_xml": "Importar BeerXML",
+    "create_recipe": "Crear receta"
+  },
+  "messages": {
+    "synced": "Recetas sincronizadas",
+    "imported": "Receta importada",
+    "created": "Receta creada",
+    "updated": "Receta actualizada",
+    "deleted": "Receta eliminada",
+    "empty": "Sin recetas. Crea tu primera receta o importa desde Brewer's Friend."
+  }
+}

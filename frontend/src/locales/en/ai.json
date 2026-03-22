@@ -1,0 +1,40 @@
+{
+  "assistant_name": "Brewmaster",
+  "welcome": "Hi! I'm Brewmaster, your brewing assistant. How can I help you today?",
+  "context": {
+    "inventory": "Context: Inventory", "brewing": "Context: Active brew",
+    "fermentation": "Context: Fermentation", "recipes": "Context: Recipes",
+    "shop": "Context: Shop", "dashboard": "Context: Dashboard"
+  },
+  "quick_actions": {
+    "inventory": [
+      "What can I brew with what I have?",
+      "Which ingredients are expiring soon?",
+      "What are my lowest stock levels?"
+    ],
+    "brewing": [
+      "How long until this step is done?",
+      "What's the correct mash temperature?",
+      "Move to the next step"
+    ],
+    "fermentation": [
+      "How is fermentation going?",
+      "Analyze the gravity curve",
+      "When will it be ready to package?"
+    ],
+    "shop": [
+      "Find the best price for Pale Ale malt",
+      "Where can I buy Citra hops cheapest?",
+      "Calculate the cost of my next recipe"
+    ],
+    "default": [
+      "Recommend a recipe with my inventory",
+      "What's my brewery status?",
+      "Help me plan my next brew"
+    ]
+  },
+  "errors": {
+    "stream_failed": "Error connecting to assistant. Please try again.",
+    "no_response": "No response from assistant."
+  }
+}

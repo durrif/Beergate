@@ -1,0 +1,32 @@
+{
+  "title": "Inventory",
+  "categories": {
+    "malta_base": "Base Malt", "malta_especial": "Specialty Malt",
+    "malta_otra": "Other Malts", "lupulo": "Hops",
+    "levadura": "Yeast", "adjunto": "Adjuncts", "otro": "Other"
+  },
+  "fields": {
+    "name": "Name", "category": "Category", "quantity": "Quantity", "unit": "Unit",
+    "min_stock": "Min stock", "expiry_date": "Expiry date", "supplier": "Supplier",
+    "origin": "Origin", "flavor_profile": "Flavor profile",
+    "lot_number": "Lot number", "notes": "Notes", "purchase_price": "Purchase price"
+  },
+  "alerts": {
+    "low_stock": "Low stock", "expiring_soon": "Expiring soon",
+    "expired": "Expired", "out_of_stock": "Out of stock",
+    "days_left": "{{days}} days", "expired_ago": "Expired {{days}} days ago"
+  },
+  "actions": {
+    "add_ingredient": "Add ingredient", "edit_ingredient": "Edit ingredient",
+    "delete_ingredient": "Delete ingredient", "adjust_stock": "Adjust stock", "view_details": "View details"
+  },
+  "messages": {
+    "added": "Ingredient added", "updated": "Ingredient updated", "deleted": "Ingredient deleted",
+    "confirm_delete": "Delete «{{name}}»? This cannot be undone.",
+    "empty": "Inventory is empty. Add your first ingredient.",
+    "no_results": "No ingredients match your search."
+  },
+  "filters": {
+    "all_categories": "All categories", "low_stock_only": "Low stock only", "expiring_only": "Expiring soon only"
+  }
+}

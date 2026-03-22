@@ -1,0 +1,191 @@
+# docker-compose.production.yml — Beergate v2 Production
+# Deploys on CT 102 alongside the legacy beergate on CT 101
+# External nginx (on CT 100 or host) proxies beergate.es → port 8080 (frontend)
+#
+# Usage:
+#   cp .env.production .env
+#   docker compose -f docker-compose.production.yml up -d
+#   docker compose -f docker-compose.production.yml exec backend alembic upgrade head
+#
+version: '3.9'
+
+services:
+  # ── Backend API ────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: production
+    image: beergate-v2-backend:latest
+    container_name: beergate-v2-backend
+    restart: always
+    expose:
+      - "8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://beergate:${POSTGRES_PASSWORD}@postgres:5432/beergate
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - TOGETHER_MODEL=${TOGETHER_MODEL:-meta-llama/Llama-3.3-70B-Instruct-Turbo}
+      - AI_PROVIDER_CHAIN=${AI_PROVIDER_CHAIN:-together,claude,ollama}
+      - OLLAMA_URL=${OLLAMA_URL:-http://192.168.30.102:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - BREWERS_FRIEND_API_KEY=${BREWERS_FRIEND_API_KEY}
+      - ISPINDEL_WEBHOOK_SECRET=${ISPINDEL_WEBHOOK_SECRET}
+      - CORS_ORIGINS=https://beergate.es,https://www.beergate.es
+      - ENVIRONMENT=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - beergate-v2
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # ── Celery worker ──────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: beergate-v2-backend:latest
+    container_name: beergate-v2-worker
+    restart: always
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://beergate:${POSTGRES_PASSWORD}@postgres:5432/beergate
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - AI_PROVIDER_CHAIN=${AI_PROVIDER_CHAIN:-together,claude,ollama}
+      - OLLAMA_URL=${OLLAMA_URL:-http://192.168.30.102:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - ENVIRONMENT=production
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - beergate-v2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Celery Beat (scheduled tasks) ─────────────────────────────────────────
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: beergate-v2-backend:latest
+    container_name: beergate-v2-beat
+    restart: always
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://beergate:${POSTGRES_PASSWORD}@postgres:5432/beergate
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - REFRESH_SECRET_KEY=${REFRESH_SECRET_KEY}
+      - ENVIRONMENT=production
+    depends_on:
+      - redis
+    networks:
+      - beergate-v2
+
+  # ── Frontend (nginx SPA) ──────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: ""  # empty = same origin
+    image: beergate-v2-frontend:latest
+    container_name: beergate-v2-frontend
+    restart: always
+    ports:
+      - "8080:80"   # External nginx proxies beergate.es → 8080
+    depends_on:
+      - backend
+    networks:
+      - beergate-v2
+      - proxy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: beergate-v2-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=beergate
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=beergate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beergate -d beergate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - beergate-v2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: beergate-v2-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - beergate-v2
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  beergate-v2:
+    driver: bridge
+    name: beergate-v2-prod
+  proxy:
+    external: true
