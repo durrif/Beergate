@@ -1,6 +1,5 @@
 # docker-compose.yml — Development (Beergate v2)
 # Production uses docker-compose.production.yml
-version: '3.9'
 
 services:
   backend:
@@ -26,6 +25,7 @@ services:
       - ISPINDEL_WEBHOOK_SECRET=${ISPINDEL_WEBHOOK_SECRET}
       - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
       - ENVIRONMENT=development
+      - LOG_FORMAT=text
     volumes:
       - ./backend:/app  # dev hot-reload mount
     depends_on:

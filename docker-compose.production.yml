@@ -7,7 +7,6 @@
 #   docker compose -f docker-compose.production.yml up -d
 #   docker compose -f docker-compose.production.yml exec backend alembic upgrade head
 #
-version: '3.9'
 
 services:
   # ── Backend API ────────────────────────────────────────────────────────────
@@ -38,6 +37,7 @@ services:
       - ISPINDEL_WEBHOOK_SECRET=${ISPINDEL_WEBHOOK_SECRET}
       - CORS_ORIGINS=https://beergate.es,https://www.beergate.es
       - ENVIRONMENT=production
+      - LOG_FORMAT=json
     depends_on:
       postgres:
         condition: service_healthy
@@ -108,6 +108,11 @@ services:
       - redis
     networks:
       - beergate-v2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ── Frontend (nginx SPA) ──────────────────────────────────────────────────
   frontend:

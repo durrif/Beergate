@@ -73,5 +73,9 @@ class Settings(BaseSettings):
     MAX_PAGE_SIZE: int = 200
     FERMENTATION_DATA_LIMIT: int = 500
 
+    # Logging
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: str = "json"  # "json" | "text"
+
 
 settings = Settings()

@@ -1,7 +1,10 @@
 # backend/app/main.py
 import logging
+import time
+import uuid
 from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextvars import ContextVar
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +12,7 @@ from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
 from app.core.database import engine
@@ -25,6 +29,52 @@ from app.api.v1 import fermentation as fermentation_router
 from app.api.v1 import prices as prices_router
 from app.api.v1 import water as water_router
 
+# ─── Correlation ID context ───────────────────────────────────────────────────
+request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
+
+
+# ─── Structured logging setup ────────────────────────────────────────────────
+def setup_logging() -> None:
+    """Configure structured JSON or text logging based on settings."""
+    root = logging.getLogger()
+    root.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
+
+    # Remove existing handlers
+    for h in root.handlers[:]:
+        root.removeHandler(h)
+
+    handler = logging.StreamHandler()
+
+    if settings.LOG_FORMAT == "json":
+        from pythonjsonlogger.json import JsonFormatter
+
+        class CorrelatedJsonFormatter(JsonFormatter):
+            def add_fields(self, log_record, record, message_dict):
+                super().add_fields(log_record, record, message_dict)
+                log_record["request_id"] = request_id_var.get("-")
+                log_record["service"] = "beergate-api"
+                log_record["environment"] = settings.ENVIRONMENT
+
+        handler.setFormatter(CorrelatedJsonFormatter(
+            "%(asctime)s %(levelname)s %(name)s %(message)s",
+            rename_fields={"asctime": "timestamp", "levelname": "level"},
+        ))
+    else:
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)-5s [%(name)s] [%(request_id)s] %(message)s",
+            defaults={"request_id": "-"},
+        ))
+
+    root.addHandler(handler)
+
+    # Quiet noisy libraries
+    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+
+
+setup_logging()
 logger = logging.getLogger(__name__)
 
 # ─── Rate limiter ─────────────────────────────────────────────────────────────
@@ -73,14 +123,20 @@ app.add_middleware(
 
 
 # ─── Request logging middleware ───────────────────────────────────────────────
-import time
-from starlette.middleware.base import BaseHTTPMiddleware
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # Generate or read correlation ID
+        rid = request.headers.get("X-Request-ID", uuid.uuid4().hex[:12])
+        request_id_var.set(rid)
+
         start = time.perf_counter()
         response = await call_next(request)
         duration_ms = (time.perf_counter() - start) * 1000
+
+        # Inject correlation ID into response headers
+        response.headers["X-Request-ID"] = rid
+
         # Skip health/docs endpoints to reduce noise
         path = request.url.path
         if not path.startswith(("/api/health", "/api/docs", "/api/redoc", "/openapi.json")):
@@ -90,6 +146,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                 path,
                 response.status_code,
                 duration_ms,
+                extra={"method": request.method, "path": path, "status": response.status_code, "duration_ms": round(duration_ms)},
             )
         return response
 
