@@ -22,6 +22,10 @@
 
 static const char *TAG = "AUDIO";
 
+// Pre-buffer: captures audio BEFORE speech onset so wake word isn't clipped
+#define PRE_BUFFER_SECONDS  1
+#define PRE_BUFFER_SAMPLES  (AUDIO_SAMPLE_RATE * PRE_BUFFER_SECONDS)  // 16000 samples = 32KB
+
 // Audio state
 typedef struct {
     bool initialized;
@@ -37,6 +41,12 @@ typedef struct {
     int16_t *buffer;
     size_t buffer_capacity;    // Total capacity in samples
     size_t buffer_index;       // Current write position
+    
+    // Circular pre-buffer (always capturing, even when not recording)
+    int16_t *pre_buffer;
+    size_t pre_buf_capacity;   // PRE_BUFFER_SAMPLES
+    size_t pre_buf_head;       // next write position
+    size_t pre_buf_count;      // valid samples in buffer
     
     // Real-time metrics
     float current_rms_db;
@@ -129,8 +139,8 @@ static void audio_task(void *arg) {
             s_state.last_voice_time_ms = now_ms;
         }
         
-        // Only buffer audio when recording is active
         if (s_state.recording) {
+            // Buffer audio into recording buffer
             size_t space_left = s_state.buffer_capacity - s_state.buffer_index;
             size_t to_copy = (samples_read < space_left) ? samples_read : space_left;
             
@@ -141,7 +151,18 @@ static void audio_task(void *arg) {
             
             if (s_state.buffer_index >= s_state.buffer_capacity) {
                 ESP_LOGW(TAG, "[TASK] Recording buffer FULL (%zu samples)", s_state.buffer_index);
-                s_state.recording = false; // Auto-stop recording when full
+                s_state.recording = false;
+            }
+        } else {
+            // Not recording: write to circular pre-buffer so we capture speech before onset
+            for (size_t i = 0; i < samples_read; i++) {
+                s_state.pre_buffer[s_state.pre_buf_head] = frame_buf[i];
+                s_state.pre_buf_head = (s_state.pre_buf_head + 1) % s_state.pre_buf_capacity;
+            }
+            if (s_state.pre_buf_count + samples_read >= s_state.pre_buf_capacity) {
+                s_state.pre_buf_count = s_state.pre_buf_capacity;
+            } else {
+                s_state.pre_buf_count += samples_read;
             }
         }
     }
@@ -169,6 +190,18 @@ esp_err_t audio_capture_init(void) {
                  s_state.buffer_capacity * sizeof(int16_t));
         return ESP_ERR_NO_MEM;
     }
+    
+    // Allocate circular pre-buffer (1 second, captures audio before speech onset)
+    s_state.pre_buf_capacity = PRE_BUFFER_SAMPLES;
+    s_state.pre_buffer = (int16_t *)malloc(s_state.pre_buf_capacity * sizeof(int16_t));
+    if (!s_state.pre_buffer) {
+        ESP_LOGE(TAG, "Failed to allocate pre-buffer (%zu bytes)",
+                 s_state.pre_buf_capacity * sizeof(int16_t));
+        free(s_state.buffer);
+        return ESP_ERR_NO_MEM;
+    }
+    s_state.pre_buf_head = 0;
+    s_state.pre_buf_count = 0;
     
     // Initialize BSP I2C (required for codec configuration)
     esp_err_t ret = bsp_i2c_init();
@@ -243,8 +276,22 @@ esp_err_t audio_capture_start(void) {
         return ESP_FAIL;
     }
     
-    // Reset buffer and VAD state, start buffering
+    // Flush pre-buffer into recording buffer so we don't lose the wake word
     s_state.buffer_index = 0;
+    if (s_state.pre_buf_count > 0) {
+        size_t count = s_state.pre_buf_count;
+        if (count > s_state.buffer_capacity) count = s_state.buffer_capacity;
+        // Read from oldest sample in the circular buffer
+        size_t start = (s_state.pre_buf_head + s_state.pre_buf_capacity - count) % s_state.pre_buf_capacity;
+        for (size_t i = 0; i < count; i++) {
+            s_state.buffer[i] = s_state.pre_buffer[(start + i) % s_state.pre_buf_capacity];
+        }
+        s_state.buffer_index = count;
+        ESP_LOGI(TAG, "Pre-buffer: copied %zu samples (%.2fs)", count, (float)count / AUDIO_SAMPLE_RATE);
+    }
+    // Reset pre-buffer and VAD state
+    s_state.pre_buf_count = 0;
+    s_state.pre_buf_head = 0;
     s_state.voice_detected = false;
     s_state.voice_start_time_ms = 0;
     s_state.last_voice_time_ms = 0;
