@@ -15,6 +15,7 @@ from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
+from app.core.config import settings
 from app.core.redis import get_redis_pool
 from app.models.price import PriceRecord, PriceAlert, AlertType
 from app.services.scraper_service import search_all_shops, PriceResult
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/prices", tags=["Prices"])
 
-CACHE_TTL = 3600 * 3  # 3 hours
+CACHE_TTL = settings.PRICE_CACHE_TTL
 
 
 # ---------------------------------------------------------------------------
@@ -75,7 +76,7 @@ async def search_prices(
             if cached:
                 data = json.loads(cached)
                 return [PriceResultOut(**r, cached=True) for r in data]
-        except Exception as exc:
+        except (ConnectionError, TimeoutError, OSError) as exc:
             logger.warning("Redis cache read error: %s", exc)
 
     # Live scrape
@@ -103,7 +104,7 @@ async def search_prices(
     if redis:
         try:
             await redis.setex(cache_key, CACHE_TTL, json.dumps([o.model_dump(mode="json") for o in out]))
-        except Exception as exc:
+        except (ConnectionError, TimeoutError, OSError) as exc:
             logger.warning("Redis cache write error: %s", exc)
 
     return out
@@ -151,7 +152,7 @@ async def compare_recipe_prices(
                 if cached:
                     data = json.loads(cached)
                     results = [PriceResultOut(**r, cached=True) for r in data]
-            except Exception:
+            except (ConnectionError, TimeoutError, OSError):
                 pass
 
         if not results:

@@ -14,7 +14,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, BeforeValidator, Field
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
@@ -186,23 +186,28 @@ async def list_conversations(
         .offset(offset)
     )
     convs = rows.scalars().all()
+    if not convs:
+        return []
 
-    result = []
-    for c in convs:
-        count_result = await db.execute(
-            select(AIMessage.id).where(AIMessage.conversation_id == c.id)
+    # Single query to get message counts for all conversations (avoids N+1)
+    conv_ids = [c.id for c in convs]
+    count_rows = await db.execute(
+        select(AIMessage.conversation_id, func.count(AIMessage.id))
+        .where(AIMessage.conversation_id.in_(conv_ids))
+        .group_by(AIMessage.conversation_id)
+    )
+    counts = dict(count_rows.all())
+
+    return [
+        ConversationOut(
+            id=c.id,
+            title=c.title,
+            context_page=c.context_page,
+            created_at=c.created_at,
+            message_count=counts.get(c.id, 0),
         )
-        count = len(count_result.all())
-        result.append(
-            ConversationOut(
-                id=c.id,
-                title=c.title,
-                context_page=c.context_page,
-                created_at=c.created_at,
-                message_count=count,
-            )
-        )
-    return result
+        for c in convs
+    ]
 
 
 @router.get("/conversations/{conversation_id}/messages")

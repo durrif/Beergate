@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
+from app.core.security import decode_access_token
 from app.models.brew_session import BrewSession, SessionPhase
 
 logger = logging.getLogger(__name__)
@@ -263,13 +264,22 @@ _ws_connections: dict[int, list[WebSocket]] = {}
 async def session_websocket(
     session_id: int,
     websocket: WebSocket,
+    token: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     """
     WebSocket for real-time brew session feed.
     Clients send timer tick / phase updates; server broadcasts to all watchers.
-    NOTE: Auth via query param token (simple check for now).
+    Auth via query param token: ws://host/api/v1/brewing/1/ws?token=<JWT>
     """
+    if not token:
+        await websocket.close(code=4001, reason="Missing authentication token")
+        return
+    try:
+        decode_access_token(token)
+    except Exception:
+        await websocket.close(code=4001, reason="Invalid authentication token")
+        return
     await websocket.accept()
     _ws_connections.setdefault(session_id, []).append(websocket)
     try:
@@ -280,7 +290,7 @@ async def session_websocket(
                 if ws is not websocket:
                     try:
                         await ws.send_json(data)
-                    except Exception:
+                    except (WebSocketDisconnect, RuntimeError) as _exc:
                         _ws_connections[session_id].remove(ws)
     except WebSocketDisconnect:
         conns = _ws_connections.get(session_id, [])

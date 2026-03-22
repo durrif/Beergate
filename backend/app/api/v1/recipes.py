@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.models.recipe import Recipe, RecipeStatus
+from app.utils.beerxml import parse_beerxml
 
 logger = logging.getLogger(__name__)
 
@@ -84,87 +85,8 @@ class RecipeOut(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers (BeerXML parsing moved to app.utils.beerxml)
 # ---------------------------------------------------------------------------
-
-def _xml_text(el: ET.Element | None) -> str | None:
-    return el.text.strip() if el is not None and el.text else None
-
-
-def _xml_float(el: ET.Element | None) -> float | None:
-    try:
-        return float(_xml_text(el) or "")
-    except (ValueError, TypeError):
-        return None
-
-
-def parse_beerxml(content: bytes) -> dict[str, Any]:
-    """Parse BeerXML 1.0 bytes into a RecipeCreate-compatible dict."""
-    root = ET.fromstring(content)
-    rec_el = root.find(".//RECIPE")
-    if rec_el is None:
-        raise ValueError("No <RECIPE> element found in BeerXML")
-
-    fermentables = []
-    for f in rec_el.findall(".//FERMENTABLE"):
-        fermentables.append({
-            "name": _xml_text(f.find("NAME")),
-            "amount_kg": _xml_float(f.find("AMOUNT")),
-            "color_ebc": (_xml_float(f.find("COLOR")) or 0) * 1.97,  # SRM→EBC
-            "type": _xml_text(f.find("TYPE")),
-            "origin": _xml_text(f.find("ORIGIN")),
-        })
-
-    hops = []
-    for h in rec_el.findall(".//HOP"):
-        hops.append({
-            "name": _xml_text(h.find("NAME")),
-            "amount_g": (_xml_float(h.find("AMOUNT")) or 0) * 1000,
-            "alpha_pct": _xml_float(h.find("ALPHA")),
-            "time_min": _xml_float(h.find("TIME")),
-            "use": _xml_text(h.find("USE")),
-            "form": _xml_text(h.find("FORM")),
-        })
-
-    yeasts = []
-    for y in rec_el.findall(".//YEAST"):
-        yeasts.append({
-            "name": _xml_text(y.find("NAME")),
-            "lab": _xml_text(y.find("LABORATORY")),
-            "product_id": _xml_text(y.find("PRODUCT_ID")),
-            "attenuation_pct": _xml_float(y.find("ATTENUATION")),
-            "min_temp": _xml_float(y.find("MIN_TEMPERATURE")),
-            "max_temp": _xml_float(y.find("MAX_TEMPERATURE")),
-        })
-
-    mash_steps = []
-    for ms in rec_el.findall(".//MASH_STEP"):
-        mash_steps.append({
-            "name": _xml_text(ms.find("NAME")),
-            "temp_c": _xml_float(ms.find("STEP_TEMP")),
-            "duration_min": _xml_float(ms.find("STEP_TIME")),
-            "type": _xml_text(ms.find("TYPE")),
-        })
-
-    batch_l = _xml_float(rec_el.find("BATCH_SIZE"))
-    eff = _xml_float(rec_el.find("EFFICIENCY"))
-    og = _xml_float(rec_el.find("OG"))
-    fg = _xml_float(rec_el.find("FG"))
-
-    return {
-        "name": _xml_text(rec_el.find("NAME")) or "Imported Recipe",
-        "style": _xml_text(rec_el.find(".//STYLE/NAME")),
-        "style_code": _xml_text(rec_el.find(".//STYLE/STYLE_LETTER")),
-        "description": _xml_text(rec_el.find("NOTES")),
-        "batch_size_liters": batch_l,
-        "efficiency_pct": eff,
-        "og": og,
-        "fg": fg,
-        "fermentables": fermentables,
-        "hops": hops,
-        "yeasts": yeasts,
-        "mash_steps": mash_steps,
-    }
 
 
 # ---------------------------------------------------------------------------
@@ -281,12 +203,24 @@ async def import_beerxml(
     if not brewery:
         raise HTTPException(status_code=400, detail="No brewery found")
 
+    # Validate file type
+    ALLOWED_EXTENSIONS = (".xml", ".beerxml")
+    ALLOWED_MIMES = ("text/xml", "application/xml", "application/octet-stream")
+    filename = file.filename or ""
+    if not any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS):
+        raise HTTPException(status_code=400, detail="Only .xml or .beerxml files accepted")
+    if file.content_type and file.content_type not in ALLOWED_MIMES:
+        raise HTTPException(status_code=400, detail=f"Invalid content type: {file.content_type}")
+
     content = await file.read()
     if len(content) > 5 * 1024 * 1024:  # 5 MB limit
         raise HTTPException(status_code=413, detail="File too large (max 5 MB)")
 
     try:
-        recipe_data = parse_beerxml(content)
+        recipes = parse_beerxml(content)
+        if not recipes:
+            raise HTTPException(status_code=422, detail="No recipes found in BeerXML file")
+        recipe_data = recipes[0]  # Import first recipe
     except (ET.ParseError, ValueError) as exc:
         raise HTTPException(status_code=422, detail=f"Invalid BeerXML: {exc}") from exc
 

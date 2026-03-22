@@ -181,13 +181,16 @@ async def invite_brewer(
     await db.commit()
 
     # TODO: background_tasks.add_task(send_invitation_email, payload.email, token)
-    # Email sending deferred to Fase 7 (SMTP config + fastapi-mail integration)
+    # Email sending deferred — SMTP config + fastapi-mail integration pending
 
-    return {
+    response: dict = {
         "message": f"Invitation sent to {payload.email}",
-        "invitation_token": token,  # only returned in response for dev/testing
         "expires_at": expires_at.isoformat(),
     }
+    # Only expose token in development for testing — NEVER in production
+    if settings.ENVIRONMENT == "development":
+        response["invitation_token"] = token
+    return response
 
 
 # ─── Accept Invitation ────────────────────────────────────────────────────────

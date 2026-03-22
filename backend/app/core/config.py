@@ -65,5 +65,13 @@ class Settings(BaseSettings):
     # Invitation token TTL (hours)
     INVITATION_EXPIRE_HOURS: int = 48
 
+    # Cache TTL (seconds) for price scraping results
+    PRICE_CACHE_TTL: int = 3600 * 3  # 3 hours
+
+    # Default pagination limits
+    DEFAULT_PAGE_SIZE: int = 50
+    MAX_PAGE_SIZE: int = 200
+    FERMENTATION_DATA_LIMIT: int = 500
+
 
 settings = Settings()

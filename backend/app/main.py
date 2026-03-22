@@ -72,6 +72,30 @@ app.add_middleware(
 )
 
 
+# ─── Request logging middleware ───────────────────────────────────────────────
+import time
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start = time.perf_counter()
+        response = await call_next(request)
+        duration_ms = (time.perf_counter() - start) * 1000
+        # Skip health/docs endpoints to reduce noise
+        path = request.url.path
+        if not path.startswith(("/api/health", "/api/docs", "/api/redoc", "/openapi.json")):
+            logger.info(
+                "%s %s → %d (%.0fms)",
+                request.method,
+                path,
+                response.status_code,
+                duration_ms,
+            )
+        return response
+
+app.add_middleware(RequestLoggingMiddleware)
+
+
 # ─── Routers ──────────────────────────────────────────────────────────────────
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(inventory_router.router, prefix="/api/v1")

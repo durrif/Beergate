@@ -16,6 +16,11 @@ from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
+
+class ScraperError(Exception):
+    """Base exception for scraper failures."""
+    pass
+
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -98,8 +103,10 @@ async def scrape_latiendadelcervecero(query: str) -> list[PriceResult]:
                     in_stock=True,
                 )
             )
-    except Exception as exc:
-        logger.warning("latiendadelcervecero scrape error for %s: %s", query, exc)
+    except httpx.HTTPError as exc:
+        logger.warning("latiendadelcervecero HTTP error for %s: %s", query, exc)
+    except (ValueError, KeyError, AttributeError) as exc:
+        logger.warning("latiendadelcervecero parse error for %s: %s", query, exc)
     return results
 
 
@@ -136,8 +143,10 @@ async def scrape_cervezania(query: str) -> list[PriceResult]:
                     in_stock=True,
                 )
             )
-    except Exception as exc:
-        logger.warning("cervezania scrape error for %s: %s", query, exc)
+    except httpx.HTTPError as exc:
+        logger.warning("cervezania HTTP error for %s: %s", query, exc)
+    except (ValueError, KeyError, AttributeError) as exc:
+        logger.warning("cervezania parse error for %s: %s", query, exc)
     return results
 
 
@@ -174,8 +183,10 @@ async def scrape_thebeertimes(query: str) -> list[PriceResult]:
                     in_stock=True,
                 )
             )
-    except Exception as exc:
-        logger.warning("thebeertimes scrape error for %s: %s", query, exc)
+    except httpx.HTTPError as exc:
+        logger.warning("thebeertimes HTTP error for %s: %s", query, exc)
+    except (ValueError, KeyError, AttributeError) as exc:
+        logger.warning("thebeertimes parse error for %s: %s", query, exc)
     return results
 
 
@@ -212,8 +223,10 @@ async def scrape_cocinista(query: str) -> list[PriceResult]:
                     in_stock=True,
                 )
             )
-    except Exception as exc:
-        logger.warning("cocinista scrape error for %s: %s", query, exc)
+    except httpx.HTTPError as exc:
+        logger.warning("cocinista HTTP error for %s: %s", query, exc)
+    except (ValueError, KeyError, AttributeError) as exc:
+        logger.warning("cocinista parse error for %s: %s", query, exc)
     return results
 
 

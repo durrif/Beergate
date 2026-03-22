@@ -72,10 +72,13 @@ class ISpindelPayload(BaseModel):
 # ---------------------------------------------------------------------------
 
 def _verify_ispindel_signature(request_body: bytes, signature: str | None) -> bool:
-    """Verify iSpindel HMAC signature if ISPINDEL_WEBHOOK_SECRET is set."""
+    """Verify iSpindel HMAC signature. Required in production."""
     secret = settings.ISPINDEL_WEBHOOK_SECRET
     if not secret:
-        return True  # no secret configured → accept all
+        if settings.ENVIRONMENT == "production":
+            logger.warning("iSpindel webhook received but ISPINDEL_WEBHOOK_SECRET not configured in production")
+            return False
+        return True  # no secret configured in dev → accept all
     if not signature:
         return False
     expected = hmac.new(secret.encode(), request_body, hashlib.sha256).hexdigest()
@@ -89,7 +92,7 @@ def _verify_ispindel_signature(request_body: bytes, signature: str | None) -> bo
 @router.get("/{session_id}/data", response_model=list[DataPointOut])
 async def get_fermentation_data(
     session_id: int,
-    limit: int = 500,
+    limit: int = settings.FERMENTATION_DATA_LIMIT,
     current_user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
