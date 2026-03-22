@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS 
+        "app_main.c"
+        "ui.c"
+        "audio_capture.c"
+        "wyoming_client.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        esp-box-3
+        esp_lvgl_port
+        lvgl
+        nvs_flash
+        ui_assets
+        esp_http_client
+        json
+        esp_netif
+        esp_wifi
+)

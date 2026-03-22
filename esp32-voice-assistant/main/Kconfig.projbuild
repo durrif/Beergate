@@ -1,0 +1,27 @@
+menu "Example Connection Configuration"
+
+    config EXAMPLE_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config EXAMPLE_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+
+    config EXAMPLE_WIFI_SCAN_METHOD
+        int
+        default 1
+
+    config EXAMPLE_WIFI_CONNECT_AP_BY_SIGNAL
+        bool
+        default y
+
+    config EXAMPLE_WIFI_SCAN_RSSI_THRESHOLD
+        int
+        default -127
+
+endmenu

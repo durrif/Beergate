@@ -1,0 +1,52 @@
+# PlatformIO
+.pio/
+managed_components/
+
+# ESP-IDF build
+build/
+sdkconfig.old
+dependencies.lock
+
+# Binaries
+*.bin
+*.tar.gz
+
+# Backup / old files
+*_old.c
+*_old.h
+*_old_backup.c
+*_backup*.c
+*_new.c
+CMakeLists_new.txt
+*.bak
+
+# IDE / editor
+.vscode/
+*.code-workspace
+compile_commands.json
+
+# Python
+*.pyc
+__pycache__/
+
+# Large third-party component assets (not needed to build)
+components/esp-box/hardware/
+components/esp-box/examples/
+components/esp-box/docs/
+components/esp-box/bin/
+components/lvgl/demos/
+components/lvgl/examples/
+components/lvgl/tests/
+components/lvgl/scripts/
+components/lvgl/env_support/
+components/lvgl/docs/
+
+# LVGL PC simulator (not needed for ESP32)
+main/ui/lv_port_pc_vscode/
+
+# Misc
+prompt*.md
+gato*.png
+
+# Large LVGL fonts not used
+components/lvgl/src/font/korean.ttf

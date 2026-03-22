@@ -1,0 +1,11 @@
+idf_component_register(
+    SRCS 
+        "cat_frame_0.c"
+        "cat_frame_1.c"
+        "cat_frame_2.c"
+        "cat_frame_3.c"
+    INCLUDE_DIRS 
+        "."
+    REQUIRES 
+        lvgl
+)
