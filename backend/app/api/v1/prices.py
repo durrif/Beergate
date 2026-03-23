@@ -10,7 +10,6 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +17,7 @@ from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.core.redis import get_redis_pool
 from app.models.price import PriceRecord, PriceAlert, AlertType
+from app.schemas.price import PriceResultOut, RecipePriceComparison
 from app.services.scraper_service import search_all_shops, PriceResult
 
 logger = logging.getLogger(__name__)
@@ -25,31 +25,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/prices", tags=["Prices"])
 
 CACHE_TTL = settings.PRICE_CACHE_TTL
-
-
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
-
-class PriceResultOut(BaseModel):
-    ingredient_name: str
-    shop_name: str
-    shop_url: str
-    product_url: str
-    product_name: str
-    price: float
-    unit: str
-    price_per_kg: float | None
-    in_stock: bool
-    cached: bool = False
-    scraped_at: datetime | None = None
-
-
-class RecipePriceComparison(BaseModel):
-    ingredient_name: str
-    cheapest_price: float | None
-    cheapest_shop: str | None
-    all_offers: list[PriceResultOut]
 
 
 # ---------------------------------------------------------------------------

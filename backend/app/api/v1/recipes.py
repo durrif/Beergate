@@ -4,84 +4,29 @@ from __future__ import annotations
 
 import logging
 import xml.etree.ElementTree as ET
-from typing import Annotated, Any
+from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, BeforeValidator, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.models.recipe import Recipe, RecipeStatus
+from app.schemas.recipe import (
+    CanBrewItem,
+    CanBrewLowStock,
+    CanBrewResult,
+    RecipeCreate,
+    RecipeOut,
+    RecipeUpdate,
+)
 from app.utils.beerxml import parse_beerxml
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
-
-StrID = Annotated[str, BeforeValidator(str)]
-
-
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
-
-class RecipeCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=200)
-    style: str | None = Field(None, max_length=100)
-    style_code: str | None = Field(None, max_length=20)
-    description: str | None = None
-    batch_size_liters: float | None = None
-    efficiency_pct: float | None = None
-    og: float | None = None
-    fg: float | None = None
-    abv: float | None = None
-    ibu: float | None = None
-    srm: float | None = None
-    ebc: float | None = None
-    fermentables: list[dict] | None = None
-    hops: list[dict] | None = None
-    yeasts: list[dict] | None = None
-    adjuncts: list[dict] | None = None
-    mash_steps: list[dict] | None = None
-    water_profile: dict | None = None
-    notes: str | None = None
-
-
-class RecipeUpdate(RecipeCreate):
-    name: str | None = None  # type: ignore[assignment]
-    status: RecipeStatus | None = None
-
-
-class RecipeOut(BaseModel):
-    id: StrID
-    brewery_id: StrID
-    name: str
-    style: str | None
-    style_code: str | None
-    description: str | None
-    status: str
-    batch_size_liters: float | None
-    efficiency_pct: float | None
-    og: float | None
-    fg: float | None
-    abv: float | None
-    ibu: float | None
-    srm: float | None
-    ebc: float | None
-    fermentables: list[dict] | None
-    hops: list[dict] | None
-    yeasts: list[dict] | None
-    adjuncts: list[dict] | None
-    mash_steps: list[dict] | None
-    water_profile: dict | None
-    notes: str | None
-    brewers_friend_id: str | None
-    created_at: Any | None = None
-    updated_at: Any | None = None
-    model_config = {"from_attributes": True}
 
 
 # ---------------------------------------------------------------------------
@@ -284,22 +229,6 @@ async def import_brewers_friend(
 # Can-brew check + brew session creation
 # ---------------------------------------------------------------------------
 
-class CanBrewItem(BaseModel):
-    name: str
-    required: float
-    unit: str
-
-class CanBrewLowStock(BaseModel):
-    name: str
-    required: float
-    available: float
-    unit: str
-
-class CanBrewResult(BaseModel):
-    status: str  # ready | partial | missing
-    missing: list[CanBrewItem]
-    low_stock: list[CanBrewLowStock]
-    available: list[str]
 
 
 @router.get("/{recipe_id}/can-brew", response_model=CanBrewResult)

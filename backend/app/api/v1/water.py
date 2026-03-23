@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_active_user, get_db
 from app.models.user import User
+from app.schemas.water import AdjustmentRequest, WaterProfileIn
 from app.services.water_service import (
     WaterProfile,
     calculate_adjustments,
@@ -19,27 +19,6 @@ from app.services.water_service import (
 )
 
 router = APIRouter(prefix="/water", tags=["water"])
-
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
-
-class WaterProfileIn(BaseModel):
-    name: str = "Mi Agua"
-    calcium: float = Field(ge=0, le=1000, default=0)
-    magnesium: float = Field(ge=0, le=500, default=0)
-    sodium: float = Field(ge=0, le=500, default=0)
-    sulfate: float = Field(ge=0, le=1000, default=0)
-    chloride: float = Field(ge=0, le=1000, default=0)
-    bicarbonate: float = Field(ge=0, le=1000, default=0)
-    ph: float = Field(ge=0, le=14, default=7.0)
-
-
-class AdjustmentRequest(BaseModel):
-    profile: WaterProfileIn
-    style: str = "balanced"
-    batch_liters: float = Field(ge=1, le=1000, default=20)
-
 
 # ---------------------------------------------------------------------------
 # Endpoints

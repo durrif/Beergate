@@ -10,61 +10,18 @@ import hashlib
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect, status
-from pydantic import BaseModel, BeforeValidator, Field
-from typing import Annotated
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
 from app.core.config import settings
+from app.schemas.fermentation import DataPointIn, DataPointOut, ISpindelPayload
 from app.models.brew_session import BrewSession
 from app.models.fermentation import FermentationDataPoint
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/fermentation", tags=["Fermentation"])
-
-StrID = Annotated[str, BeforeValidator(str)]
-
-
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
-
-class DataPointIn(BaseModel):
-    temperature: float | None = None
-    gravity: float | None = None
-    angle: float | None = None
-    battery: float | None = None
-    rssi: int | None = None
-    source: str = Field("manual", max_length=20)
-    recorded_at: datetime | None = None
-
-
-class DataPointOut(BaseModel):
-    id: StrID
-    session_id: StrID
-    temperature: float | None
-    gravity: float | None
-    angle: float | None
-    battery: float | None
-    rssi: int | None
-    source: str
-    recorded_at: datetime
-    model_config = {"from_attributes": True}
-
-
-class ISpindelPayload(BaseModel):
-    """iSpindel sends this JSON to the webhook URL."""
-    name: str
-    ID: int
-    angle: float
-    temperature: float
-    temp_units: str = "C"
-    battery: float
-    gravity: float
-    interval: int
-    RSSI: int
 
 
 # ---------------------------------------------------------------------------
