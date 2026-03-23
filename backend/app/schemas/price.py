@@ -26,3 +26,22 @@ class RecipePriceComparison(BaseModel):
     cheapest_price: float | None
     cheapest_shop: str | None
     all_offers: list[PriceResultOut]
+
+
+class PriceAlertOut(BaseModel):
+    id: int
+    brewery_id: int
+    ingredient_name: str
+    alert_type: str
+    threshold_price: float | None
+    is_active: bool
+    last_triggered_at: datetime | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class PriceAlertCreate(BaseModel):
+    ingredient_name: str
+    alert_type: str = "price_drop"
+    threshold_price: float | None = None

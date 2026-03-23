@@ -17,7 +17,7 @@ from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.core.redis import get_redis_pool
 from app.models.price import PriceRecord, PriceAlert, AlertType
-from app.schemas.price import PriceResultOut, RecipePriceComparison
+from app.schemas.price import PriceResultOut, RecipePriceComparison, PriceAlertOut, PriceAlertCreate
 from app.services.scraper_service import search_all_shops, PriceResult
 
 logger = logging.getLogger(__name__)
@@ -185,30 +185,6 @@ async def trigger_recipe_scrape(
     except Exception as exc:
         logger.error("Failed to dispatch scrape task: %s", exc)
         raise HTTPException(status_code=503, detail="Could not queue scrape task")
-
-
-# ---------------------------------------------------------------------------
-# Alert Schemas
-# ---------------------------------------------------------------------------
-
-class PriceAlertOut(BaseModel):
-    id: int
-    brewery_id: int
-    ingredient_name: str
-    alert_type: str
-    threshold_price: float | None
-    is_active: bool
-    last_triggered_at: datetime | None
-    created_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-class PriceAlertCreate(BaseModel):
-    ingredient_name: str
-    alert_type: str = "price_drop"
-    threshold_price: float | None = None
-
 
 # ---------------------------------------------------------------------------
 # Alert Routes
