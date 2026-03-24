@@ -208,7 +208,7 @@ export function AiPanel() {
             <Send size={16} />
           </button>
         </div>
-        <p className="text-[10px] text-text-secondary mt-1 text-center">Enter para enviar · Shift+Enter nueva línea</p>
+        <p className="text-[10px] text-text-secondary mt-1 text-center">{t('ai:input_hint', 'Enter to send · Shift+Enter new line')}</p>
       </div>
     </div>
   )

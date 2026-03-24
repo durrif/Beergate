@@ -1,0 +1,29 @@
+{
+  "subtitle": "Performance, costs and trends for your brewery",
+  "last_6m": "Last 6 months",
+  "last_12m": "Last year",
+  "all_time": "All time",
+  "production_volume": "Production volume",
+  "top_styles": "Most brewed styles",
+  "efficiency_trend": "Efficiency trend",
+  "cost_trend": "Cost per liter",
+  "style_distribution": "Style distribution",
+  "ingredient_usage": "Ingredient usage (kg)",
+  "fermentation_comparison": "Fermentation performance",
+  "seasonal_patterns": "Seasonal patterns (liters/month)",
+  "brewery_score": "Brewery profile",
+  "overall_score": "Overall score",
+  "kpi": {
+    "batches": "Total batches",
+    "efficiency": "Average efficiency",
+    "cost_per_liter": "Cost per liter",
+    "ingredients_used": "Ingredients used"
+  },
+  "table": {
+    "batch": "Batch",
+    "attenuation": "Att.",
+    "days": "Days"
+  },
+  "liters": "Liters",
+  "score": "Score"
+}

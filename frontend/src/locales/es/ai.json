@@ -1,6 +1,10 @@
 {
   "assistant_name": "Brewmaster",
   "welcome": "¡Hola! Soy Brewmaster, tu asistente cervecero. ¿En qué puedo ayudarte hoy?",
+  "new_chat": "Nueva",
+  "chat_history": "Historial",
+  "no_conversations": "Sin conversaciones aún",
+  "placeholder": "Pregúntame cualquier cosa sobre tu cervecería...",
   "context": {
     "inventory": "Contexto: Inventario",
     "brewing": "Contexto: Elaboración activa",
@@ -39,5 +43,6 @@
   "errors": {
     "stream_failed": "Error al conectar con el asistente. Inténtalo de nuevo.",
     "no_response": "Sin respuesta del asistente."
-  }
+  },
+  "input_hint": "Enter → enviar · Shift+Enter → nueva línea"
 }

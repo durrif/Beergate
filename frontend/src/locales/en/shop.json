@@ -1,27 +1,101 @@
 {
-  "title": "Price Comparator",
+  "title": "Smart Procurement",
+  "subtitle": "Compare prices, set alerts and optimize your purchases",
+  "tabs": {
+    "search": "Search",
+    "shopper": "Personal Shopper",
+    "alerts": "Alerts"
+  },
   "shops": {
     "latiendadelcervecero": "La Tienda del Cervecero",
-    "cervezania": "Cervezanía", "cocinista": "Cocinista", "thebeertimes": "The Beer Times"
+    "cervezania": "Cervezanía",
+    "cocinista": "Cocinista",
+    "thebeertimes": "The Beer Times",
+    "todograno": "Todo Grano",
+    "brewhub": "Brew & Hub",
+    "themaltmiller": "The Malt Miller",
+    "brouwland": "Brouwland",
+    "hobbybrauerversand": "Hobbybrauerversand",
+    "hopandbrew": "Hop and Brew",
+    "castlemalting": "Castle Malting"
   },
   "fields": {
-    "price": "Price", "price_per_kg": "Price/kg", "shop": "Shop",
-    "in_stock": "In stock", "out_of_stock": "Out of stock",
-    "last_updated": "Updated", "best_price": "Best price"
+    "price": "Price",
+    "price_per_kg": "Price/kg",
+    "shop": "Shop",
+    "in_stock": "In stock",
+    "out_of_stock": "Out of stock",
+    "last_updated": "Updated",
+    "best_price": "Best price",
+    "shipping": "Shipping",
+    "free_shipping": "Free shipping",
+    "delivery": "Delivery",
+    "rating": "Rating",
+    "results": "Results",
+    "stores": "Stores",
+    "active_alerts": "Active alerts"
   },
   "actions": {
-    "search": "Search prices", "buy": "Buy", "set_alert": "Price alert",
-    "compare_recipe": "Compare full recipe", "refresh_prices": "Refresh prices"
+    "search": "Search prices",
+    "buy": "Buy",
+    "set_alert": "Price alert",
+    "compare_recipe": "Compare full recipe",
+    "refresh_prices": "Refresh prices",
+    "create_alert": "Create alert",
+    "visit": "Visit",
+    "details": "Details",
+    "filter_stock": "In stock only",
+    "all_suppliers": "All"
   },
   "alerts": {
     "price_drop": "{{ingredient}} dropped {{percent}}% at {{shop}}",
-    "back_in_stock": "{{ingredient}} is back in stock at {{shop}}"
+    "back_in_stock": "{{ingredient}} is back in stock at {{shop}}",
+    "new_alert": "New price alert",
+    "alert_created": "Price alert created",
+    "no_alerts": "No active alerts. Create one to get notified when prices drop."
   },
   "messages": {
     "searching": "Searching prices...",
     "no_results": "No prices found for «{{term}}»",
     "cached": "Prices updated {{time}} ago",
     "scraping": "Querying online shops...",
-    "alert_set": "Alert created for {{ingredient}}"
+    "alert_set": "Alert created for {{ingredient}}",
+    "min_chars": "Type at least 3 characters to search",
+    "comparing_shops": "We compare prices across {{count}} shops in Spain and Europe",
+    "refresh_from_shops": "Refresh prices from shops"
+  },
+  "shopper": {
+    "title": "Personal Shopper",
+    "inventory_analysis": "Inventory analysis",
+    "inventory_complete": "Inventory complete",
+    "no_restock": "No ingredients need restocking",
+    "needs_restock": "{{count}} ingredients need restocking",
+    "purchase_options": "Optimized purchase options",
+    "search_for_options": "Search ingredients to see optimized purchase options",
+    "best_price_tag": "BEST PRICE",
+    "out_of_stock": "Out of stock",
+    "below_min": "Below minimum",
+    "expiring": "Expires in {{days}} days",
+    "free_shipping": "Free shipping",
+    "items": "items",
+    "subtotal": "Subtotal"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "subtitle": "Homebrew supplier directory for Spain and Europe",
+    "all": "All",
+    "active": "Active",
+    "base_shipping": "Base shipping",
+    "currency": "Currency",
+    "web": "Website",
+    "no_results": "No suppliers found",
+    "search_placeholder": "Search supplier or specialty..."
+  },
+  "best_price": {
+    "title": "Best price",
+    "at": "at {{shop}}",
+    "free_above": "Free shipping above {{threshold}} €",
+    "shipping_cost": "Shipping: {{cost}} €",
+    "delivery_days": "{{min}}-{{max}} days"
   }
 }

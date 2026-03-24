@@ -1,0 +1,29 @@
+{
+  "subtitle": "Rendimiento, costes y tendencias de tu cervecería",
+  "last_6m": "Últimos 6 meses",
+  "last_12m": "Último año",
+  "all_time": "Todo",
+  "production_volume": "Volumen de producción",
+  "top_styles": "Estilos más elaborados",
+  "efficiency_trend": "Tendencia de eficiencia",
+  "cost_trend": "Coste por litro",
+  "style_distribution": "Distribución de estilos",
+  "ingredient_usage": "Uso de ingredientes (kg)",
+  "fermentation_comparison": "Rendimiento de fermentación",
+  "seasonal_patterns": "Patrón estacional (litros/mes)",
+  "brewery_score": "Perfil de tu cervecería",
+  "overall_score": "Puntuación general",
+  "kpi": {
+    "batches": "Lotes totales",
+    "efficiency": "Eficiencia media",
+    "cost_per_liter": "Coste por litro",
+    "ingredients_used": "Ingredientes usados"
+  },
+  "table": {
+    "batch": "Lote",
+    "attenuation": "Att.",
+    "days": "Días"
+  },
+  "liters": "Litros",
+  "score": "Puntuación"
+}

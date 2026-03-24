@@ -1,5 +1,6 @@
 // frontend/src/App.tsx
 import React, { lazy, Suspense } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createRouter, createRoute, createRootRoute, Outlet, redirect } from '@tanstack/react-router'
 import { RouterProvider } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
@@ -14,17 +15,25 @@ const InventoryPage = lazy(() => import('@/pages/inventory'))
 const BrewingPage = lazy(() => import('@/pages/brewing'))
 const FermentationPage = lazy(() => import('@/pages/fermentation'))
 const RecipesPage = lazy(() => import('@/pages/recipes'))
-const ShopPage = lazy(() => import('@/pages/shop'))
+const ProcurementPage = lazy(() => import('@/pages/procurement'))
+const DevicesPage = lazy(() => import('@/pages/devices'))
+const KeezerPage = lazy(() => import('@/pages/keezer'))
+const AnalyticsPage = lazy(() => import('@/pages/analytics'))
+const AiChatPage = lazy(() => import('@/pages/ai-chat'))
 const SettingsPage = lazy(() => import('@/pages/settings'))
+const SuppliersPage = lazy(() => import('@/pages/suppliers'))
 
-const PageLoader = () => (
+const PageLoader = () => {
+  const { t } = useTranslation('common')
+  return (
   <div className="flex items-center justify-center h-full min-h-48">
     <div className="flex flex-col items-center gap-3">
       <span className="text-4xl animate-pulse">🍺</span>
-      <p className="text-sm text-text-secondary">Cargando...</p>
+      <p className="text-sm text-text-secondary">{t('status.loading')}</p>
     </div>
   </div>
-)
+  )
+}
 
 function requireAuth() {
   const isAuthenticated = useAuthStore.getState().isAuthenticated
@@ -98,10 +107,39 @@ const recipesRoute = createRoute({
 
 const shopRoute = createRoute({
   getParentRoute: () => appRoute,
-  path: '/shop',
-  component: () => <Suspense fallback={<PageLoader />}><ShopPage /></Suspense>,
+  path: '/procurement',
+  component: () => <Suspense fallback={<PageLoader />}><ProcurementPage /></Suspense>,
 })
 
+const devicesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/devices',
+  component: () => <Suspense fallback={<PageLoader />}><DevicesPage /></Suspense>,
+})
+
+const keezerRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/keezer',
+  component: () => <Suspense fallback={<PageLoader />}><KeezerPage /></Suspense>,
+})
+
+const analyticsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/analytics',
+  component: () => <Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense>,
+})
+
+const aiChatRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/ai-chat',
+  component: () => <Suspense fallback={<PageLoader />}><AiChatPage /></Suspense>,
+})
+
+const suppliersRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/suppliers',
+  component: () => <Suspense fallback={<PageLoader />}><SuppliersPage /></Suspense>,
+})
 const settingsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/settings',
@@ -118,6 +156,11 @@ const routeTree = rootRoute.addChildren([
     fermentationRoute,
     recipesRoute,
     shopRoute,
+    devicesRoute,
+    keezerRoute,
+    analyticsRoute,
+    aiChatRoute,
+    suppliersRoute,
     settingsRoute,
   ]),
 ])

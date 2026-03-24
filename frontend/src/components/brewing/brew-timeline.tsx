@@ -1,6 +1,7 @@
 // src/components/brewing/brew-timeline.tsx
 import { motion } from "framer-motion";
 import { Check, Circle, Loader2 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import { cn } from "@/lib/utils";
 
 export type BrewPhase =
@@ -15,18 +16,18 @@ export type BrewPhase =
   | "completed"
   | "aborted";
 
-const PHASES: { key: BrewPhase; label: string; emoji: string }[] = [
-  { key: "mashing", label: "Maceración", emoji: "🌡️" },
-  { key: "lautering", label: "Filtrado", emoji: "🪣" },
-  { key: "boiling", label: "Cocción", emoji: "🔥" },
-  { key: "cooling", label: "Enfriado", emoji: "❄️" },
-  { key: "fermenting", label: "Fermentación", emoji: "🧫" },
-  { key: "conditioning", label: "Maduración", emoji: "🍺" },
-  { key: "packaging", label: "Envasado", emoji: "📦" },
-  { key: "completed", label: "Terminado", emoji: "✅" },
+const PHASE_KEYS: { key: BrewPhase; emoji: string }[] = [
+  { key: "mashing", emoji: "🌡️" },
+  { key: "lautering", emoji: "🪣" },
+  { key: "boiling", emoji: "🔥" },
+  { key: "cooling", emoji: "❄️" },
+  { key: "fermenting", emoji: "🧫" },
+  { key: "conditioning", emoji: "🍺" },
+  { key: "packaging", emoji: "📦" },
+  { key: "completed", emoji: "✅" },
 ];
 
-const PHASE_ORDER: BrewPhase[] = PHASES.map((p) => p.key);
+const PHASE_ORDER: BrewPhase[] = PHASE_KEYS.map((p) => p.key);
 
 interface BrewTimelineProps {
   currentPhase: BrewPhase;
@@ -39,6 +40,7 @@ export function BrewTimeline({
   onAdvance,
   compact = false,
 }: BrewTimelineProps) {
+  const { t } = useTranslation('brewing');
   const currentIdx = PHASE_ORDER.indexOf(currentPhase);
   const isAborted = currentPhase === "aborted";
 
@@ -49,7 +51,7 @@ export function BrewTimeline({
         compact ? "w-full overflow-x-auto pb-1" : "flex-col gap-2 md:flex-row"
       )}
     >
-      {PHASES.map(({ key, label, emoji }, idx) => {
+      {PHASE_KEYS.map(({ key, emoji }, idx) => {
         const done = currentIdx > idx && !isAborted;
         const active = currentIdx === idx && !isAborted;
         const upcoming = currentIdx < idx;
@@ -105,7 +107,7 @@ export function BrewTimeline({
                     upcoming && "text-text-muted"
                   )}
                 >
-                  {label}
+                  {t(`phases.${key}`)}
                 </span>
               )}
             </motion.div>

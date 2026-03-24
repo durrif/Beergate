@@ -1,6 +1,10 @@
 {
   "assistant_name": "Brewmaster",
   "welcome": "Hi! I'm Brewmaster, your brewing assistant. How can I help you today?",
+  "new_chat": "New",
+  "chat_history": "History",
+  "no_conversations": "No conversations yet",
+  "placeholder": "Ask me anything about your brewery...",
   "context": {
     "inventory": "Context: Inventory", "brewing": "Context: Active brew",
     "fermentation": "Context: Fermentation", "recipes": "Context: Recipes",
@@ -36,5 +40,6 @@
   "errors": {
     "stream_failed": "Error connecting to assistant. Please try again.",
     "no_response": "No response from assistant."
-  }
+  },
+  "input_hint": "Enter → send · Shift+Enter → new line"
 }

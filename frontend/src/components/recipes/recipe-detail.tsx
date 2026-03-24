@@ -1,4 +1,5 @@
 // src/components/recipes/recipe-detail.tsx
+import { useTranslation } from 'react-i18next'
 import { Beaker, Clock, Droplets, Flame, Loader2, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ interface RecipeDetailProps {
 }
 
 export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
+  const { t } = useTranslation('common')
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-48">
@@ -21,10 +23,10 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
   }
 
   const sections: { label: string; items: RecipeIngredient[] }[] = [
-    { label: "Maltas / Fermentables", items: recipe.fermentables ?? [] },
-    { label: "Lúpulos", items: recipe.hops ?? [] },
-    { label: "Levaduras", items: recipe.yeasts ?? [] },
-    { label: "Adjuntos", items: recipe.adjuncts ?? [] },
+    { label: t('recipes.fermentables'), items: recipe.fermentables ?? [] },
+    { label: t('recipes.hops'), items: recipe.hops ?? [] },
+    { label: t('recipes.yeasts'), items: recipe.yeasts ?? [] },
+    { label: t('recipes.adjuncts'), items: recipe.adjuncts ?? [] },
   ].filter((s) => s.items.length > 0);
 
   return (
@@ -47,7 +49,7 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
         {[
           { icon: <Zap className="w-4 h-4 text-amber-400" />, label: "ABV", value: recipe.abv != null ? `${recipe.abv.toFixed(1)}%` : "—" },
           { icon: <Beaker className="w-4 h-4 text-green-400" />, label: "IBU", value: recipe.ibu != null ? Math.round(recipe.ibu).toString() : "—" },
-          { icon: <Droplets className="w-4 h-4 text-blue-400" />, label: "Volumen", value: recipe.batch_size_liters ? `${recipe.batch_size_liters} L` : "—" },
+          { icon: <Droplets className="w-4 h-4 text-blue-400" />, label: t('recipes.volume'), value: recipe.batch_size_liters ? `${recipe.batch_size_liters} L` : "—" },
           { icon: <Clock className="w-4 h-4 text-zinc-400" />, label: "OG", value: recipe.og ? recipe.og.toFixed(3) : "—" },
         ].map(({ icon, label, value }) => (
           <Card key={label} className="bg-zinc-900/60 border-zinc-700">
@@ -62,7 +64,7 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
       {/* Ingredients by use */}
       <Card className="bg-zinc-900/60 border-zinc-700">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Ingredientes</CardTitle>
+          <CardTitle className="text-sm">{t('recipes.ingredients')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           {sections.map(({ label, items }, idx) => (
@@ -98,7 +100,7 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
         <Card className="bg-zinc-900/60 border-zinc-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Flame className="w-4 h-4 text-orange-400" /> Programa de maceración
+              <Flame className="w-4 h-4 text-orange-400" /> {t('recipes.mash_schedule')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -108,7 +110,7 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
                   <span className="w-5 h-5 rounded-full bg-orange-500/20 text-orange-400 text-xs flex items-center justify-center font-bold">
                     {i + 1}
                   </span>
-                  <span className="font-medium">{step.name ?? `Paso ${i + 1}`}</span>
+                  <span className="font-medium">{step.name ?? `${t('recipes.step')} ${i + 1}`}</span>
                   <span className="text-zinc-400 ml-auto text-xs">
                     {step.temp_c} °C · {step.duration_min ?? step.time_min} min
                   </span>
@@ -123,7 +125,7 @@ export function RecipeDetail({ recipe, isLoading = false }: RecipeDetailProps) {
       {recipe.notes && (
         <Card className="bg-zinc-900/60 border-zinc-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Notas</CardTitle>
+            <CardTitle className="text-sm">{t('recipes.notes')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <p className="text-sm text-zinc-300 whitespace-pre-line">{recipe.notes}</p>

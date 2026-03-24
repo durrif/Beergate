@@ -1,4 +1,5 @@
 // src/components/inventory/liquid-progress.tsx
+import { useTranslation } from 'react-i18next'
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export function LiquidProgress({
   className,
   showLabel = true,
 }: LiquidProgressProps) {
+  const { t } = useTranslation('common')
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   const isLow = low > 0 && value <= low;
   const isEmpty = value <= 0;
@@ -39,7 +41,7 @@ export function LiquidProgress({
     <div className={cn("flex flex-col gap-1", className)}>
       {showLabel && (
         <div className="flex justify-between text-xs text-text-muted">
-          <span>Stock</span>
+          <span>{t('inventory.stock')}</span>
           <span className={cn(isLow && "text-amber-400", isEmpty && "text-red-400")}>
             {value} {unit}
           </span>

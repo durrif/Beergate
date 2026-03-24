@@ -1,15 +1,17 @@
-// src/components/recipes/recipe-card.tsx
-import { motion } from "framer-motion";
-import { Beaker, Droplets, Zap } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CanBrewBadge } from "./can-brew-badge";
-import { cn } from "@/lib/utils";
-import type { Recipe } from "@/lib/types";
+// src/components/recipes/recipe-card.tsx — Beergate v3
+import { motion } from 'framer-motion'
+import { Beaker, Droplets, Zap, Wheat, Leaf, Edit3, PlayCircle } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { CanBrewBadge } from './can-brew-badge'
+import { cn } from '@/lib/utils'
+import type { Recipe } from '@/lib/types'
 
 interface RecipeCardProps {
-  recipe: Recipe;
-  index?: number;
+  recipe: Recipe
+  index?: number
+  onEdit?: () => void
+  onBrew?: () => void
 }
 
 function srmToHex(srm: number): string {
@@ -29,67 +31,100 @@ function srmToHex(srm: number): string {
   return palette[clamp] ?? "#A06010";
 }
 
-export function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
+export function RecipeCard({ recipe, index = 0, onEdit, onBrew }: RecipeCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
     >
-      <div>
-        <Card className="group bg-zinc-900/80 border-zinc-700 hover:border-amber-500/60 transition-colors h-full">
-          {/* SRM colour bar */}
-          {recipe.srm != null && (
-            <div
-              className="h-1.5 rounded-t-lg"
-              style={{ background: srmToHex(recipe.srm) }}
-            />
-          )}
+      <div className="glass-card rounded-xl border border-white/10 hover:border-accent-amber/40 transition-all h-full group cursor-pointer overflow-hidden"
+        onClick={onEdit}
+      >
+        {/* SRM colour bar */}
+        {recipe.srm != null && (
+          <div
+            className="h-1.5"
+            style={{ background: srmToHex(recipe.srm) }}
+          />
+        )}
 
-          <CardHeader className="pb-2 pt-3 px-4">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-sm leading-tight group-hover:text-amber-400 transition-colors line-clamp-2">
+        <div className="p-4 space-y-3">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-bold text-sm leading-tight text-text-primary group-hover:text-accent-amber transition-colors line-clamp-2">
                 {recipe.name}
               </h3>
-              <CanBrewBadge recipeId={Number(recipe.id)} compact />
+              {recipe.style && (
+                <Badge variant="outline" className="w-fit text-[10px] mt-1.5 border-white/10 text-text-tertiary">
+                  {recipe.style}
+                </Badge>
+              )}
             </div>
+            <CanBrewBadge recipeId={Number(recipe.id)} compact />
+          </div>
 
-            {recipe.style && (
-              <Badge variant="outline" className="w-fit text-xs mt-1 border-zinc-600 text-zinc-400">
-                {recipe.style}
-              </Badge>
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-2">
+            {recipe.abv != null && (
+              <div className="text-center">
+                <p className="font-mono text-sm font-bold text-text-primary">{recipe.abv.toFixed(1)}%</p>
+                <p className="text-[10px] text-text-tertiary">ABV</p>
+              </div>
             )}
-          </CardHeader>
+            {recipe.ibu != null && (
+              <div className="text-center">
+                <p className="font-mono text-sm font-bold text-text-primary">{Math.round(recipe.ibu)}</p>
+                <p className="text-[10px] text-text-tertiary">IBU</p>
+              </div>
+            )}
+            {recipe.srm != null && (
+              <div className="text-center flex flex-col items-center">
+                <div className="w-4 h-4 rounded-full border border-white/10 mb-0.5"
+                  style={{ background: srmToHex(recipe.srm) }} />
+                <p className="text-[10px] text-text-tertiary">{recipe.srm.toFixed(0)} SRM</p>
+              </div>
+            )}
+          </div>
 
-          <CardContent className="px-4 pb-4">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {recipe.abv != null && (
-                <div className="flex items-center gap-1.5 text-zinc-400">
-                  <Zap className="w-3 h-3 text-amber-400" />
-                  <span>ABV {recipe.abv.toFixed(1)}%</span>
-                </div>
-              )}
-              {recipe.ibu != null && (
-                <div className="flex items-center gap-1.5 text-zinc-400">
-                  <Beaker className="w-3 h-3 text-green-400" />
-                  <span>IBU {Math.round(recipe.ibu)}</span>
-                </div>
-              )}
-              {recipe.batch_size_liters && (
-                <div className="flex items-center gap-1.5 text-zinc-400">
-                  <Droplets className="w-3 h-3 text-blue-400" />
-                  <span>{recipe.batch_size_liters} L</span>
-                </div>
-              )}
-            </div>
+          {/* Ingredients summary */}
+          <div className="flex items-center gap-3 text-[10px] text-text-tertiary">
+            {(recipe.fermentables?.length ?? 0) > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Wheat size={10} className="text-amber-400" />
+                {recipe.fermentables!.length}
+              </span>
+            )}
+            {(recipe.hops?.length ?? 0) > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Leaf size={10} className="text-green-400" />
+                {recipe.hops!.length}
+              </span>
+            )}
+            {recipe.batch_size_liters && (
+              <span className="flex items-center gap-0.5">
+                <Droplets size={10} className="text-blue-400" />
+                {recipe.batch_size_liters}L
+              </span>
+            )}
+          </div>
 
-            {/* Ingredient chip count */}
-            <p className="mt-2 text-xs text-zinc-500">
-              {(recipe.fermentables?.length ?? 0) + (recipe.hops?.length ?? 0) + (recipe.yeasts?.length ?? 0) + (recipe.adjuncts?.length ?? 0)} ingredientes
-            </p>
-          </CardContent>
-        </Card>
+          {/* Hover actions */}
+          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity pt-1">
+            <Button size="sm" variant="outline"
+              className="flex-1 border-white/10 text-text-secondary text-[10px] h-7"
+              onClick={e => { e.stopPropagation(); onEdit?.() }}>
+              <Edit3 size={10} className="mr-1" /> Editar
+            </Button>
+            <Button size="sm"
+              className="flex-1 bg-accent-amber text-bg-primary text-[10px] h-7"
+              onClick={e => { e.stopPropagation(); onBrew?.() }}>
+              <PlayCircle size={10} className="mr-1" /> Elaborar
+            </Button>
+          </div>
+        </div>
       </div>
     </motion.div>
-  );
+  )
 }

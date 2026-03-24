@@ -77,7 +77,7 @@ export function useSpeechRecognition(opts: UseSpeechRecognitionOptions) {
   const start = () => {
     const Ctor = getSpeechRecognition();
     if (!Ctor) {
-      opts.onError?.("Reconocimiento de voz no soportado en este navegador.");
+      opts.onError?.("Speech recognition not supported in this browser.");
       return null;
     }
 

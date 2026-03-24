@@ -1,10 +1,23 @@
 {
-  "title": "Comparador de Precios",
+  "title": "Compras Inteligentes",
+  "subtitle": "Compara precios, configura alertas y optimiza tus compras",
+  "tabs": {
+    "search": "Buscador",
+    "shopper": "Personal Shopper",
+    "alerts": "Alertas"
+  },
   "shops": {
     "latiendadelcervecero": "La Tienda del Cervecero",
     "cervezania": "Cervezanía",
     "cocinista": "Cocinista",
-    "thebeertimes": "The Beer Times"
+    "thebeertimes": "The Beer Times",
+    "todograno": "Todo Grano",
+    "brewhub": "Brew & Hub",
+    "themaltmiller": "The Malt Miller",
+    "brouwland": "Brouwland",
+    "hobbybrauerversand": "Hobbybrauerversand",
+    "hopandbrew": "Hop and Brew",
+    "castlemalting": "Castle Malting"
   },
   "fields": {
     "price": "Precio",
@@ -13,24 +26,76 @@
     "in_stock": "En stock",
     "out_of_stock": "Agotado",
     "last_updated": "Actualizado",
-    "best_price": "Mejor precio"
+    "best_price": "Mejor precio",
+    "shipping": "Envío",
+    "free_shipping": "Envío gratis",
+    "delivery": "Entrega",
+    "rating": "Valoración",
+    "results": "Resultados",
+    "stores": "Tiendas",
+    "active_alerts": "Alertas activas"
   },
   "actions": {
     "search": "Buscar precios",
     "buy": "Comprar",
     "set_alert": "Alerta de precio",
     "compare_recipe": "Comparar receta completa",
-    "refresh_prices": "Actualizar precios"
+    "refresh_prices": "Actualizar precios",
+    "create_alert": "Crear alerta",
+    "visit": "Visitar",
+    "details": "Detalles",
+    "filter_stock": "Solo en stock",
+    "all_suppliers": "Todas"
   },
   "alerts": {
     "price_drop": "{{ingredient}} bajó un {{percent}}% en {{shop}}",
-    "back_in_stock": "{{ingredient}} vuelve a estar disponible en {{shop}}"
+    "back_in_stock": "{{ingredient}} vuelve a estar disponible en {{shop}}",
+    "new_alert": "Nueva alerta de precio",
+    "alert_created": "Alerta de precio creada",
+    "no_alerts": "Sin alertas activas. Crea una para recibir notificaciones cuando bajen los precios."
   },
   "messages": {
     "searching": "Buscando precios...",
-    "no_results": "No se encontraron precios para «{{term}}»",
+    "no_results": "Sin resultados para «{{term}}»",
     "cached": "Precios actualizados hace {{time}}",
     "scraping": "Consultando tiendas online...",
-    "alert_set": "Alerta creada para {{ingredient}}"
+    "alert_set": "Alerta creada para {{ingredient}}",
+    "min_chars": "Escribe al menos 3 caracteres para buscar",
+    "comparing_shops": "Comparamos precios en {{count}} tiendas de España y Europa",
+    "refresh_from_shops": "Actualizar precios desde tiendas"
+  },
+  "shopper": {
+    "title": "Personal Shopper",
+    "inventory_analysis": "Análisis de inventario",
+    "inventory_complete": "Inventario completo",
+    "no_restock": "No hay ingredientes que necesiten reposición",
+    "needs_restock": "{{count}} ingredientes necesitan reposición",
+    "purchase_options": "Opciones de compra optimizadas",
+    "search_for_options": "Busca ingredientes para ver opciones de compra optimizadas",
+    "best_price_tag": "MEJOR PRECIO",
+    "out_of_stock": "Sin stock",
+    "below_min": "Bajo mínimo",
+    "expiring": "Caduca en {{days}} días",
+    "free_shipping": "Envío gratis",
+    "items": "artículos",
+    "subtotal": "Subtotal"
+  },
+  "suppliers": {
+    "title": "Proveedores",
+    "subtitle": "Directorio de proveedores de cerveza artesanal en España y Europa",
+    "all": "Todos",
+    "active": "Activo",
+    "base_shipping": "Envío base",
+    "currency": "Moneda",
+    "web": "Web",
+    "no_results": "No se encontraron proveedores",
+    "search_placeholder": "Buscar proveedor o especialidad..."
+  },
+  "best_price": {
+    "title": "Mejor precio",
+    "at": "en {{shop}}",
+    "free_above": "Envío gratis a partir de {{threshold}} €",
+    "shipping_cost": "Envío: {{cost}} €",
+    "delivery_days": "{{min}}-{{max}} días"
   }
 }

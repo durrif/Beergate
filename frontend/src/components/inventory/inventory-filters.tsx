@@ -1,4 +1,5 @@
 // src/components/inventory/inventory-filters.tsx
+import { useTranslation } from 'react-i18next'
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,14 +18,14 @@ export interface InventoryFilters {
   sortDir: SortDir;
 }
 
-const CATEGORIES = [
-  { value: "", label: "Todos" },
-  { value: "malta_base", label: "Malta base" },
-  { value: "malta_especial", label: "Malta especial" },
-  { value: "lupulo", label: "Lúpulo" },
-  { value: "levadura", label: "Levadura" },
-  { value: "adjunto", label: "Adjunto" },
-  { value: "otro", label: "Otro" },
+const CATEGORY_KEYS = [
+  { value: "", labelKey: "inventory.categories.all" },
+  { value: "malta_base", labelKey: "inventory.categories.base_malt" },
+  { value: "malta_especial", labelKey: "inventory.categories.specialty_malt" },
+  { value: "lupulo", labelKey: "inventory.categories.hops" },
+  { value: "levadura", labelKey: "inventory.categories.yeast" },
+  { value: "adjunto", labelKey: "inventory.categories.adjuncts" },
+  { value: "otro", labelKey: "inventory.categories.other" },
 ];
 
 interface InventoryFiltersProps {
@@ -40,6 +41,7 @@ export function InventoryFiltersBar({
   totalCount,
   filteredCount,
 }: InventoryFiltersProps) {
+  const { t } = useTranslation('common')
   const set = (patch: Partial<InventoryFilters>) =>
     onChange({ ...filters, ...patch });
 
@@ -57,7 +59,7 @@ export function InventoryFiltersBar({
           <Input
             value={filters.search}
             onChange={(e) => set({ search: e.target.value })}
-            placeholder="Buscar ingrediente..."
+            placeholder={t('inventory.search_placeholder')}
             className="pl-9 bg-bg-card border-white/10"
           />
           {filters.search && (
@@ -88,7 +90,7 @@ export function InventoryFiltersBar({
 
       {/* category pills */}
       <div className="flex gap-1.5 flex-wrap">
-        {CATEGORIES.map(({ value, label }) => (
+        {CATEGORY_KEYS.map(({ value, labelKey }) => (
           <button
             key={value}
             onClick={() => set({ category: value })}
@@ -99,7 +101,7 @@ export function InventoryFiltersBar({
                 : "bg-bg-card border-white/10 text-text-muted hover:border-white/30"
             )}
           >
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>
@@ -115,7 +117,7 @@ export function InventoryFiltersBar({
               : "bg-bg-card border-white/10 text-text-muted hover:border-amber-500/40"
           )}
         >
-          ⚠ Stock bajo
+          ⚠ {t('inventory.low_stock')}
         </button>
         <button
           onClick={() =>
@@ -128,12 +130,12 @@ export function InventoryFiltersBar({
               : "bg-bg-card border-white/10 text-text-muted hover:border-red-500/40"
           )}
         >
-          ⏰ Próximos a vencer
+          ⏰ {t('inventory.expiring_soon')}
         </button>
 
         <span className="ml-auto text-xs text-text-muted">
           {filteredCount === totalCount
-            ? `${totalCount} ingredientes`
+            ? t('inventory.total_ingredients', { count: totalCount })
             : `${filteredCount} / ${totalCount}`}
         </span>
       </div>

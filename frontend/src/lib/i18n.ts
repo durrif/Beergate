@@ -10,6 +10,8 @@ import esBrewing from '../locales/es/brewing.json'
 import esRecipes from '../locales/es/recipes.json'
 import esAi from '../locales/es/ai.json'
 import esShop from '../locales/es/shop.json'
+import esDevices from '../locales/es/devices.json'
+import esAnalytics from '../locales/es/analytics.json'
 
 import enCommon from '../locales/en/common.json'
 import enInventory from '../locales/en/inventory.json'
@@ -17,6 +19,8 @@ import enBrewing from '../locales/en/brewing.json'
 import enRecipes from '../locales/en/recipes.json'
 import enAi from '../locales/en/ai.json'
 import enShop from '../locales/en/shop.json'
+import enDevices from '../locales/en/devices.json'
+import enAnalytics from '../locales/en/analytics.json'
 
 void i18n
   .use(LanguageDetector)
@@ -30,6 +34,8 @@ void i18n
         recipes: esRecipes,
         ai: esAi,
         shop: esShop,
+        devices: esDevices,
+        analytics: esAnalytics,
       },
       en: {
         common: enCommon,
@@ -38,12 +44,14 @@ void i18n
         recipes: enRecipes,
         ai: enAi,
         shop: enShop,
+        devices: enDevices,
+        analytics: enAnalytics,
       },
     },
     lng: 'es',
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'inventory', 'brewing', 'recipes', 'ai', 'shop'],
+    ns: ['common', 'inventory', 'brewing', 'recipes', 'ai', 'shop', 'devices', 'analytics'],
     interpolation: {
       escapeValue: false, // React handles XSS
     },

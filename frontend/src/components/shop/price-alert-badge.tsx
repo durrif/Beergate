@@ -1,64 +1,44 @@
-// src/components/shop/price-alert-badge.tsx
-import { Bell, BellRing } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import type { PriceAlert } from "@/lib/types";
+// src/components/shop/price-alert-badge.tsx — v3 glass design  
+import { useTranslation } from 'react-i18next'
+import { Bell, BellRing, X } from 'lucide-react'
+import type { PriceAlert } from '@/lib/types'
 
 interface PriceAlertBadgeProps {
-  alert: PriceAlert;
-  onDelete?: (id: number) => void;
-  className?: string;
+  alert: PriceAlert
+  onDelete?: (id: number) => void
 }
 
-export function PriceAlertBadge({ alert, onDelete, className }: PriceAlertBadgeProps) {
-  const triggered = !!alert.last_triggered_at;
+export function PriceAlertBadge({ alert, onDelete }: PriceAlertBadgeProps) {
+  const { t } = useTranslation('common')
+  const triggered = !!alert.last_triggered_at
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Badge
-          variant="outline"
-          className={cn(
-            "inline-flex items-center gap-1.5 cursor-default text-xs",
-            triggered
-              ? "border-amber-500 text-amber-400 animate-pulse"
-              : "border-zinc-600 text-zinc-400",
-            className
-          )}
+    <div
+      className={`group inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all ${
+        triggered
+          ? 'border-accent-amber/40 text-accent-amber bg-accent-amber/10 animate-pulse'
+          : 'border-white/[0.08] text-text-secondary bg-white/[0.03] hover:bg-white/[0.05]'
+      }`}
+      title={
+        triggered
+          ? `¡Precio por debajo de ${alert.threshold_price?.toFixed(2) ?? '?'} €! Disparada: ${alert.last_triggered_at ? new Date(alert.last_triggered_at).toLocaleString('es-ES') : ''}`
+          : `Alerta cuando baje de ${alert.threshold_price?.toFixed(2) ?? '?'} €`
+      }
+    >
+      {triggered ? <BellRing size={12} /> : <Bell size={12} />}
+      <span className="font-medium">{alert.ingredient_name}</span>
+      {alert.threshold_price != null && (
+        <span className="text-text-tertiary">≤ {alert.threshold_price.toFixed(2)} €</span>
+      )}
+      {onDelete && (
+        <button
+          onClick={() => onDelete(alert.id)}
+          className="ml-0.5 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
+          aria-label={t('shop.delete_alert')}
         >
-          {triggered ? (
-            <BellRing className="w-3 h-3" />
-          ) : (
-            <Bell className="w-3 h-3" />
-          )}
-          {alert.ingredient_name}
-          {alert.threshold_price != null && ` ≤ ${alert.threshold_price.toFixed(2)} €`}
-          {onDelete && (
-            <button
-              onClick={() => onDelete(alert.id)}
-              className="ml-1 hover:text-red-400 transition-colors"
-              aria-label="Eliminar alerta"
-            >
-              ×
-            </button>
-          )}
-        </Badge>
-      </TooltipTrigger>
-      <TooltipContent>
-        {triggered
-          ? `¡Precio por debajo de ${alert.threshold_price?.toFixed(2) ?? '?'} €!`
-          : `Alerta cuando baje de ${alert.threshold_price?.toFixed(2) ?? '?'} €`}
-        {alert.last_triggered_at && (
-          <span className="block text-xs text-zinc-400 mt-0.5">
-            Disparada: {new Date(alert.last_triggered_at).toLocaleString("es-ES")}
-          </span>
-        )}
-      </TooltipContent>
-    </Tooltip>
-  );
+          <X size={12} />
+        </button>
+      )}
+    </div>
+  )
 }

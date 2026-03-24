@@ -1,5 +1,6 @@
 // src/components/brewing/dual-timer.tsx
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from 'react-i18next'
 import { motion } from "framer-motion";
 import { Play, Pause, RotateCcw, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -156,15 +157,16 @@ export function DualTimer({
   mashDurationMinutes = 60,
   boilDurationMinutes = 60,
 }: DualTimerProps) {
+  const { t } = useTranslation('common')
   return (
     <div className="grid grid-cols-2 gap-3">
       <SingleTimer
-        label="Maceración"
+        label={t('brew_day.mashing')}
         colorClass="text-amber-400"
         durationMinutes={mashDurationMinutes}
       />
       <SingleTimer
-        label="Cocción"
+        label={t('brew_day.boiling')}
         colorClass="text-orange-400"
         durationMinutes={boilDurationMinutes}
       />

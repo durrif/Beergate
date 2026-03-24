@@ -1,6 +1,7 @@
-// frontend/src/components/layout/app-shell.tsx
-import { type ReactNode, useEffect } from 'react'
+// frontend/src/components/layout/app-shell.tsx — Beergate v3
+import { type ReactNode, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouterState } from '@tanstack/react-router'
 import { useUIStore } from '@/stores/ui-store'
 import { Sidebar } from './sidebar'
 import { Header } from './header'
@@ -8,6 +9,8 @@ import { MobileNav } from './mobile-nav'
 import { AiFab } from './ai-fab'
 import { VoiceFab } from './voice-fab'
 import { AiPanel } from '@/components/ai/ai-panel'
+import { CommandPalette } from './command-palette'
+import { NotificationCenter } from './notification-center'
 import { cn } from '@/lib/utils'
 
 interface AppShellProps {
@@ -16,30 +19,57 @@ interface AppShellProps {
 
 const ambientClasses: Record<string, string> = {
   idle: 'ambient-idle',
+  planned: 'ambient-planned',
   mashing: 'ambient-mashing',
   boiling: 'ambient-boiling',
   fermenting: 'ambient-fermenting',
+  conditioning: 'ambient-conditioning',
+}
+
+const pageTransition = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.2, ease: 'easeOut' as const },
 }
 
 export function AppShell({ children }: AppShellProps) {
   const { aiPanelOpen, brewPhase } = useUIStore()
+  const routerState = useRouterState()
+  const currentPath = routerState.location.pathname
 
-  // Keyboard shortcut: Cmd/Ctrl + K to open AI panel
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+
+  // Keyboard shortcut: Cmd/Ctrl + K → command palette
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        useUIStore.getState().toggleAiPanel()
+        setCmdPaletteOpen(prev => !prev)
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
 
+  const openCmdPalette = useCallback(() => setCmdPaletteOpen(true), [])
+  const closeCmdPalette = useCallback(() => setCmdPaletteOpen(false), [])
+  const openNotif = useCallback(() => setNotifOpen(true), [])
+  const closeNotif = useCallback(() => setNotifOpen(false), [])
+
   const ambientClass = ambientClasses[brewPhase] ?? 'ambient-idle'
 
   return (
     <div className={cn('flex h-dvh overflow-hidden bg-bg-primary', ambientClass)}>
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-accent-amber focus:text-bg-primary focus:rounded-lg focus:font-semibold"
+      >
+        Skip to main content
+      </a>
+
       {/* Ambient background overlay */}
       <div
         className="pointer-events-none fixed inset-0 z-0 transition-all duration-1000"
@@ -51,16 +81,16 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
-        <Header />
+        <Header
+          onOpenCommandPalette={openCmdPalette}
+          onOpenNotifications={openNotif}
+        />
 
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+        <main id="main-content" className="flex-1 overflow-y-auto pb-20 md:pb-0" role="main">
           <AnimatePresence mode="wait">
             <motion.div
-              key={brewPhase}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
+              key={currentPath}
+              {...pageTransition}
               className="h-full"
             >
               {children}
@@ -73,7 +103,6 @@ export function AppShell({ children }: AppShellProps) {
       <AnimatePresence>
         {aiPanelOpen && (
           <>
-            {/* Backdrop (mobile) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -86,13 +115,19 @@ export function AppShell({ children }: AppShellProps) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-sm md:max-w-[360px] flex flex-col glass-card border-l border-white/[0.08] shadow-glass"
+              className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-sm md:max-w-[360px] flex flex-col glass-card border-l border-white/[0.06] shadow-glass"
             >
               <AiPanel />
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      {/* Command Palette */}
+      <CommandPalette open={cmdPaletteOpen} onClose={closeCmdPalette} />
+
+      {/* Notification Center */}
+      <NotificationCenter open={notifOpen} onClose={closeNotif} />
 
       {/* AI FAB */}
       <AiFab />

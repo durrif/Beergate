@@ -1,4 +1,5 @@
 // src/components/brewing/gravity-chart.tsx
+import { useTranslation } from 'react-i18next'
 import {
   ResponsiveContainer,
   LineChart,
@@ -10,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import { format, parseISO } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import type { FermentationDataPoint } from "@/lib/types";
 
 interface GravityChartProps {
@@ -25,11 +26,13 @@ interface ChartEntry {
 }
 
 export function GravityChart({ data, height = 240 }: GravityChartProps) {
+  const { t, i18n } = useTranslation('common')
+  const dateFnsLocale = i18n.language === 'en' ? enUS : es
   const chartData: ChartEntry[] = data.map((p) => ({
     time: format(
       typeof p.recorded_at === "string" ? parseISO(p.recorded_at) : new Date(p.recorded_at),
       "dd/MM HH:mm",
-      { locale: es }
+      { locale: dateFnsLocale }
     ),
     gravity: p.gravity ? Math.round(p.gravity * 1000) : null, // SG → points (e.g. 1050)
     temperature: p.temperature,
@@ -57,7 +60,7 @@ export function GravityChart({ data, height = 240 }: GravityChartProps) {
           tickLine={false}
           axisLine={false}
           domain={["auto", "auto"]}
-          label={{ value: "Densidad (SG×1000)", angle: -90, position: "insideLeft", fill: "#D4A04A", fontSize: 10 }}
+          label={{ value: t('fermentation.gravity') + ' (SG×1000)', angle: -90, position: "insideLeft", fill: "#D4A04A", fontSize: 10 }}
         />
         <YAxis
           yAxisId="temp"
@@ -86,7 +89,7 @@ export function GravityChart({ data, height = 240 }: GravityChartProps) {
           yAxisId="gravity"
           type="monotone"
           dataKey="gravity"
-          name="Densidad (×1000)"
+          name={t('fermentation.gravity') + ' (×1000)'}
           stroke="#D4A04A"
           strokeWidth={2}
           dot={false}
@@ -97,7 +100,7 @@ export function GravityChart({ data, height = 240 }: GravityChartProps) {
           yAxisId="temp"
           type="monotone"
           dataKey="temperature"
-          name="Temp (°C)"
+          name={t('fermentation.temperature') + ' (°C)'}
           stroke="#60A5FA"
           strokeWidth={1.5}
           dot={false}

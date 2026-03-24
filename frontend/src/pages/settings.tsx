@@ -1,5 +1,6 @@
 // frontend/src/pages/settings.tsx
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { User, Building, Droplets, Key, Globe, Save, Eye, EyeOff } from 'lucide-react'
 import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
@@ -24,6 +25,7 @@ function Section({ icon, title, children }: SectionProps) {
 }
 
 export default function SettingsPage() {
+  const { t } = useTranslation('common')
   const { setActivePage, language, setLanguage } = useUIStore()
   const { user, brewery } = useAuthStore()
   useEffect(() => { setActivePage('settings') }, [setActivePage])
@@ -39,38 +41,38 @@ export default function SettingsPage() {
 
   const saveBfKey = () => {
     localStorage.setItem('bf_api_key', bfKey)
-    toast.success('API key guardada localmente')
+    toast.success(t('settings.api_key_saved'))
   }
 
   const changePassword = async () => {
-    if (newPwd !== confirmPwd) { toast.error('Las contraseñas no coinciden'); return }
-    if (newPwd.length < 8) { toast.error('La contraseña debe tener al menos 8 caracteres'); return }
+    if (newPwd !== confirmPwd) { toast.error(t('errors.passwords_mismatch')); return }
+    if (newPwd.length < 8) { toast.error(t('errors.password_too_short')); return }
     try {
       await apiClient.post('/auth/change-password', { current_password: currentPwd, new_password: newPwd })
-      toast.success('Contraseña actualizada')
+      toast.success(t('settings.password_updated'))
       setCurrentPwd(''); setNewPwd(''); setConfirmPwd('')
     } catch (e: unknown) {
-      toast.error((e as Error).message ?? 'Error al cambiar contraseña')
+      toast.error((e as Error).message ?? t('settings.password_error'))
     }
   }
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold amber-text">Ajustes</h1>
+      <h1 className="text-2xl font-bold amber-text">{t('nav.settings')}</h1>
 
       {/* Profile */}
-      <Section icon={<User className="w-4 h-4 text-amber-400" />} title="Perfil">
+      <Section icon={<User className="w-4 h-4 text-amber-400" />} title={t('settings.profile')}>
         <div className="text-sm text-text-secondary space-y-2">
           <div className="flex justify-between">
-            <span className="text-text-primary font-medium">Nombre</span>
+            <span className="text-text-primary font-medium">{t('settings.name')}</span>
             <span>{user?.full_name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-primary font-medium">Email</span>
+            <span className="text-text-primary font-medium">{t('settings.email')}</span>
             <span>{user?.email}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-primary font-medium">Rol</span>
+            <span className="text-text-primary font-medium">{t('settings.role')}</span>
             <span className="capitalize">{user?.role}</span>
           </div>
         </div>
@@ -78,19 +80,19 @@ export default function SettingsPage() {
         <Separator className="bg-zinc-700" />
 
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-zinc-300">Cambiar contraseña</h3>
+          <h3 className="text-sm font-medium text-zinc-300">{t('settings.change_password')}</h3>
           <div className="space-y-2">
-            <Label className="text-xs text-zinc-400">Contraseña actual</Label>
+            <Label className="text-xs text-zinc-400">{t('settings.current_password')}</Label>
             <Input type="password" value={currentPwd} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentPwd(e.target.value)}
               className="bg-zinc-900 border-zinc-700 text-sm" />
           </div>
           <div className="space-y-2">
-            <Label className="text-xs text-zinc-400">Nueva contraseña</Label>
+            <Label className="text-xs text-zinc-400">{t('settings.new_password')}</Label>
             <Input type="password" value={newPwd} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPwd(e.target.value)}
               className="bg-zinc-900 border-zinc-700 text-sm" />
           </div>
           <div className="space-y-2">
-            <Label className="text-xs text-zinc-400">Confirmar nueva contraseña</Label>
+            <Label className="text-xs text-zinc-400">{t('settings.confirm_password')}</Label>
             <Input type="password" value={confirmPwd} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPwd(e.target.value)}
               className="bg-zinc-900 border-zinc-700 text-sm" />
           </div>
@@ -100,22 +102,22 @@ export default function SettingsPage() {
             onClick={changePassword}
             className="bg-amber-600 hover:bg-amber-700 text-white"
           >
-            <Save className="w-3.5 h-3.5 mr-1" /> Guardar contraseña
+            <Save className="w-3.5 h-3.5 mr-1" /> {t('settings.save_password')}
           </Button>
         </div>
       </Section>
 
       {/* Brewery */}
       {brewery && (
-        <Section icon={<Building className="w-4 h-4 text-amber-400" />} title="Cervecería">
+        <Section icon={<Building className="w-4 h-4 text-amber-400" />} title={t('settings.brewery')}>
           <div className="text-sm text-text-secondary space-y-2">
             <div className="flex justify-between">
-              <span className="text-text-primary font-medium">Nombre</span>
+              <span className="text-text-primary font-medium">{t('settings.name')}</span>
               <span>{brewery.name}</span>
             </div>
             {brewery.location && (
               <div className="flex justify-between">
-                <span className="text-text-primary font-medium">Ubicación</span>
+                <span className="text-text-primary font-medium">{t('settings.location')}</span>
                 <span>{brewery.location}</span>
               </div>
             )}
@@ -124,7 +126,7 @@ export default function SettingsPage() {
       )}
 
       {/* Language */}
-      <Section icon={<Globe className="w-4 h-4 text-amber-400" />} title="Idioma">
+      <Section icon={<Globe className="w-4 h-4 text-amber-400" />} title={t('settings.language')}>
         <div className="flex gap-3">
           {(['es', 'en'] as const).map(lang => (
             <button
@@ -143,7 +145,7 @@ export default function SettingsPage() {
       </Section>
 
       {/* API Keys */}
-      <Section icon={<Key className="w-4 h-4 text-amber-400" />} title="Integraciones">
+      <Section icon={<Key className="w-4 h-4 text-amber-400" />} title={t('settings.integrations')}>
         <div className="space-y-3">
           <Label className="text-xs text-zinc-400">Brewer's Friend API Key</Label>
           <div className="flex gap-2">
@@ -152,7 +154,7 @@ export default function SettingsPage() {
                 type={showBfKey ? 'text' : 'password'}
                 value={bfKey}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBfKey(e.target.value)}
-                placeholder="Tu API key de Brewer's Friend"
+                placeholder={t('settings.api_key_placeholder')}
                 className="bg-zinc-900 border-zinc-700 text-sm pr-10"
               />
               <button
@@ -169,7 +171,7 @@ export default function SettingsPage() {
               disabled={!bfKey}
               className="bg-amber-600 hover:bg-amber-700 text-white"
             >
-              <Save className="w-3.5 h-3.5 mr-1" /> Guardar
+              <Save className="w-3.5 h-3.5 mr-1" /> {t('actions.save')}
             </Button>
           </div>
           <p className="text-xs text-zinc-500">

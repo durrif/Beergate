@@ -1,4 +1,5 @@
 // src/components/inventory/expiry-badge.tsx
+import { useTranslation } from 'react-i18next'
 import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ function getStatus(daysLeft: number | null): ExpiryStatus {
 }
 
 export function ExpiryBadge({ daysLeft, className }: ExpiryBadgeProps) {
+  const { t } = useTranslation('common')
   const status = getStatus(daysLeft);
 
   if (status === "none") return null;
@@ -37,7 +39,7 @@ export function ExpiryBadge({ daysLeft, className }: ExpiryBadgeProps) {
     },
     expired: {
       icon: AlertTriangle,
-      label: "Vencido",
+      label: t('inventory.expired'),
       classes: "bg-red-500/20 text-red-400 border-red-500/30",
       pulse: true,
     },

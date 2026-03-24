@@ -1,9 +1,10 @@
 // src/components/fermentation/ispindel-card.tsx
+import { useTranslation } from 'react-i18next'
 import { Wifi, WifiOff, Battery, Thermometer, Droplets } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import type { ISpindelReading } from "@/lib/types";
 
 interface ISpindelCardProps {
@@ -24,7 +25,9 @@ function voltageToPct(v: number) {
 }
 
 export function ISpindelCard({ reading, online = false, name }: ISpindelCardProps) {
+  const { t, i18n } = useTranslation('common')
   const batPct = reading ? voltageToPct(reading.battery) : null;
+  const dateFnsLocale = i18n.language === 'en' ? enUS : es;
 
   return (
     <Card className="bg-zinc-900/80 border-zinc-700">
@@ -38,7 +41,7 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
           {name ?? reading?.name ?? "iSpindel"}
         </CardTitle>
         <Badge variant={online ? "default" : "secondary"} className="text-xs">
-          {online ? "En línea" : "Offline"}
+          {online ? t('fermentation.online') : t('fermentation.offline')}
         </Badge>
       </CardHeader>
 
@@ -49,7 +52,7 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
             <div className="flex items-center gap-2">
               <Droplets className="w-4 h-4 text-blue-400 shrink-0" />
               <div>
-                <p className="text-xs text-zinc-400">Densidad</p>
+                <p className="text-xs text-zinc-400">{t('fermentation.gravity')}</p>
                 <p className="font-semibold">{reading.gravity.toFixed(3)}</p>
               </div>
             </div>
@@ -58,7 +61,7 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
             <div className="flex items-center gap-2">
               <Thermometer className="w-4 h-4 text-amber-400 shrink-0" />
               <div>
-                <p className="text-xs text-zinc-400">Temperatura</p>
+                <p className="text-xs text-zinc-400">{t('fermentation.temperature')}</p>
                 <p className="font-semibold">{reading.temperature.toFixed(1)} °C</p>
               </div>
             </div>
@@ -67,7 +70,7 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
             <div className="flex items-center gap-2">
               <span className="text-zinc-400 text-sm shrink-0">°</span>
               <div>
-                <p className="text-xs text-zinc-400">Ángulo</p>
+                <p className="text-xs text-zinc-400">{t('fermentation.angle')}</p>
                 <p className="font-semibold">{reading.angle.toFixed(1)}°</p>
               </div>
             </div>
@@ -76,7 +79,7 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
             <div className="flex items-center gap-2">
               <Battery className={`w-4 h-4 shrink-0 ${batteryColor(batPct ?? 0)}`} />
               <div>
-                <p className="text-xs text-zinc-400">Batería</p>
+                <p className="text-xs text-zinc-400">{t('fermentation.battery')}</p>
                 <p className={`font-semibold ${batteryColor(batPct ?? 0)}`}>
                   {batPct}% ({reading.battery.toFixed(2)}V)
                 </p>
@@ -85,16 +88,15 @@ export function ISpindelCard({ reading, online = false, name }: ISpindelCardProp
           </div>
         ) : (
           <p className="text-sm text-zinc-500 text-center py-4">
-            Sin datos recientes
+            {t('fermentation.no_recent_data')}
           </p>
         )}
 
         {reading && (
           <p className="text-xs text-zinc-500 mt-3 text-right">
-            Hace{" "}
             {formatDistanceToNow(new Date(reading.timestamp), {
-              locale: es,
-              addSuffix: false,
+              locale: dateFnsLocale,
+              addSuffix: true,
             })}
           </p>
         )}

@@ -1,0 +1,161 @@
+// frontend/src/pages/analytics.tsx
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { motion } from 'framer-motion'
+import { BarChart3, TrendingUp, TrendingDown, Minus, Beaker, Package, DollarSign, FlaskConical } from 'lucide-react'
+import { useUIStore } from '@/stores/ui-store'
+import { cn } from '@/lib/utils'
+
+// Placeholder KPIs until backend provides real analytics
+const mockKpis = [
+  { key: 'batches', value: 12, prev: 9, icon: Beaker, color: 'text-accent-amber', bg: 'bg-accent-amber/10' },
+  { key: 'efficiency', value: 72.5, prev: 70.1, icon: TrendingUp, color: 'text-status-success', bg: 'bg-status-success/10', suffix: '%' },
+  { key: 'cost_per_liter', value: 1.85, prev: 2.10, icon: DollarSign, color: 'text-status-info', bg: 'bg-status-info/10', prefix: '€', invert: true },
+  { key: 'ingredients_used', value: 48.2, prev: 42.0, icon: Package, color: 'text-accent-copper', bg: 'bg-accent-copper/10', suffix: ' kg' },
+]
+
+// Placeholder monthly data
+const monthlyBatches = [
+  { month: 'Ene', batches: 2, liters: 40 },
+  { month: 'Feb', batches: 1, liters: 20 },
+  { month: 'Mar', batches: 3, liters: 60 },
+  { month: 'Abr', batches: 2, liters: 38 },
+  { month: 'May', batches: 1, liters: 19 },
+  { month: 'Jun', batches: 3, liters: 57 },
+]
+
+function TrendIndicator({ current, prev, invert }: { current: number; prev: number; invert?: boolean }) {
+  const diff = current - prev
+  const pctChange = prev !== 0 ? ((diff / prev) * 100) : 0
+  const isUp = diff > 0
+  const isGood = invert ? !isUp : isUp
+
+  if (Math.abs(pctChange) < 0.5) {
+    return <span className="trend-chip trend-chip--flat"><Minus size={12} />0%</span>
+  }
+
+  return (
+    <span className={cn('trend-chip', isGood ? 'trend-chip--up' : 'trend-chip--down')}>
+      {isUp ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+      {Math.abs(pctChange).toFixed(1)}%
+    </span>
+  )
+}
+
+// Simple bar chart (no Recharts dependency for stub)
+function MiniBarChart({ data }: { data: typeof monthlyBatches }) {
+  const max = Math.max(...data.map(d => d.liters), 1)
+  return (
+    <div className="flex items-end gap-2 h-32">
+      {data.map((d, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: `${(d.liters / max) * 100}%` }}
+            transition={{ duration: 0.6, delay: i * 0.05 }}
+            className="w-full rounded-t-md bg-accent-amber/60 hover:bg-accent-amber/80 transition-colors min-h-[4px]"
+            title={`${d.liters}L`}
+          />
+          <span className="text-2xs text-text-tertiary">{d.month}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default function AnalyticsPage() {
+  const { t } = useTranslation(['common', 'analytics'])
+  const { setActivePage } = useUIStore()
+
+  useEffect(() => { setActivePage('analytics') }, [setActivePage])
+
+  return (
+    <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+      {/* Page header */}
+      <div className="page-header">
+        <div>
+          <h1 className="page-header__title">{t('nav.analytics')}</h1>
+          <p className="page-header__subtitle">{t('analytics:subtitle', 'Rendimiento, costes y tendencias de tu cervecería')}</p>
+        </div>
+        <div className="toolbar">
+          <select className="px-3 py-1.5 rounded-lg text-sm bg-bg-elevated border border-white/[0.07] text-text-primary">
+            <option value="6m">{t('analytics:last_6m', 'Últimos 6 meses')}</option>
+            <option value="12m">{t('analytics:last_12m', 'Último año')}</option>
+            <option value="all">{t('analytics:all_time', 'Todo')}</option>
+          </select>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {mockKpis.map(({ key, value, prev, icon: Icon, color, bg, prefix, suffix, invert }, i) => (
+          <motion.div
+            key={key}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.05 }}
+            className="metric-card"
+          >
+            <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-3', bg)}>
+              <Icon size={18} className={color} />
+            </div>
+            <p className="text-2xl font-bold text-text-primary">
+              {prefix}{typeof value === 'number' && value % 1 !== 0 ? value.toFixed(1) : value}{suffix}
+            </p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-xs text-text-secondary">{t(`analytics:kpi.${key}`, key)}</p>
+              <TrendIndicator current={value} prev={prev} invert={invert} />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Production volume */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="glass-card rounded-xl p-5"
+        >
+          <h3 className="text-sm font-semibold text-text-primary mb-4">{t('analytics:production_volume', 'Volumen de producción')}</h3>
+          <MiniBarChart data={monthlyBatches} />
+        </motion.div>
+
+        {/* Top styles */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+          className="glass-card rounded-xl p-5"
+        >
+          <h3 className="text-sm font-semibold text-text-primary mb-4">{t('analytics:top_styles', 'Estilos más elaborados')}</h3>
+          <div className="space-y-3">
+            {[
+              { style: 'IPA', count: 5, pct: 42 },
+              { style: 'Amber Ale', count: 3, pct: 25 },
+              { style: 'Wheat Beer', count: 2, pct: 17 },
+              { style: 'Stout', count: 2, pct: 16 },
+            ].map((item, i) => (
+              <div key={i} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-text-primary font-medium">{item.style}</span>
+                  <span className="text-text-secondary">{item.count} lotes · {item.pct}%</span>
+                </div>
+                <div className="h-1.5 bg-bg-elevated rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${item.pct}%` }}
+                    transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
+                    className="h-full rounded-full bg-accent-amber/70"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}

@@ -1,11 +1,13 @@
 // frontend/src/components/layout/voice-fab.tsx
 import { useState, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mic, MicOff, Loader2 } from 'lucide-react'
 import { useSpeechRecognition, useVoiceCommand } from '@/hooks/use-voice'
 import { toast } from 'sonner'
 
 export function VoiceFab() {
+  const { t } = useTranslation('common')
   const [listening, setListening] = useState(false)
   const recognitionRef = useRef<ReturnType<ReturnType<typeof useSpeechRecognition>['start']>>(null)
   const voiceCommand = useVoiceCommand()
@@ -21,7 +23,7 @@ export function VoiceFab() {
             toast.success(result.response_text)
           },
           onError: () => {
-            toast.error('Error procesando comando de voz')
+            toast.error(t('errors.voice_command_error'))
           },
         }
       )
@@ -61,8 +63,8 @@ export function VoiceFab() {
           ? 'linear-gradient(135deg, #ef4444, #dc2626)'
           : 'linear-gradient(135deg, #3b82f6, #2563eb)',
       }}
-      aria-label={listening ? 'Parar grabación' : 'Comando de voz'}
-      title={listening ? 'Parar grabación' : 'Comando de voz'}
+      aria-label={listening ? t('ai.stop_recording', 'Stop recording') : t('ai.voice_command', 'Voice command')}
+      title={listening ? t('ai.stop_recording', 'Stop recording') : t('ai.voice_command', 'Voice command')}
     >
       {voiceCommand.isPending ? (
         <Loader2 size={20} className="text-white animate-spin" />

@@ -1,4 +1,5 @@
 // src/components/recipes/can-brew-badge.tsx
+import { useTranslation } from 'react-i18next'
 import { useCheckCanBrew } from "@/hooks/use-recipes";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,13 +15,14 @@ interface CanBrewBadgeProps {
 }
 
 export function CanBrewBadge({ recipeId, compact = false }: CanBrewBadgeProps) {
+  const { t } = useTranslation('common')
   const { data, isLoading } = useCheckCanBrew(recipeId);
 
   if (isLoading) {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
         <Loader2 className="w-3 h-3 animate-spin" />
-        {!compact && "Comprobando…"}
+        {!compact && t('recipes.checking')}
       </span>
     );
   }
@@ -30,19 +32,19 @@ export function CanBrewBadge({ recipeId, compact = false }: CanBrewBadgeProps) {
   const config = {
     ready: {
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-      label: "Listo para elaborar",
+      label: t('recipes.ready_to_brew'),
       variant: "default" as const,
       className: "bg-green-700/80 text-green-100 border-green-600",
     },
     partial: {
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
-      label: `Faltan ${data.missing.length} ingredientes`,
+      label: t('recipes.missing_ingredients', { count: data.missing.length }),
       variant: "outline" as const,
       className: "border-amber-500 text-amber-400",
     },
     missing: {
       icon: <XCircle className="w-3.5 h-3.5" />,
-      label: `Faltan ${data.missing.length} ingredientes`,
+      label: t('recipes.missing_ingredients', { count: data.missing.length }),
       variant: "outline" as const,
       className: "border-red-500 text-red-400",
     },
@@ -61,8 +63,8 @@ export function CanBrewBadge({ recipeId, compact = false }: CanBrewBadgeProps) {
   if (compact || data.status === "ready") return badge;
 
   const missingList = [
-    ...data.missing.map((m) => `${m.name}: necesitas ${m.required} ${m.unit}`),
-    ...data.low_stock.map((l) => `${l.name}: tienes ${l.available}/${l.required} ${l.unit}`),
+    ...data.missing.map((m) => `${m.name}: ${t('recipes.need')} ${m.required} ${m.unit}`),
+    ...data.low_stock.map((l) => `${l.name}: ${t('recipes.have')} ${l.available}/${l.required} ${l.unit}`),
   ];
 
   return (

@@ -1,5 +1,5 @@
-// src/components/shop/price-table.tsx
-import { useState } from "react";
+// src/components/shop/price-table.tsx — v3 glass design
+import { useState } from 'react'
 import {
   flexRender,
   getCoreRowModel,
@@ -7,81 +7,90 @@ import {
   useReactTable,
   createColumnHelper,
   type SortingState,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { PriceRecord } from "@/lib/types";
+} from '@tanstack/react-table'
+import { ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Store } from 'lucide-react'
+import { SUPPLIER_MAP, COUNTRY_FLAGS } from '@/data/suppliers'
+import type { PriceRecord } from '@/lib/types'
 
 interface PriceTableProps {
-  records: PriceRecord[];
-  isLoading?: boolean;
+  records: PriceRecord[]
+  isLoading?: boolean
 }
 
-const col = createColumnHelper<PriceRecord>();
+const col = createColumnHelper<PriceRecord>()
 
 const columns = [
-  col.accessor("ingredient_name", {
-    header: "Ingrediente",
-    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  col.accessor('ingredient_name', {
+    header: 'Ingrediente',
+    cell: info => <span className="font-medium text-text-primary">{info.getValue()}</span>,
   }),
-  col.accessor("shop_name", {
-    header: "Tienda",
-    cell: (info) => info.getValue(),
+  col.accessor('shop_name', {
+    header: 'Tienda',
+    cell: info => {
+      const key = info.getValue().toLowerCase().replace(/\s+/g, '')
+      const supplier = SUPPLIER_MAP.get(key)
+      const flag = supplier ? COUNTRY_FLAGS[supplier.country] ?? '' : ''
+      return (
+        <span className="flex items-center gap-1.5 text-text-secondary">
+          <Store size={12} style={{ color: supplier?.color ?? '#F5A623' }} />
+          {flag} {info.getValue()}
+        </span>
+      )
+    },
   }),
-  col.accessor("price", {
-    header: "Precio",
-    cell: (info) => (
-      <span className="font-semibold text-amber-400">
+  col.accessor('price', {
+    header: 'Precio',
+    cell: info => (
+      <span className="font-semibold font-mono text-accent-amber">
         {info.getValue().toFixed(2)} €
       </span>
     ),
   }),
-  col.accessor("unit", {
-    header: "Unidad",
-    cell: (info) => info.getValue(),
+  col.accessor('unit', {
+    header: 'Unidad',
+    cell: info => <span className="text-text-tertiary">{info.getValue()}</span>,
   }),
-  col.accessor("in_stock", {
-    header: "Stock",
-    cell: (info) => (
-      <Badge
-        variant="outline"
-        className={
+  col.accessor('in_stock', {
+    header: 'Stock',
+    cell: info => (
+      <span
+        className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${
           info.getValue()
-            ? "border-green-600 text-green-400"
-            : "border-red-600 text-red-400"
-        }
+            ? 'border-green-500/30 text-green-400 bg-green-500/10'
+            : 'border-red-500/30 text-red-400 bg-red-500/10'
+        }`}
       >
-        {info.getValue() ? "Disponible" : "Sin stock"}
-      </Badge>
+        <span className={`w-1.5 h-1.5 rounded-full ${info.getValue() ? 'bg-green-400' : 'bg-red-400'}`} />
+        {info.getValue() ? 'Stock' : 'Agotado'}
+      </span>
     ),
   }),
-  col.accessor("scraped_at", {
-    header: "Actualizado",
-    cell: (info) => {
-      const v = info.getValue();
-      return v ? new Date(v).toLocaleDateString("es-ES") : "—";
+  col.accessor('scraped_at', {
+    header: 'Actualizado',
+    cell: info => {
+      const v = info.getValue()
+      return <span className="text-xs text-text-tertiary">{v ? new Date(v).toLocaleDateString('es-ES') : '—'}</span>
     },
   }),
   col.display({
-    id: "link",
-    header: "",
-    cell: (info) => (
+    id: 'link',
+    header: '',
+    cell: info => (
       <a
-        href={info.row.original.shop_url}
+        href={info.row.original.product_url || info.row.original.shop_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-zinc-400 hover:text-amber-400 transition-colors"
-        onClick={(e) => e.stopPropagation()}
+        className="text-text-tertiary hover:text-accent-amber transition-colors"
+        onClick={e => e.stopPropagation()}
       >
-        <ExternalLink className="w-4 h-4" />
+        <ExternalLink size={14} />
       </a>
     ),
   }),
-];
+]
 
 export function PriceTable({ records, isLoading = false }: PriceTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({
     data: records,
@@ -90,46 +99,44 @@ export function PriceTable({ records, isLoading = false }: PriceTableProps) {
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-  });
+  })
 
   if (isLoading) {
     return (
       <div className="space-y-2">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-12 rounded bg-zinc-800 animate-pulse" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-12 rounded-lg bg-white/[0.03] animate-pulse" />
         ))}
       </div>
-    );
+    )
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-zinc-700">
+    <div className="glass-card rounded-xl overflow-hidden">
       <table className="w-full text-sm">
-        <thead className="bg-zinc-900/80">
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
+        <thead>
+          {table.getHeaderGroups().map(hg => (
+            <tr key={hg.id} className="border-b border-white/[0.06]">
+              {hg.headers.map(header => (
                 <th
                   key={header.id}
-                  className="px-4 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-text-tertiary uppercase tracking-wider"
                 >
                   {header.isPlaceholder ? null : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="-ml-3 h-8 hover:text-white"
+                    <button
+                      className="flex items-center gap-1 hover:text-text-primary transition-colors"
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
                       {header.column.getCanSort() &&
-                        (header.column.getIsSorted() === "asc" ? (
-                          <ArrowUp className="ml-1 w-3 h-3" />
-                        ) : header.column.getIsSorted() === "desc" ? (
-                          <ArrowDown className="ml-1 w-3 h-3" />
+                        (header.column.getIsSorted() === 'asc' ? (
+                          <ArrowUp size={12} />
+                        ) : header.column.getIsSorted() === 'desc' ? (
+                          <ArrowDown size={12} />
                         ) : (
-                          <ArrowUpDown className="ml-1 w-3 h-3 opacity-40" />
+                          <ArrowUpDown size={12} className="opacity-40" />
                         ))}
-                    </Button>
+                    </button>
                   )}
                 </th>
               ))}
@@ -137,25 +144,21 @@ export function PriceTable({ records, isLoading = false }: PriceTableProps) {
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
+          {table.getRowModel().rows.map(row => (
             <tr
               key={row.id}
-              className="border-t border-zinc-800 hover:bg-zinc-800/40 transition-colors"
+              className="border-t border-white/[0.04] hover:bg-white/[0.03] transition-colors"
             >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3 text-zinc-200">
+              {row.getVisibleCells().map(cell => (
+                <td key={cell.id} className="px-4 py-3">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
             </tr>
           ))}
-
           {records.length === 0 && (
             <tr>
-              <td
-                colSpan={columns.length}
-                className="px-4 py-10 text-center text-zinc-500"
-              >
+              <td colSpan={columns.length} className="px-4 py-10 text-center text-text-tertiary">
                 No se encontraron resultados
               </td>
             </tr>
@@ -163,5 +166,5 @@ export function PriceTable({ records, isLoading = false }: PriceTableProps) {
         </tbody>
       </table>
     </div>
-  );
+  )
 }
