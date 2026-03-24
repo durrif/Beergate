@@ -42,13 +42,16 @@ function BarrelIcon({ size = 32 }: { size?: number }) {
 export function BarrelTrigger() {
   const { config, phase, summon, dismiss } = useAvatarStore()
 
-  // Don't render if avatar is not configured/enabled
-  if (!config.enabled) return null
-
-  const isVisible = phase === 'hidden' || phase === 'active'
-  const isActive = phase !== 'hidden'
+  const isConfigured = config.enabled
+  const isVisible = !isConfigured || phase === 'hidden' || phase === 'active'
+  const isActive = isConfigured && phase !== 'hidden'
 
   const handleClick = () => {
+    if (!isConfigured) {
+      // Redirect to avatar configuration
+      window.location.href = '/avatar-config'
+      return
+    }
     if (phase === 'hidden') {
       summon()
     } else if (phase === 'active') {
@@ -82,10 +85,21 @@ export function BarrelTrigger() {
               ? 'drop-shadow(0 0 20px rgba(156, 106, 222, 0.6))'
               : 'drop-shadow(0 0 12px rgba(245, 166, 35, 0.3))',
           }}
-          aria-label={isActive ? 'Dismiss AI Brewmaster' : 'Summon AI Brewmaster'}
-          title={isActive ? 'Dismiss AI Brewmaster' : 'Summon AI Brewmaster'}
+          aria-label={!isConfigured ? 'Configurar AI Brewmaster' : isActive ? 'Dismiss AI Brewmaster' : 'Summon AI Brewmaster'}
+          title={!isConfigured ? '🧞 Configura tu Genio Cervecero' : isActive ? 'Dismiss AI Brewmaster' : 'Summon AI Brewmaster'}
         >
           <BarrelIcon size={isActive ? 36 : 32} />
+
+          {/* Setup badge when not configured */}
+          {!isConfigured && (
+            <motion.span
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent-purple flex items-center justify-center text-[10px] font-bold text-white shadow-lg"
+            >
+              ?
+            </motion.span>
+          )}
 
           {/* Ambient glow ring */}
           {!isActive && (

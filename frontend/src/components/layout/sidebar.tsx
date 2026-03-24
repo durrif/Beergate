@@ -61,6 +61,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/analytics', icon: BarChart3, labelKey: 'nav.analytics' },
       { to: '/ai-chat', icon: Bot, labelKey: 'nav.ai_assistant' },
+      { to: '/avatar-config', icon: Sparkles, labelKey: 'nav.avatar_config' },
       { to: '/brew-academy', icon: GraduationCap, labelKey: 'nav.brew_academy' },
     ],
   },

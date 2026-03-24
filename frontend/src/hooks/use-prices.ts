@@ -1,16 +1,27 @@
 // src/hooks/use-prices.ts
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
+import { localPriceSearch } from "@/lib/local-price-search";
 import type { PriceResult, PriceAlert } from "@/lib/types";
 
-// ─── Price search ─────────────────────────────────────────────────────────────
+// ─── Price search (backend → local fallback) ─────────────────────────────────
 
 export function usePriceSearch(query: string) {
   return useQuery({
     queryKey: ["prices-search", query],
-    queryFn: () => apiClient.get<PriceResult[]>(`/v1/prices/search?q=${encodeURIComponent(query)}`),
+    queryFn: async () => {
+      try {
+        const results = await apiClient.get<PriceResult[]>(`/v1/prices/search?q=${encodeURIComponent(query)}`);
+        // If backend returns data, use it
+        if (results && results.length > 0) return results;
+      } catch {
+        // Backend unavailable — fall through to local search
+      }
+      // Client-side fallback using local databases
+      return localPriceSearch(query);
+    },
     enabled: !!query && query.length > 2,
-    staleTime: 5 * 60_000, // 5 min - prices don't change that often
+    staleTime: 5 * 60_000,
   });
 }
 
@@ -19,10 +30,17 @@ export function useMultiPriceSearch(names: string[]) {
   const queries = useQueries({
     queries: names.map((name) => ({
       queryKey: ["prices-search", name],
-      queryFn: () =>
-        apiClient.get<PriceResult[]>(
-          `/v1/prices/search?q=${encodeURIComponent(name)}`
-        ),
+      queryFn: async () => {
+        try {
+          const results = await apiClient.get<PriceResult[]>(
+            `/v1/prices/search?q=${encodeURIComponent(name)}`
+          );
+          if (results && results.length > 0) return results;
+        } catch {
+          // fall through
+        }
+        return localPriceSearch(name);
+      },
       enabled: !!name && name.length > 2,
       staleTime: 5 * 60_000,
     })),

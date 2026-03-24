@@ -17,7 +17,7 @@ const PAGE_TITLE_KEYS: Record<string, string> = {
   'water-lab': 'nav.water_lab',
   'pool-buying': 'nav.pool_buying',
   'brew-academy': 'nav.brew_academy',
-  'avatar-config': 'nav.avatar',
+  'avatar-config': 'nav.avatar_config',
 }
 
 export function usePageTitle(pageId: string) {

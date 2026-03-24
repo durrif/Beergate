@@ -1,15 +1,16 @@
-// frontend/src/pages/recipes.tsx — Beergate v3 Recipe Library
+// frontend/src/pages/recipes.tsx — Beergate v4 Recipe Library with Bulk BeerXML/ZIP Import
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Search, Upload, RefreshCw, Grid3x3, List, Filter,
   SlidersHorizontal, BookOpen, Sparkles, X, FileDown,
+  Package, CheckCircle, AlertTriangle, FileArchive,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useUIStore } from '@/stores/ui-store'
-import { useRecipes, useImportBeerXML, useStartBrewFromRecipe } from '@/hooks/use-recipes'
+import { useRecipes, useImportBeerXML, useBulkImportBeerXML, useStartBrewFromRecipe } from '@/hooks/use-recipes'
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -68,10 +69,12 @@ export default function RecipesPage() {
   const [creatorOpen, setCreatorOpen] = useState(false)
   const [editRecipe, setEditRecipe] = useState<Recipe | null>(null)
   const [dragActive, setDragActive] = useState(false)
+  const [bulkModalOpen, setBulkModalOpen] = useState(false)
 
   // Data
   const { data: recipes = [], isLoading } = useRecipes(search || undefined)
   const importBeerXML = useImportBeerXML()
+  const bulkImport = useBulkImportBeerXML()
   const startBrew = useStartBrewFromRecipe()
 
   // Apply filters + sort
@@ -89,26 +92,50 @@ export default function RecipesPage() {
   const handleImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    importBeerXML.mutate(file, {
-      onSuccess: (imported: Recipe[]) => toast.success(`${imported.length} ${t('recipes.import_success')}`),
-      onError: () => toast.error(t('recipes.import_error')),
-    })
+    const isZip = file.name.toLowerCase().endsWith('.zip') || file.type.includes('zip')
+    if (isZip) {
+      setBulkModalOpen(true)
+      bulkImport.mutate(file, {
+        onSuccess: (result) => {
+          toast.success(`${result.recipes.length} recetas importadas de ${result.succeeded}/${result.total} archivos`)
+        },
+        onError: () => toast.error(t('recipes.import_error')),
+      })
+    } else {
+      importBeerXML.mutate(file, {
+        onSuccess: (imported) => toast.success(`${imported.length} ${t('recipes.import_success')}`),
+        onError: () => toast.error(t('recipes.import_error')),
+      })
+    }
     e.target.value = ''
-  }, [importBeerXML])
+  }, [importBeerXML, bulkImport, t])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setDragActive(false)
     const file = e.dataTransfer.files[0]
-    if (!file || !file.name.endsWith('.xml')) {
-      toast.error('Solo archivos BeerXML (.xml)')
+    if (!file) return
+    const isZip = file.name.toLowerCase().endsWith('.zip') || file.type.includes('zip')
+    const isXml = file.name.toLowerCase().endsWith('.xml')
+    if (!isZip && !isXml) {
+      toast.error('Solo archivos BeerXML (.xml) o ZIP (.zip)')
       return
     }
-    importBeerXML.mutate(file, {
-      onSuccess: (imported: Recipe[]) => toast.success(`${imported.length} ${t('recipes.import_success')}`),
-      onError: () => toast.error(t('recipes.import_error')),
-    })
-  }, [importBeerXML])
+    if (isZip) {
+      setBulkModalOpen(true)
+      bulkImport.mutate(file, {
+        onSuccess: (result) => {
+          toast.success(`${result.recipes.length} recetas importadas de ${result.succeeded}/${result.total} archivos`)
+        },
+        onError: () => toast.error(t('recipes.import_error')),
+      })
+    } else {
+      importBeerXML.mutate(file, {
+        onSuccess: (imported) => toast.success(`${imported.length} ${t('recipes.import_success')}`),
+        onError: () => toast.error(t('recipes.import_error')),
+      })
+    }
+  }, [importBeerXML, bulkImport, t])
 
   const handleStartBrew = (recipeId: string) => {
     startBrew.mutate(Number(recipeId), {
@@ -142,7 +169,7 @@ export default function RecipesPage() {
               <div className="border-2 border-dashed border-accent-amber/50 rounded-2xl p-12 text-center">
                 <Upload className="w-12 h-12 text-accent-amber mx-auto mb-3" />
                 <p className="text-lg font-display font-bold text-text-primary">Suelta tu BeerXML aquí</p>
-                <p className="text-sm text-text-secondary mt-1">Archivos .xml compatibles con BeerXML 1.0</p>
+                <p className="text-sm text-text-secondary mt-1">Archivos .xml o .zip con múltiples recetas</p>
               </div>
             </motion.div>
           )}
@@ -158,17 +185,17 @@ export default function RecipesPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <input ref={fileRef} type="file" accept=".xml" className="hidden" onChange={handleImport} />
+            <input ref={fileRef} type="file" accept=".xml,.zip" className="hidden" onChange={handleImport} />
             <Button
               variant="outline" size="sm"
               className="border-white/10 text-text-secondary hover:text-text-primary text-xs"
               onClick={() => fileRef.current?.click()}
-              disabled={importBeerXML.isPending}
+              disabled={importBeerXML.isPending || bulkImport.isPending}
             >
-              {importBeerXML.isPending
+              {(importBeerXML.isPending || bulkImport.isPending)
                 ? <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" />
                 : <Upload className="w-3.5 h-3.5 mr-1" />}
-              {t('recipes.import_beerxml')}
+              Importar XML/ZIP
             </Button>
             <Button
               size="sm"
@@ -355,6 +382,133 @@ export default function RecipesPage() {
           </div>
         )}
       </div>
+
+      {/* ── Bulk import progress modal ────────────────────── */}
+      <AnimatePresence>
+        {bulkModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => {
+              if (!bulkImport.isPending) {
+                setBulkModalOpen(false)
+                bulkImport.resetProgress()
+              }
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="glass-card rounded-2xl border border-white/10 p-6 w-full max-w-lg"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-accent-amber/10 flex items-center justify-center">
+                  <FileArchive className="w-5 h-5 text-accent-amber" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-display font-bold text-text-primary">
+                    Importación masiva BeerXML
+                  </h3>
+                  <p className="text-xs text-text-secondary">
+                    {bulkImport.isPending ? 'Procesando archivos...' : 'Importación completada'}
+                  </p>
+                </div>
+              </div>
+
+              {bulkImport.progress && (
+                <div className="space-y-4">
+                  {/* Progress bar */}
+                  <div>
+                    <div className="flex justify-between text-xs text-text-secondary mb-1.5">
+                      <span>{bulkImport.progress.processed} / {bulkImport.progress.total} archivos</span>
+                      <span>{bulkImport.progress.recipes.length} recetas encontradas</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-accent-amber to-accent-copper"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(bulkImport.progress.processed / Math.max(bulkImport.progress.total, 1)) * 100}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Current file */}
+                  {bulkImport.isPending && bulkImport.progress.currentFile && (
+                    <div className="flex items-center gap-2 text-xs text-text-tertiary">
+                      <RefreshCw size={12} className="animate-spin text-accent-amber" />
+                      <span className="truncate">{bulkImport.progress.currentFile}</span>
+                    </div>
+                  )}
+
+                  {/* Stats */}
+                  {!bulkImport.isPending && (
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="rounded-xl bg-green-500/5 border border-green-500/20 p-3 text-center">
+                        <CheckCircle size={16} className="text-green-400 mx-auto mb-1" />
+                        <p className="text-lg font-bold text-green-400">{bulkImport.progress.succeeded}</p>
+                        <p className="text-[10px] text-text-tertiary">Archivos OK</p>
+                      </div>
+                      <div className="rounded-xl bg-accent-amber/5 border border-accent-amber/20 p-3 text-center">
+                        <Package size={16} className="text-accent-amber mx-auto mb-1" />
+                        <p className="text-lg font-bold text-accent-amber">{bulkImport.progress.recipes.length}</p>
+                        <p className="text-[10px] text-text-tertiary">Recetas</p>
+                      </div>
+                      {bulkImport.progress.failed > 0 && (
+                        <div className="rounded-xl bg-red-500/5 border border-red-500/20 p-3 text-center">
+                          <AlertTriangle size={16} className="text-red-400 mx-auto mb-1" />
+                          <p className="text-lg font-bold text-red-400">{bulkImport.progress.failed}</p>
+                          <p className="text-[10px] text-text-tertiary">Errores</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Recipe list preview */}
+                  {!bulkImport.isPending && bulkImport.progress.recipes.length > 0 && (
+                    <div className="max-h-48 overflow-y-auto rounded-lg border border-white/5 divide-y divide-white/5">
+                      {bulkImport.progress.recipes.map((r, i) => (
+                        <div key={i} className="px-3 py-2 flex items-center gap-2">
+                          <CheckCircle size={12} className="text-green-400 flex-shrink-0" />
+                          <span className="text-xs text-text-primary truncate flex-1">{r.name}</span>
+                          {r.style && <span className="text-[10px] text-text-tertiary truncate max-w-[100px]">{r.style}</span>}
+                          {r.abv != null && <span className="text-[10px] text-text-tertiary">{r.abv.toFixed(1)}%</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Errors */}
+                  {bulkImport.progress.errors.length > 0 && (
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-1">
+                      <p className="text-xs font-medium text-red-400">Errores:</p>
+                      {bulkImport.progress.errors.map((err, i) => (
+                        <div key={i} className="text-[10px] text-red-300/70">
+                          <span className="font-mono">{err.file}</span>: {err.error}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Close button */}
+                  {!bulkImport.isPending && (
+                    <Button
+                      className="w-full bg-accent-amber text-bg-primary hover:bg-accent-amber/90 font-medium"
+                      onClick={() => {
+                        setBulkModalOpen(false)
+                        bulkImport.resetProgress()
+                      }}
+                    >
+                      <CheckCircle size={14} className="mr-2" />
+                      Cerrar
+                    </Button>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Recipe Creator overlay ──────────────────────────── */}
       <AnimatePresence>
