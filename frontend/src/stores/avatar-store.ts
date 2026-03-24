@@ -5,7 +5,7 @@ import { persist } from 'zustand/middleware'
 export type AvatarStyle = 'cartoon' | 'realistic' | 'anime' | 'classic'
 export type PersonalityType = 'professional' | 'casual' | 'sarcastic' | 'shy' | 'demanding'
 export type GeniePhase = 'hidden' | 'summoning' | 'active' | 'navigating' | 'dismissing'
-export type PresetCharacter = 'maestro' | 'cientifica' | 'punk' | 'hop3000'
+export type PresetCharacter = 'david' | 'maestro' | 'cientifica' | 'punk' | 'hop3000'
 
 export interface AvatarConfig {
   /** Whether the avatar system is enabled */

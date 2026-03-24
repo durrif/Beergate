@@ -15,6 +15,7 @@ const STYLE_MODIFIERS: Record<AvatarStyle, string> = {
 
 // Preset character prompts
 const PRESET_PROMPTS: Record<PresetCharacter, string> = {
+  david: "", // Pre-generated avatar — no prompt needed
   maestro: "A wise, bearded master brewer in his 50s, wearing a dark leather apron over a flannel shirt, warm smile, holding a hydrometer, grey beard neatly trimmed, kind eyes",
   cientifica: "A young female scientist with hop-shaped earrings, wearing a white lab coat with amber stains, safety goggles on forehead, short dark hair, confident smirk, holding a flask with golden liquid",
   punk: "A punk brewer with a colorful mohawk, tattoo sleeves of hops and barley, ripped band t-shirt under a brewing apron, piercings, rebellious grin, holding a pint glass",

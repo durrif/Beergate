@@ -26,7 +26,14 @@ import { cn } from '@/lib/utils'
 
 type WizardStep = 'source' | 'preset' | 'style' | 'personality' | 'voice' | 'done'
 
-const PRESETS: Array<{ id: PresetCharacter; label: string; emoji: string; desc: string }> = [
+/** David's custom avatar — pre-generated via SadTalker on Replicate */
+const DAVID_AVATAR = {
+  imageUrl: 'https://replicate.delivery/pbxt/OnxG3obnBa1SZjPsBwJkL2H0Alr6gkCq7rjJ3VnwoaxCEUow/together-image%20%284%29.jpeg',
+  videoUrl: 'https://replicate.delivery/yhqm/eebVxLQkxAvkepWjiBNcUZleSWuSP7AkJdU1yKAmzacuBPQZB/out.mp4',
+}
+
+const PRESETS: Array<{ id: PresetCharacter; label: string; emoji: string; desc: string; imageUrl?: string }> = [
+  { id: 'david', label: 'Comandante Lara', emoji: '🧞', desc: 'Tu genio cervecero personalizado con voz propia', imageUrl: DAVID_AVATAR.imageUrl },
   { id: 'maestro', label: 'El Maestro Cervecero', emoji: '🧔', desc: 'Sabio, barbudo, con delantal' },
   { id: 'cientifica', label: 'La Científica del Lúpulo', emoji: '👩‍🔬', desc: 'Bata de laboratorio, pendientes de lúpulo' },
   { id: 'punk', label: 'El Punk Brewer', emoji: '🎸', desc: 'Mohawk, tatuajes, espíritu DIY' },
@@ -95,6 +102,20 @@ export default function AvatarConfigPage() {
   const handlePresetSelect = async (preset: PresetCharacter) => {
     setSelectedPreset(preset)
     setConfig({ presetCharacter: preset })
+
+    // David's custom avatar has pre-generated image + video — skip style step
+    if (preset === 'david') {
+      setGeneratedImage(DAVID_AVATAR.imageUrl)
+      setConfig({
+        imageUrl: DAVID_AVATAR.imageUrl,
+        videoUrl: DAVID_AVATAR.videoUrl,
+        style: 'realistic',
+      })
+      setSelectedStyle('realistic')
+      setStep('personality')
+      return
+    }
+
     setStep('style')
   }
 
@@ -140,7 +161,9 @@ export default function AvatarConfigPage() {
   const handleFinish = () => {
     setConfig({
       enabled: true,
-      videoUrl: '/assets/avatar/avatar-demo.mp4',
+      videoUrl: selectedPreset === 'david'
+        ? DAVID_AVATAR.videoUrl
+        : '/assets/avatar/avatar-demo.mp4',
     })
     setStep('done')
   }
@@ -238,12 +261,28 @@ export default function AvatarConfigPage() {
                       'p-4 rounded-xl glass-card border transition-all text-left',
                       selectedPreset === preset.id
                         ? 'border-accent-purple/60 bg-accent-purple/5'
-                        : 'border-white/[0.06] hover:border-white/[0.12]'
+                        : 'border-white/[0.06] hover:border-white/[0.12]',
+                      preset.id === 'david' && 'sm:col-span-2 border-accent-purple/30 bg-gradient-to-br from-accent-purple/5 to-accent-amber/5'
                     )}
                   >
-                    <span className="text-3xl mb-2 block">{preset.emoji}</span>
-                    <h3 className="font-semibold text-text-primary text-sm">{preset.label}</h3>
-                    <p className="text-xs text-text-secondary mt-1">{preset.desc}</p>
+                    <div className="flex items-center gap-3">
+                      {preset.imageUrl ? (
+                        <img
+                          src={preset.imageUrl}
+                          alt={preset.label}
+                          className="w-14 h-14 rounded-xl object-cover border border-white/10"
+                        />
+                      ) : (
+                        <span className="text-3xl">{preset.emoji}</span>
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-text-primary text-sm">{preset.label}</h3>
+                        <p className="text-xs text-text-secondary mt-0.5">{preset.desc}</p>
+                        {preset.id === 'david' && (
+                          <span className="text-[10px] text-accent-purple font-medium mt-1 inline-block">✨ Avatar + voz propia</span>
+                        )}
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
