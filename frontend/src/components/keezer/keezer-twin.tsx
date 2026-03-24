@@ -56,10 +56,11 @@ function WaveSurface({ id, y, color }: { id: string; y: number; color: string })
 }
 
 /** Single keg SVG — corny style */
-function KegSVG({ tap, selected, onClick }: {
+function KegSVG({ tap, selected, onClick, pouring }: {
   tap: TapConfig
   selected: boolean
   onClick: () => void
+  pouring?: boolean
 }) {
   const keg = KEG_MAP.get(tap.keg_type_id ?? '')
   const pct = tap.liters_total > 0 ? tap.liters_remaining / tap.liters_total : 0
@@ -156,6 +157,33 @@ function KegSVG({ tap, selected, onClick }: {
           {(pct * 100).toFixed(0)}%
         </text>
       )}
+
+      {/* Pour flow animation */}
+      {pouring && !isEmpty && (
+        <g>
+          {/* Flow stream from tap handle */}
+          <motion.rect
+            x="29" y="-8" width="2" height="10" rx="1"
+            fill={beerColor}
+            animate={{ opacity: [0.9, 0.5, 0.9], height: [10, 14, 10] }}
+            transition={{ duration: 0.4, repeat: Infinity }}
+          />
+          {/* Drip drops */}
+          <motion.circle
+            cx="30" cy="2" r="1.5"
+            fill={beerColor}
+            animate={{ cy: [2, 12], opacity: [1, 0], r: [1.5, 0.5] }}
+            transition={{ duration: 0.6, repeat: Infinity, ease: 'easeIn' }}
+          />
+          <motion.circle
+            cx="30" cy="6" r="1"
+            fill={beerColor}
+            opacity={0.6}
+            animate={{ cy: [6, 14], opacity: [0.6, 0], r: [1, 0.3] }}
+            transition={{ duration: 0.5, repeat: Infinity, delay: 0.3 }}
+          />
+        </g>
+      )}
     </motion.g>
   )
 }
@@ -204,9 +232,10 @@ interface KeezerTwinProps {
   selectedTap: number | null
   onSelectTap: (id: number) => void
   keezerTemp?: number
+  pouringTapId?: number | null
 }
 
-export default function KeezerTwin({ taps, selectedTap, onSelectTap, keezerTemp = 3 }: KeezerTwinProps) {
+export default function KeezerTwin({ taps, selectedTap, onSelectTap, keezerTemp = 3, pouringTapId }: KeezerTwinProps) {
   const tapCount = taps.length
   const svgWidth = Math.max(200, tapCount * 80 + 40)
   const svgHeight = 195
@@ -220,6 +249,7 @@ export default function KeezerTwin({ taps, selectedTap, onSelectTap, keezerTemp 
             tap={tap}
             selected={selectedTap === tap.id}
             onClick={() => onSelectTap(tap.id)}
+            pouring={pouringTapId === tap.id}
           />
           {/* Tap number label below */}
           <text x="30" y="157" textAnchor="middle" fill="#5A6B80"
@@ -239,7 +269,7 @@ export default function KeezerTwin({ taps, selectedTap, onSelectTap, keezerTemp 
         </g>
       )
     })
-  }, [taps, selectedTap, onSelectTap])
+  }, [taps, selectedTap, onSelectTap, pouringTapId])
 
   return (
     <div style={{

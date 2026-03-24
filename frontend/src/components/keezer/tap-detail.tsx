@@ -1,4 +1,5 @@
 // src/components/keezer/tap-detail.tsx — Beergate v3 Tap Detail Panel
+import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Beer, Thermometer, Gauge, Droplets, Calendar, Clock,
@@ -6,11 +7,13 @@ import {
 } from 'lucide-react'
 import type { TapConfig } from '@/data/kegs'
 import { KEG_MAP, CONNECTOR_LABELS, co2ToPsi } from '@/data/kegs'
+import { useKeezerStore } from '@/stores/keezer-store'
 import { useTranslation } from 'react-i18next'
 
 interface TapDetailProps {
   tap: TapConfig | null
   onClose: () => void
+  onPour?: () => void
 }
 
 function Stat({ icon: Icon, label, value, unit, color }: {
@@ -50,23 +53,23 @@ function Stat({ icon: Icon, label, value, unit, color }: {
   )
 }
 
-/** Fake pour log data for demo */
-function generatePourLog(tap: TapConfig): { time: string; volume: number }[] {
-  if (!tap.beer_name) return []
-  const pours: { time: string; volume: number }[] = []
-  const now = new Date()
-  for (let i = 0; i < Math.min(tap.serving_count, 8); i++) {
-    const d = new Date(now.getTime() - i * 3600000 * (2 + Math.random() * 10))
-    pours.push({
-      time: d.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
-      volume: +(0.25 + Math.random() * 0.25).toFixed(2),
-    })
-  }
-  return pours
-}
-
-export default function TapDetail({ tap, onClose }: TapDetailProps) {
+export default function TapDetail({ tap, onClose, onPour }: TapDetailProps) {
   const { t } = useTranslation('devices')
+  const pourLog = useKeezerStore(s => s.pourLog)
+
+  const tapPours = useMemo(() => {
+    if (!tap) return []
+    return pourLog
+      .filter(p => p.tapId === tap.id)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 10)
+      .map(p => ({
+        time: new Date(p.timestamp).toLocaleString('es-ES', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+        }),
+        volume: +(p.volume).toFixed(2),
+      }))
+  }, [pourLog, tap])
 
   return (
     <AnimatePresence>
@@ -114,16 +117,31 @@ export default function TapDetail({ tap, onClose }: TapDetailProps) {
                 <p style={{ fontSize: 12, color: '#8B9BB4', margin: '2px 0 0' }}>{tap.style}</p>
               )}
             </div>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8,
-                width: 28, height: 28, cursor: 'pointer', color: '#8B9BB4',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-              }}
-            >
-              ✕
-            </button>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {onPour && tap.status === 'active' && (
+                <button
+                  onClick={onPour}
+                  style={{
+                    background: 'linear-gradient(135deg, #F5A623, #D4723C)',
+                    border: 'none', borderRadius: 8,
+                    padding: '6px 12px', cursor: 'pointer', color: '#0A0E14',
+                    fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  🍺 Servir
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 8,
+                  width: 28, height: 28, cursor: 'pointer', color: '#8B9BB4',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+                }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {tap.status === 'empty' ? (
@@ -247,7 +265,7 @@ export default function TapDetail({ tap, onClose }: TapDetailProps) {
                   {t('pour_log', 'Registro de servicios')}
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {generatePourLog(tap).map((pour, i) => (
+                  {tapPours.map((pour, i) => (
                     <div key={i} style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '6px 10px', borderRadius: 8,
@@ -262,7 +280,7 @@ export default function TapDetail({ tap, onClose }: TapDetailProps) {
                       </span>
                     </div>
                   ))}
-                  {tap.serving_count === 0 && (
+                  {tapPours.length === 0 && (
                     <p style={{ fontSize: 12, color: '#5A6B80', textAlign: 'center', padding: 12 }}>
                       {t('no_pours', 'Sin servicios registrados')}
                     </p>
