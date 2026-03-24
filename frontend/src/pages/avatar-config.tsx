@@ -30,6 +30,8 @@ type WizardStep = 'source' | 'preset' | 'style' | 'personality' | 'voice' | 'don
 const DAVID_AVATAR = {
   imageUrl: 'https://replicate.delivery/pbxt/OnxG3obnBa1SZjPsBwJkL2H0Alr6gkCq7rjJ3VnwoaxCEUow/together-image%20%284%29.jpeg',
   videoUrl: 'https://replicate.delivery/yhqm/eebVxLQkxAvkepWjiBNcUZleSWuSP7AkJdU1yKAmzacuBPQZB/out.mp4',
+  /** Driving audio from Mediteradio a la Carta — baked into the SadTalker video */
+  audioUrl: 'https://replicate.delivery/pbxt/OnxG3obnBa1SZjPsBwJkL2H0Alr6gkCq7rjJ3VnwoaxCEUow/comandantelara-mediteradioalacarta.mp3',
 }
 
 const PRESETS: Array<{ id: PresetCharacter; label: string; emoji: string; desc: string; imageUrl?: string }> = [
@@ -56,6 +58,7 @@ const PERSONALITIES: Array<{ id: PersonalityType; label: string; emoji: string; 
 ]
 
 const VOICES = [
+  { id: 'david_own', label: 'Comandante Lara (voz propia)', flag: '🧞' },
   { id: 'warm_male_es', label: 'Voz cálida masculina (ES)', flag: '🇪🇸' },
   { id: 'energetic_female_es', label: 'Voz enérgica femenina (ES)', flag: '🇪🇸' },
   { id: 'deep_male_en', label: 'Deep warm male (EN)', flag: '🇬🇧' },
@@ -103,7 +106,7 @@ export default function AvatarConfigPage() {
     setSelectedPreset(preset)
     setConfig({ presetCharacter: preset })
 
-    // David's custom avatar has pre-generated image + video — skip style step
+    // David's custom avatar has pre-generated image + video + voice — skip style step
     if (preset === 'david') {
       setGeneratedImage(DAVID_AVATAR.imageUrl)
       setConfig({
@@ -112,6 +115,7 @@ export default function AvatarConfigPage() {
         style: 'realistic',
       })
       setSelectedStyle('realistic')
+      setSelectedVoice('david_own')
       setStep('personality')
       return
     }
@@ -164,6 +168,8 @@ export default function AvatarConfigPage() {
       videoUrl: selectedPreset === 'david'
         ? DAVID_AVATAR.videoUrl
         : '/assets/avatar/avatar-demo.mp4',
+      voiceEnabled: selectedVoice !== null,
+      presetVoice: selectedVoice,
     })
     setStep('done')
   }
