@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"name": "ovosfera-hub",
+			"uri": "vscode-remote://ssh-remote+docker-edge-apps/srv/docker/apps/ovosfera-hub"
+		}
+	],
+	"remoteAuthority": "ssh-remote+docker-edge-apps",
+	"settings": {}
+}

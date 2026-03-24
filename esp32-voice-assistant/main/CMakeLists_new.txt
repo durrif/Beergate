@@ -1,0 +1,14 @@
+idf_component_register(
+    SRCS 
+        "app_main_new.c"
+        "ui/ui.c"
+        "ui/assets/cat_0.c"
+        "ui/assets/cat_1.c"
+        "ui/assets/cat_2.c"
+        "ui/assets/cat_3.c"
+    INCLUDE_DIRS "." "ui"
+    REQUIRES 
+        esp-box-3
+        esp_lvgl_port
+        lvgl
+)
