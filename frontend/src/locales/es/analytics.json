@@ -25,5 +25,10 @@
     "days": "Días"
   },
   "liters": "Litros",
-  "score": "Puntuación"
+  "score": "Puntuación",
+  "supplier_comparison": "Comparativa de proveedores",
+  "lower_is_better": "Menor coste = mejor valor",
+  "brewing_heatmap": "Frecuencia de elaboración",
+  "no_brew": "Sin elaboración",
+  "brewed": "Elaboración"
 }

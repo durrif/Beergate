@@ -1,4 +1,4 @@
-// frontend/src/components/layout/app-shell.tsx — Beergate v3
+// frontend/src/components/layout/app-shell.tsx — Beergate v4
 import { type ReactNode, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouterState } from '@tanstack/react-router'
@@ -11,6 +11,13 @@ import { VoiceFab } from './voice-fab'
 import { AiPanel } from '@/components/ai/ai-panel'
 import { CommandPalette } from './command-palette'
 import { NotificationCenter } from './notification-center'
+import { BarrelTrigger } from '@/components/avatar/barrel-trigger'
+import { SmokeParticles } from '@/components/avatar/smoke-particles'
+import { GenieAvatar } from '@/components/avatar/genie-avatar'
+import { MobileAvatarSheet } from '@/components/avatar/mobile-avatar-sheet'
+import { InstallPrompt } from '@/components/pwa/install-prompt'
+import { OfflineBanner } from '@/components/pwa/offline-banner'
+import { usePageTitle } from '@/hooks/use-page-title'
 import { cn } from '@/lib/utils'
 
 interface AppShellProps {
@@ -37,6 +44,10 @@ export function AppShell({ children }: AppShellProps) {
   const { aiPanelOpen, brewPhase } = useUIStore()
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
+
+  // Dynamic page title
+  const pageId = currentPath === '/' ? 'dashboard' : currentPath.slice(1)
+  usePageTitle(pageId)
 
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
@@ -81,6 +92,8 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
+        <InstallPrompt />
+        <OfflineBanner />
         <Header
           onOpenCommandPalette={openCmdPalette}
           onOpenNotifications={openNotif}
@@ -134,6 +147,14 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Voice FAB */}
       <VoiceFab />
+
+      {/* Avatar System — El Genio Cervecero */}
+      <BarrelTrigger />
+      <SmokeParticles />
+      <div className="hidden md:block">
+        <GenieAvatar />
+      </div>
+      <MobileAvatarSheet />
 
       {/* Mobile bottom nav */}
       <MobileNav />

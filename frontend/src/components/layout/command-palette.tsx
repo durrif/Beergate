@@ -113,6 +113,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             exit={{ opacity: 0, y: -20, scale: 0.96 }}
             transition={{ duration: 0.15 }}
             className="cmd-palette"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command Palette"
           >
             <div className="flex items-center gap-3 px-4 border-b border-white/[0.06]">
               <Search size={18} className="text-text-tertiary shrink-0" />
@@ -126,6 +129,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 className="cmd-palette-input"
                 autoComplete="off"
                 spellCheck={false}
+                aria-label="Search commands"
               />
             </div>
             <div ref={listRef} className="max-h-72 overflow-y-auto py-1.5 no-scrollbar">

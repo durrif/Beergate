@@ -6,6 +6,7 @@ import { RouterProvider } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { api } from '@/lib/api'
 import { AppShell } from '@/components/layout/app-shell'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 // Lazy-loaded pages
 const LoginPage = lazy(() => import('@/pages/login'))
@@ -22,6 +23,10 @@ const AnalyticsPage = lazy(() => import('@/pages/analytics'))
 const AiChatPage = lazy(() => import('@/pages/ai-chat'))
 const SettingsPage = lazy(() => import('@/pages/settings'))
 const SuppliersPage = lazy(() => import('@/pages/suppliers'))
+const WaterLabPage = lazy(() => import('@/pages/water-lab'))
+const PoolBuyingPage = lazy(() => import('@/pages/pool-buying'))
+const BrewAcademyPage = lazy(() => import('@/pages/brew-academy'))
+const AvatarConfigPage = lazy(() => import('@/pages/avatar-config'))
 
 const PageLoader = () => {
   const { t } = useTranslation('common')
@@ -69,9 +74,11 @@ const appRoute = createRoute({
   id: 'app',
   beforeLoad: requireAuth,
   component: () => (
-    <AppShell>
-      <Outlet />
-    </AppShell>
+    <ErrorBoundary>
+      <AppShell>
+        <Outlet />
+      </AppShell>
+    </ErrorBoundary>
   ),
 })
 
@@ -140,6 +147,31 @@ const suppliersRoute = createRoute({
   path: '/suppliers',
   component: () => <Suspense fallback={<PageLoader />}><SuppliersPage /></Suspense>,
 })
+
+const waterLabRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/water-lab',
+  component: () => <Suspense fallback={<PageLoader />}><WaterLabPage /></Suspense>,
+})
+
+const poolBuyingRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/pool-buying',
+  component: () => <Suspense fallback={<PageLoader />}><PoolBuyingPage /></Suspense>,
+})
+
+const brewAcademyRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/brew-academy',
+  component: () => <Suspense fallback={<PageLoader />}><BrewAcademyPage /></Suspense>,
+})
+
+const avatarConfigRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: '/avatar-config',
+  component: () => <Suspense fallback={<PageLoader />}><AvatarConfigPage /></Suspense>,
+})
+
 const settingsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: '/settings',
@@ -161,6 +193,10 @@ const routeTree = rootRoute.addChildren([
     analyticsRoute,
     aiChatRoute,
     suppliersRoute,
+    waterLabRoute,
+    poolBuyingRoute,
+    brewAcademyRoute,
+    avatarConfigRoute,
     settingsRoute,
   ]),
 ])

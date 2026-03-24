@@ -23,9 +23,21 @@
     "group_insights": "Análisis",
     "suppliers": "Proveedores",
     "ai_assistant": "Asistente IA",
+    "water_lab": "Laboratorio de Agua",
+    "pool_buying": "Compra Conjunta",
+    "brew_academy": "Brew Academy",
     "group_brew": "Elaboración",
     "group_ops": "Operaciones",
-    "group_gear": "Equipamiento"
+    "group_gear": "Equipamiento",
+    "group_insights": "Análisis",
+    "more": "Más",
+    "mobile_navigation": "Navegación móvil"
+  },
+  "pwa": {
+    "install_title": "Instala Beergate para acceso rápido y modo offline",
+    "install_button": "Instalar",
+    "offline_message": "Sin conexión — modo offline activo",
+    "more_options": "Más opciones"
   },
   "auth": {
     "login": "Iniciar sesión",

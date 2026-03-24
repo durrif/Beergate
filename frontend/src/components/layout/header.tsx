@@ -112,6 +112,9 @@ export function Header({ onOpenCommandPalette, onOpenNotifications }: HeaderProp
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg hover:bg-bg-hover transition-all"
+              aria-label="User menu"
+              aria-haspopup="menu"
+              aria-expanded={userMenuOpen}
             >
               <div className="w-7 h-7 rounded-full bg-accent-amber/20 border border-accent-amber/30 flex items-center justify-center">
                 <span className="text-xs font-semibold text-accent-amber">

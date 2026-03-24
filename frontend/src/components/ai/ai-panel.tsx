@@ -112,7 +112,7 @@ export function AiPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" role="complementary" aria-label="AI Assistant">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] shrink-0">
         <div className="flex items-center gap-2">
@@ -184,6 +184,7 @@ export function AiPanel() {
             placeholder={t('ai.placeholder')}
             rows={1}
             disabled={isStreaming}
+            aria-label={t('ai.placeholder')}
             className={cn(
               'flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-secondary',
               'resize-none focus:outline-none max-h-32 overflow-y-auto no-scrollbar'

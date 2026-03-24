@@ -22,10 +22,22 @@
     "group_equipment": "Equipment",
     "group_insights": "Insights",
     "suppliers": "Suppliers",
-    "ai_assistant": "AI Assistant",
+    "ai_assistant": "AI Brewmaster",
+    "water_lab": "Water Lab",
+    "pool_buying": "Pool Buying",
+    "brew_academy": "Brew Academy",
     "group_brew": "Brew",
     "group_ops": "Operations",
-    "group_gear": "Gear"
+    "group_gear": "Gear",
+    "group_insights": "Insights",
+    "more": "More",
+    "mobile_navigation": "Mobile navigation"
+  },
+  "pwa": {
+    "install_title": "Install Beergate for quick access and offline mode",
+    "install_button": "Install",
+    "offline_message": "No connection — offline mode active",
+    "more_options": "More options"
   },
   "auth": {
     "login": "Sign in",

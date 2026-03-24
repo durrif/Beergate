@@ -1,15 +1,16 @@
-// src/pages/ai-chat.tsx — Beergate v3 Dedicated AI Chat Page
+// src/pages/ai-chat.tsx — Beergate v4 Dedicated AI Chat Page
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Plus, Trash2, MessageSquare, Sparkles,
   Package, Beaker, FlaskConical, ShoppingCart, BarChart3,
-  Beer, ChevronLeft,
+  Beer, ChevronLeft, X,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui-store'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { MessageBubble } from '@/components/ai/message-bubble'
 import type { AIMessage } from '@/lib/types'
 
@@ -45,6 +46,7 @@ function useQuickActions(context: string) {
 export default function AiChatPage() {
   const { t } = useTranslation(['common', 'ai'])
   const { setActivePage } = useUIStore()
+  const isMobile = useIsMobile()
 
   const [conversations, setConversations] = useState<LocalConversation[]>([])
   const [activeConvId, setActiveConvId] = useState<string | null>(null)
@@ -52,7 +54,7 @@ export default function AiChatPage() {
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [streamBuffer, setStreamBuffer] = useState('')
-  const [showHistory, setShowHistory] = useState(true)
+  const [showHistory, setShowHistory] = useState(() => window.innerWidth >= 768)
 
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -187,230 +189,182 @@ export default function AiChatPage() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-      {/* Conversation history sidebar */}
+    <div className="flex h-full overflow-hidden">
+      {/* Conversation history sidebar — drawer on mobile, panel on desktop */}
       <AnimatePresence>
         {showHistory && (
-          <motion.div
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 280, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              background: 'rgba(255,255,255,0.02)',
-              borderRight: '1px solid rgba(255,255,255,0.06)',
-              display: 'flex', flexDirection: 'column',
-              overflow: 'hidden', flexShrink: 0,
-            }}
-          >
-            {/* History header */}
-            <div style={{
-              padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#E8E0D4' }}>
-                {t('ai:chat_history', 'Historial')}
-              </span>
-              <button
-                onClick={handleNewChat}
-                style={{
-                  padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
-                  border: 'none', cursor: 'pointer',
-                  background: 'rgba(245,166,35,0.12)', color: '#F5A623',
-                }}
-              >
-                <Plus size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                {t('ai:new_chat', 'Nueva')}
-              </button>
-            </div>
-
-            {/* Context picker */}
-            <div style={{ padding: '8px 12px', display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-              {CONTEXT_OPTIONS.map(opt => {
-                const Icon = opt.icon
-                const active = contextPage === opt.key
-                return (
-                  <button
-                    key={opt.key}
-                    onClick={() => setContextPage(opt.key)}
-                    style={{
-                      padding: '4px 8px', borderRadius: 6, fontSize: 10, fontWeight: 500,
-                      border: 'none', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', gap: 3,
-                      background: active ? `${opt.color}18` : 'rgba(255,255,255,0.04)',
-                      color: active ? opt.color : '#8B9BB4',
-                      transition: 'all 0.15s',
-                    }}
-                    title={t(`ai:context.${opt.key}`, opt.key)}
-                  >
-                    <Icon size={11} />
-                    {opt.key.slice(0, 4)}
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Conversation list */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '4px 8px' }}>
-              {conversations.length === 0 ? (
-                <div style={{
-                  textAlign: 'center', padding: '32px 12px', color: '#5A6B80', fontSize: 12,
-                }}>
-                  <MessageSquare size={28} style={{ margin: '0 auto 8px', opacity: 0.4 }} />
-                  {t('ai:no_conversations', 'Sin conversaciones aún')}
-                </div>
-              ) : (
-                conversations.map(conv => (
-                  <div
-                    key={conv.id}
-                    onClick={() => setActiveConvId(conv.id)}
-                    style={{
-                      padding: '10px 12px', borderRadius: 10, marginBottom: 4,
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      background: activeConvId === conv.id
-                        ? 'rgba(245,166,35,0.08)' : 'transparent',
-                      border: activeConvId === conv.id
-                        ? '1px solid rgba(245,166,35,0.15)' : '1px solid transparent',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 12, fontWeight: 500, color: '#E8E0D4',
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}>
-                        {conv.title}
-                      </div>
-                      <div style={{ fontSize: 10, color: '#5A6B80', marginTop: 2 }}>
-                        {conv.messages.length - 1} msgs · {conv.contextPage}
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDeleteConv(conv.id) }}
-                      style={{
-                        padding: 4, borderRadius: 6, border: 'none', cursor: 'pointer',
-                        background: 'transparent', color: '#5A6B80',
-                        opacity: 0.5, transition: 'opacity 0.15s',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                      onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                ))
+          <>
+            {/* Mobile overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowHistory(false)}
+              className="md:hidden fixed inset-0 z-40 bg-black/50"
+            />
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: isMobile ? 280 : 280, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                'bg-white/[0.02] border-r border-white/[0.06] flex flex-col overflow-hidden shrink-0',
+                isMobile && 'fixed left-0 top-0 bottom-0 z-50 !w-[280px]',
               )}
-            </div>
-          </motion.div>
+            >
+              {/* History header */}
+              <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-[#E8E0D4]">
+                  {t('ai:chat_history', 'Historial')}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleNewChat}
+                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border-none cursor-pointer bg-accent-amber/[0.12] text-accent-amber hover:bg-accent-amber/20 transition-colors"
+                  >
+                    <Plus size={13} className="inline align-middle mr-1" />
+                    {t('ai:new_chat', 'Nueva')}
+                  </button>
+                  {isMobile && (
+                    <button
+                      onClick={() => setShowHistory(false)}
+                      className="p-1 text-[#5A6B80] hover:text-text-primary transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Context picker */}
+              <div className="px-3 py-2 flex flex-wrap gap-1">
+                {CONTEXT_OPTIONS.map(opt => {
+                  const Icon = opt.icon
+                  const active = contextPage === opt.key
+                  return (
+                    <button
+                      key={opt.key}
+                      onClick={() => setContextPage(opt.key)}
+                      className={cn(
+                        'px-2 py-1 rounded-md text-[10px] font-medium border-none cursor-pointer flex items-center gap-1 transition-all',
+                        active
+                          ? 'text-white'
+                          : 'bg-white/[0.04] text-[#8B9BB4] hover:bg-white/[0.08]',
+                      )}
+                      style={active ? { background: `${opt.color}18`, color: opt.color } : undefined}
+                      title={t(`ai:context.${opt.key}`, opt.key)}
+                    >
+                      <Icon size={11} />
+                      {opt.key.slice(0, 4)}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Conversation list */}
+              <div className="flex-1 overflow-y-auto px-2 py-1">
+                {conversations.length === 0 ? (
+                  <div className="text-center py-8 px-3 text-[#5A6B80] text-xs">
+                    <MessageSquare size={28} className="mx-auto mb-2 opacity-40" />
+                    {t('ai:no_conversations', 'Sin conversaciones aún')}
+                  </div>
+                ) : (
+                  conversations.map(conv => (
+                    <div
+                      key={conv.id}
+                      onClick={() => { setActiveConvId(conv.id); if (isMobile) setShowHistory(false) }}
+                      className={cn(
+                        'px-3 py-2.5 rounded-[10px] mb-1 cursor-pointer flex items-center justify-between transition-all border',
+                        activeConvId === conv.id
+                          ? 'bg-accent-amber/[0.08] border-accent-amber/15'
+                          : 'border-transparent hover:bg-white/[0.03]',
+                      )}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-[#E8E0D4] truncate">
+                          {conv.title}
+                        </div>
+                        <div className="text-[10px] text-[#5A6B80] mt-0.5">
+                          {conv.messages.length - 1} msgs · {conv.contextPage}
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeleteConv(conv.id) }}
+                        className="p-1 rounded-md border-none cursor-pointer bg-transparent text-[#5A6B80] opacity-50 hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
       {/* Main chat area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Chat header */}
-        <div style={{
-          padding: '12px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex', alignItems: 'center', gap: 12,
-          flexShrink: 0,
-        }}>
+        <div className="px-4 md:px-5 py-3 border-b border-white/[0.06] flex items-center gap-3 shrink-0">
           <button
             onClick={() => setShowHistory(!showHistory)}
-            style={{
-              padding: 6, borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: 'rgba(255,255,255,0.05)', color: '#8B9BB4',
-            }}
+            className="p-1.5 rounded-lg border-none cursor-pointer bg-white/[0.05] text-[#8B9BB4] hover:text-text-primary transition-colors"
           >
-            <ChevronLeft size={16} style={{
-              transform: showHistory ? 'rotate(0deg)' : 'rotate(180deg)',
-              transition: 'transform 0.2s',
-            }} />
+            <ChevronLeft size={16} className={cn('transition-transform duration-200', !showHistory && 'rotate-180')} />
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 24 }}>🤖</span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-accent-amber/15 flex items-center justify-center">
+              <Sparkles size={16} className="text-accent-amber" />
+            </div>
             <div>
-              <h1 style={{
-                fontSize: 16, fontWeight: 700, color: '#E8E0D4', margin: 0,
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
+              <h1 className="text-sm md:text-base font-bold text-[#E8E0D4] font-display">
                 {t('ai:assistant_name')}
               </h1>
-              <span style={{
-                fontSize: 10, fontWeight: 500,
-                color: CONTEXT_OPTIONS.find(o => o.key === contextPage)?.color ?? '#8B9BB4',
-              }}>
+              <span
+                className="text-[10px] font-medium"
+                style={{ color: CONTEXT_OPTIONS.find(o => o.key === contextPage)?.color ?? '#8B9BB4' }}
+              >
                 {t(`ai:context.${contextPage}`, contextPage)}
               </span>
             </div>
           </div>
           {activeConv && (
-            <div style={{
-              marginLeft: 'auto', fontSize: 12, color: '#5A6B80',
-              fontStyle: 'italic',
-            }}>
+            <div className="hidden sm:block ml-auto text-xs text-[#5A6B80] italic truncate max-w-[200px]">
               {activeConv.title}
             </div>
           )}
         </div>
 
         {/* Messages area */}
-        <div style={{
-          flex: 1, overflowY: 'auto', padding: '16px 24px',
-          display: 'flex', flexDirection: 'column', gap: 12,
-        }}>
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 flex flex-col gap-3">
           {/* Welcome state (no active conversation) */}
           {!activeConv && messages.length === 0 && (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: 16,
-            }}>
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ fontSize: 56 }}
               >
-                🤖
+                <div className="w-14 h-14 rounded-full bg-accent-amber/15 flex items-center justify-center">
+                  <Sparkles size={28} className="text-accent-amber" />
+                </div>
               </motion.div>
-              <h2 style={{
-                fontSize: 20, fontWeight: 700, color: '#E8E0D4', margin: 0,
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}>
+              <h2 className="text-xl font-bold text-[#E8E0D4] font-display">
                 {t('ai:assistant_name')}
               </h2>
-              <p style={{
-                fontSize: 13, color: '#8B9BB4', textAlign: 'center',
-                maxWidth: 400, lineHeight: 1.6,
-              }}>
+              <p className="text-[13px] text-[#8B9BB4] text-center max-w-[400px] leading-relaxed">
                 {t('ai:welcome')}
               </p>
 
               {/* Quick action pills */}
-              <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: 8,
-                justifyContent: 'center', maxWidth: 500, marginTop: 8,
-              }}>
+              <div className="flex flex-wrap gap-2 justify-center max-w-[500px] mt-2">
                 {quickActions.map((action) => (
                   <button
                     key={action}
                     onClick={() => sendMessage(action)}
-                    style={{
-                      padding: '8px 16px', borderRadius: 20, fontSize: 12,
-                      border: '1px solid rgba(245,166,35,0.2)',
-                      background: 'rgba(245,166,35,0.06)',
-                      color: '#E8E0D4', cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = 'rgba(245,166,35,0.12)'
-                      e.currentTarget.style.borderColor = 'rgba(245,166,35,0.4)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(245,166,35,0.06)'
-                      e.currentTarget.style.borderColor = 'rgba(245,166,35,0.2)'
-                    }}
+                    className="px-4 py-2 rounded-full text-xs border border-accent-amber/20 bg-accent-amber/[0.06] text-[#E8E0D4] cursor-pointer hover:bg-accent-amber/[0.12] hover:border-accent-amber/40 transition-all"
                   >
-                    <Sparkles size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6, color: '#F5A623' }} />
+                    <Sparkles size={12} className="inline align-middle mr-1.5 text-accent-amber" />
                     {action}
                   </button>
                 ))}
@@ -433,22 +387,17 @@ export default function AiChatPage() {
             />
           )}
           {isStreaming && !streamBuffer && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: 20 }}>🤖</span>
-              <div style={{
-                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: '16px 16px 16px 4px', padding: '8px 14px',
-                display: 'flex', gap: 4,
-              }}>
+            <div className="flex gap-2 items-center">
+              <div className="w-7 h-7 rounded-full bg-accent-amber/15 flex items-center justify-center shrink-0">
+                <Sparkles size={14} className="text-accent-amber" />
+              </div>
+              <div className="glass-card rounded-2xl rounded-tl-sm px-3.5 py-2 flex gap-1">
                 {[0, 1, 2].map(i => (
                   <motion.span
                     key={i}
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                    style={{
-                      width: 6, height: 6, borderRadius: '50%', background: '#F5A623',
-                      display: 'inline-block',
-                    }}
+                    className="w-1.5 h-1.5 rounded-full bg-accent-amber inline-block"
                   />
                 ))}
               </div>
@@ -459,19 +408,8 @@ export default function AiChatPage() {
         </div>
 
         {/* Input area */}
-        <div style={{
-          padding: '12px 24px 20px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          flexShrink: 0,
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'flex-end', gap: 10,
-            borderRadius: 14,
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            padding: '10px 14px',
-            transition: 'border-color 0.2s',
-          }}>
+        <div className="px-4 md:px-6 pb-4 md:pb-5 pt-3 border-t border-white/[0.06] shrink-0">
+          <div className="flex items-end gap-2.5 rounded-[14px] bg-white/[0.03] border border-white/[0.08] px-3.5 py-2.5 focus-within:border-accent-amber/30 transition-colors">
             <textarea
               ref={inputRef}
               value={input}
@@ -480,12 +418,7 @@ export default function AiChatPage() {
               placeholder={t('ai:placeholder', 'Pregúntame cualquier cosa sobre tu cervecería...')}
               rows={1}
               disabled={isStreaming}
-              style={{
-                flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                fontSize: 14, color: '#E8E0D4', resize: 'none',
-                fontFamily: "'Inter', sans-serif", maxHeight: 120,
-                overflowY: 'auto', lineHeight: 1.5,
-              }}
+              className="flex-1 bg-transparent border-none outline-none text-sm text-[#E8E0D4] resize-none max-h-[120px] overflow-y-auto leading-relaxed placeholder:text-[#5A6B80]"
               onInput={(e) => {
                 const el = e.target as HTMLTextAreaElement
                 el.style.height = 'auto'
@@ -495,21 +428,17 @@ export default function AiChatPage() {
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || isStreaming}
-              style={{
-                padding: 8, borderRadius: 10, border: 'none', cursor: 'pointer',
-                flexShrink: 0,
-                background: input.trim() && !isStreaming
-                  ? 'linear-gradient(135deg, #F5A623, #D4723C)' : 'rgba(255,255,255,0.05)',
-                color: input.trim() && !isStreaming ? '#0A0E14' : '#5A6B80',
-                transition: 'all 0.2s',
-              }}
+              className={cn(
+                'p-2 rounded-[10px] border-none cursor-pointer shrink-0 transition-all',
+                input.trim() && !isStreaming
+                  ? 'bg-gradient-to-br from-accent-amber to-accent-copper text-bg-primary'
+                  : 'bg-white/[0.05] text-[#5A6B80] cursor-not-allowed',
+              )}
             >
               <Send size={16} />
             </button>
           </div>
-          <p style={{
-            fontSize: 10, color: '#5A6B80', textAlign: 'center', marginTop: 6,
-          }}>
+          <p className="text-[10px] text-[#5A6B80] text-center mt-1.5">
             {t('ai:input_hint', 'Enter → send · Shift+Enter → new line')}
           </p>
         </div>

@@ -1,4 +1,4 @@
-// frontend/src/components/layout/sidebar.tsx — Beergate v3
+// frontend/src/components/layout/sidebar.tsx — Beergate v4
 import { Link, useRouterState } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -6,9 +6,11 @@ import {
   LayoutDashboard, Beaker, FlaskConical, BookOpen,
   Package, ShoppingCart, FileText, Settings,
   ChevronLeft, ChevronRight, Cpu, Beer, BarChart3, Bot,
+  Droplets, Users, GraduationCap, Sparkles,
 } from 'lucide-react'
 import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { useAvatarStore } from '@/stores/avatar-store'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -35,6 +37,7 @@ const navGroups: NavGroup[] = [
       { to: '/brewing', icon: Beaker, labelKey: 'nav.brew_day' },
       { to: '/fermentation', icon: FlaskConical, labelKey: 'nav.fermentation' },
       { to: '/recipes', icon: BookOpen, labelKey: 'nav.recipes' },
+      { to: '/water-lab', icon: Droplets, labelKey: 'nav.water_lab' },
     ],
   },
   {
@@ -42,6 +45,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/inventory', icon: Package, labelKey: 'nav.inventory' },
       { to: '/procurement', icon: ShoppingCart, labelKey: 'nav.procurement' },
+      { to: '/pool-buying', icon: Users, labelKey: 'nav.pool_buying' },
       { to: '/suppliers', icon: FileText, labelKey: 'nav.suppliers' },
     ],
   },
@@ -57,6 +61,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/analytics', icon: BarChart3, labelKey: 'nav.analytics' },
       { to: '/ai-chat', icon: Bot, labelKey: 'nav.ai_assistant' },
+      { to: '/brew-academy', icon: GraduationCap, labelKey: 'nav.brew_academy' },
     ],
   },
 ]
@@ -69,6 +74,7 @@ export function Sidebar() {
   const { t } = useTranslation('common')
   const { sidebarCollapsed, toggleSidebar } = useUIStore()
   const { user } = useAuthStore()
+  const avatarConfig = useAvatarStore((s) => s.config)
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
 
@@ -91,6 +97,7 @@ export function Sidebar() {
           sidebarCollapsed && 'justify-center px-0',
         )}
         title={sidebarCollapsed ? t(labelKey) : undefined}
+        aria-current={active ? 'page' : undefined}
         onClick={() => handleClick(to)}
       >
         <Icon size={18} className="shrink-0 sidebar-icon" />
@@ -166,6 +173,37 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Avatar mini-preview */}
+      {avatarConfig.enabled && avatarConfig.imageUrl && !sidebarCollapsed && (
+        <Link to="/avatar-config" className="block mx-3 mb-2">
+          <div className="flex items-center gap-2.5 p-2 rounded-xl glass-card border border-white/[0.06] hover:border-accent-purple/30 transition-all group cursor-pointer">
+            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-accent-purple/30 ring-2 ring-accent-purple/10">
+              <img src={avatarConfig.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-medium text-text-primary truncate">El Genio</p>
+              <p className="text-[9px] text-accent-purple flex items-center gap-1">
+                <Sparkles size={8} />
+                Activo
+              </p>
+            </div>
+          </div>
+        </Link>
+      )}
+      {avatarConfig.enabled && sidebarCollapsed && (
+        <Link to="/avatar-config" className="flex justify-center mb-2" title="El Genio Cervecero">
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-accent-purple/30 ring-2 ring-accent-purple/10">
+            {avatarConfig.imageUrl ? (
+              <img src={avatarConfig.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-accent-purple/10">
+                <Sparkles size={12} className="text-accent-purple" />
+              </div>
+            )}
+          </div>
+        </Link>
+      )}
 
       {/* Bottom: settings + user avatar */}
       <div className="border-t border-white/[0.06]">
