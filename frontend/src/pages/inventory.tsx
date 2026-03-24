@@ -1,10 +1,10 @@
-// frontend/src/pages/inventory.tsx — Beergate v3 Smart Inventory
+// frontend/src/pages/inventory.tsx — Beergate v4 Smart Inventory
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Plus, RefreshCw, AlertTriangle, Download, ChevronDown,
+  Plus, RefreshCw, AlertTriangle, Download, ChevronDown, ChevronRight,
   Package, Wheat, Leaf, Pill, Beaker, LayoutGrid, BarChart3,
-  Search, X, SlidersHorizontal, ArrowUpDown,
+  Search, X, SlidersHorizontal, ArrowUpDown, FolderOpen,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +16,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { cn, categoryColor, categoryIcon } from '@/lib/utils'
+import {
+  groupByMajorAndSub, getSubcategoryInfo,
+  MAJOR_CATEGORIES, toMajorCategory,
+  type MajorCategory, type Subcategory,
+} from '@/lib/ingredient-matcher'
 import type { Ingredient, IngredientCategory } from '@/lib/types'
 
 /* ── Constants ─────────────────────────────────────────────── */
@@ -45,16 +50,6 @@ const CATEGORY_ORDER: Record<string, number> = {
   lupulo: 3, levadura: 4, adjunto: 5, otro: 6,
 }
 
-const GROUP_LABELS: Record<string, string> = {
-  malta_base: 'Malta base',
-  malta_especial: 'Malta especial',
-  malta_otra: 'Otra malta',
-  lupulo: 'Lúpulo',
-  levadura: 'Levadura',
-  adjunto: 'Adjunto',
-  otro: 'Otro',
-}
-
 /* ── Sort helpers ──────────────────────────────────────────── */
 function sortIngredients(items: Ingredient[], key: SortKey): Ingredient[] {
   const sorted = [...items]
@@ -74,30 +69,25 @@ function sortIngredients(items: Ingredient[], key: SortKey): Ingredient[] {
   }
 }
 
-/* ── Group for smart view ──────────────────────────────────── */
-function groupByCategory(items: Ingredient[]): Map<IngredientCategory, Ingredient[]> {
-  const map = new Map<IngredientCategory, Ingredient[]>()
-  for (const item of items) {
-    const arr = map.get(item.category) ?? []
-    arr.push(item)
-    map.set(item.category, arr)
-  }
-  // Sort groups by order
-  return new Map(
-    [...map.entries()].sort(([a], [b]) =>
-      (CATEGORY_ORDER[a] ?? 9) - (CATEGORY_ORDER[b] ?? 9))
-  )
-}
-
 /* ── Category Icon helper ──────────────────────────────────── */
 const CAT_ICON: Record<string, typeof Package> = {
   malta_base: Wheat, malta_especial: Wheat, malta_otra: Wheat,
   lupulo: Leaf, levadura: Pill, adjunto: Beaker, otro: Package,
 }
 
+const MAJOR_ICON: Record<MajorCategory, typeof Package> = {
+  maltas: Wheat, lupulos: Leaf, levaduras: Pill, otros: Package,
+}
+
 /* ── Warehouse Treemap Bar ─────────────────────────────────── */
 function WarehouseBar({ items }: { items: Ingredient[] }) {
-  const groups = groupByCategory(items)
+  // Group by major category for the bar
+  const groups = new Map<MajorCategory, Ingredient[]>()
+  for (const item of items) {
+    const major = toMajorCategory(item.category)
+    if (!groups.has(major)) groups.set(major, [])
+    groups.get(major)!.push(item)
+  }
   const total = items.reduce((s, i) => s + i.quantity, 0)
   if (total === 0) return null
 
@@ -109,14 +99,15 @@ function WarehouseBar({ items }: { items: Ingredient[] }) {
       </div>
       {/* Proportional bar */}
       <div className="flex rounded-lg overflow-hidden h-8 gap-px">
-        {[...groups.entries()].map(([cat, catItems]) => {
+        {[...groups.entries()].map(([major, catItems]) => {
           const catTotal = catItems.reduce((s, i) => s + i.quantity, 0)
           const pct = (catTotal / total) * 100
           if (pct < 1) return null
-          const color = categoryColor(cat)
+          const info = MAJOR_CATEGORIES.find(c => c.key === major)
+          const color = info?.color ?? '#607D8B'
           return (
             <motion.div
-              key={cat}
+              key={major}
               className="relative group cursor-default flex items-center justify-center overflow-hidden"
               style={{ width: `${pct}%`, backgroundColor: `${color}30` }}
               initial={{ scaleX: 0 }}
@@ -124,12 +115,12 @@ function WarehouseBar({ items }: { items: Ingredient[] }) {
               transition={{ duration: 0.5 }}
             >
               <span className="text-[9px] font-medium text-text-primary truncate px-1">
-                {pct >= 8 ? `${GROUP_LABELS[cat] ?? cat}` : ''}
+                {pct >= 8 ? `${info?.label ?? major}` : ''}
               </span>
               {/* hover detail */}
               <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:block z-20">
                 <div className="glass-card rounded-lg border border-white/10 px-2 py-1 text-[10px] whitespace-nowrap text-text-primary shadow-elevated">
-                  {GROUP_LABELS[cat]}: {catItems.length} items · {catTotal.toFixed(1)} total
+                  {info?.label ?? major}: {catItems.length} items · {catTotal.toFixed(1)} total
                 </div>
               </div>
             </motion.div>
@@ -138,12 +129,13 @@ function WarehouseBar({ items }: { items: Ingredient[] }) {
       </div>
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mt-3">
-        {[...groups.entries()].map(([cat, catItems]) => {
-          const color = categoryColor(cat)
+        {[...groups.entries()].map(([major, catItems]) => {
+          const info = MAJOR_CATEGORIES.find(c => c.key === major)
+          const color = info?.color ?? '#607D8B'
           return (
-            <div key={cat} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
+            <div key={major} className="flex items-center gap-1.5 text-[10px] text-text-tertiary">
               <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: color }} />
-              <span>{GROUP_LABELS[cat] ?? cat}</span>
+              <span>{info?.label ?? major}</span>
               <span className="font-mono text-text-secondary">{catItems.length}</span>
             </div>
           )
@@ -153,28 +145,29 @@ function WarehouseBar({ items }: { items: Ingredient[] }) {
   )
 }
 
-/* ── Category Section Header ───────────────────────────────── */
-function CategoryHeader({
-  category, count, collapsed, onToggle,
+/* ── Major Category Section Header ─────────────────────────── */
+function MajorCategoryHeader({
+  major, count, collapsed, onToggle,
 }: {
-  category: IngredientCategory; count: number; collapsed: boolean; onToggle: () => void
+  major: MajorCategory; count: number; collapsed: boolean; onToggle: () => void
 }) {
-  const color = categoryColor(category)
-  const Icon = CAT_ICON[category] ?? Package
+  const info = MAJOR_CATEGORIES.find(c => c.key === major)
+  const color = info?.color ?? '#607D8B'
+  const Icon = MAJOR_ICON[major] ?? Package
 
   return (
     <button
       onClick={onToggle}
-      className="flex items-center gap-3 w-full py-2 group"
+      className="flex items-center gap-3 w-full py-2.5 group"
     >
       <div
-        className="h-7 w-7 rounded-lg flex items-center justify-center"
+        className="h-8 w-8 rounded-lg flex items-center justify-center"
         style={{ backgroundColor: `${color}20` }}
       >
-        <Icon className="h-3.5 w-3.5" style={{ color }} />
+        <Icon className="h-4 w-4" style={{ color }} />
       </div>
-      <span className="font-display font-bold text-sm text-text-primary">
-        {GROUP_LABELS[category] ?? category}
+      <span className="font-display font-bold text-base text-text-primary">
+        {info?.label ?? major}
       </span>
       <Badge variant="outline" className="border-white/10 text-text-tertiary text-[10px]">
         {count}
@@ -184,6 +177,23 @@ function CategoryHeader({
         <ChevronDown className="h-4 w-4 text-text-tertiary group-hover:text-text-secondary transition-colors" />
       </motion.div>
     </button>
+  )
+}
+
+/* ── Subcategory Section Header ────────────────────────────── */
+function SubcategoryHeader({
+  major, sub, count,
+}: {
+  major: MajorCategory; sub: Subcategory; count: number
+}) {
+  const info = getSubcategoryInfo(major, sub)
+  return (
+    <div className="flex items-center gap-2 py-1.5 pl-4">
+      <span className="text-sm">{info.emoji}</span>
+      <span className="text-xs font-medium text-text-secondary">{info.label}</span>
+      <span className="text-[10px] text-text-tertiary font-mono">({count})</span>
+      <div className="flex-1 h-px bg-white/5 ml-2" />
+    </div>
   )
 }
 
@@ -248,7 +258,7 @@ export default function InventoryPage() {
 
   // Client-side sort
   const sorted = useMemo(() => sortIngredients(rawItems, sortKey), [rawItems, sortKey])
-  const grouped = useMemo(() => groupByCategory(sorted), [sorted])
+  const twoLevel = useMemo(() => groupByMajorAndSub(sorted), [sorted])
 
   const toggleGroup = (cat: string) => {
     setCollapsedGroups(prev => {
@@ -460,40 +470,53 @@ export default function InventoryPage() {
           )}
         </div>
       ) : viewMode === 'grid' && sortKey === 'category' && !category ? (
-        /* Grouped view — by category */
-        <div className="space-y-4">
-          {[...grouped.entries()].map(([cat, items]) => (
-            <div key={cat}>
-              <CategoryHeader
-                category={cat}
-                count={items.length}
-                collapsed={collapsedGroups.has(cat)}
-                onToggle={() => toggleGroup(cat)}
-              />
-              <AnimatePresence initial={false}>
-                {!collapsedGroups.has(cat) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-2 pb-4">
-                      {items.map(ing => (
-                        <IngredientCard
-                          key={ing.id}
-                          ingredient={ing}
-                          onAdjust={handleAdjust}
-                          onDelete={handleDelete}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
+        /* Grouped view — major category → subcategory */
+        <div className="space-y-2">
+          {[...twoLevel.entries()].map(([major, subMap]) => {
+            const majorCount = [...subMap.values()].reduce((s, arr) => s + arr.length, 0)
+            const isCollapsed = collapsedGroups.has(major)
+
+            return (
+              <div key={major} className="glass-card rounded-xl border border-white/10 overflow-hidden">
+                <MajorCategoryHeader
+                  major={major}
+                  count={majorCount}
+                  collapsed={isCollapsed}
+                  onToggle={() => toggleGroup(major)}
+                />
+                <AnimatePresence initial={false}>
+                  {!isCollapsed && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-3 pb-4 space-y-3">
+                        {[...subMap.entries()].map(([sub, items]) => (
+                          <div key={sub}>
+                            <SubcategoryHeader major={major} sub={sub} count={items.length} />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pt-1 pl-4">
+                              {items.map(ing => (
+                                <IngredientCard
+                                  key={ing.id}
+                                  ingredient={ing}
+                                  allInventory={rawItems}
+                                  onAdjust={handleAdjust}
+                                  onDelete={handleDelete}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )
+          })}
         </div>
       ) : (
         /* Flat grid */
@@ -505,6 +528,7 @@ export default function InventoryPage() {
             <IngredientCard
               key={ing.id}
               ingredient={ing}
+              allInventory={rawItems}
               onAdjust={handleAdjust}
               onDelete={handleDelete}
             />

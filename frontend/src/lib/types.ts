@@ -249,6 +249,55 @@ export interface CanBrewResult {
   available: string[]
 }
 
+// ─── Pool Buying ────────────────────────────────────────────────────────────
+
+export interface PoolParticipant {
+  id: string
+  name: string
+  avatar?: string
+  rating: number
+  joinedAt: string
+}
+
+export interface PoolItem {
+  id: string
+  name: string
+  unit: string
+  /** Unit price at supplier */
+  unitPrice: number
+  /** { participantId → quantity } */
+  quantities: Record<string, number>
+}
+
+export type PoolStatus = 'open' | 'closed' | 'ordered' | 'delivered' | 'cancelled'
+
+export interface PoolOrder {
+  id: string
+  title: string
+  supplier: string
+  organizer: PoolParticipant
+  participants: PoolParticipant[]
+  items: PoolItem[]
+  status: PoolStatus
+  /** Amount before shipping */
+  subtotal: number
+  /** Shipping cost (0 if above free-shipping threshold) */
+  shipping: number
+  /** Individual cost without pool vs pool total */
+  individualCostEstimate: number
+  /** Savings percentage */
+  savingsPercent: number
+  /** Zone / city */
+  zone: string
+  /** Pickup location */
+  deliveryPoint: string
+  /** Deadline to join / add items */
+  closingDate: string
+  /** Estimated delivery date */
+  estimatedDelivery: string
+  createdAt: string
+}
+
 // AI
 export type MessageRole = 'user' | 'assistant' | 'system'
 

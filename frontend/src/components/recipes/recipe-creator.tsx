@@ -22,6 +22,11 @@ import {
 import { useCreateRecipe, useUpdateRecipe } from '@/hooks/use-recipes'
 import { toast } from 'sonner'
 import type { Recipe, RecipeIngredient, MashStep } from '@/lib/types'
+import { StyleSelector, StyleConformance } from './style-selector'
+import { MaltDetailCard, HopDetailCard, YeastDetailCard, IngredientDetailTrigger } from './ingredient-detail-cards'
+import { MALT_MAP } from '@/data/malts'
+import { HOP_MAP } from '@/data/hops'
+import { YEAST_MAP } from '@/data/yeasts'
 
 /* ── Types ─────────────────────────────────────────────────────── */
 interface GrainRow {
@@ -138,6 +143,7 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
   // Recipe metadata
   const [name, setName] = useState(recipe?.name ?? '')
   const [style, setStyle] = useState(recipe?.style ?? '')
+  const [styleCode, setStyleCode] = useState(recipe?.style_code ?? '')
   const [batchSize, setBatchSize] = useState(recipe?.batch_size_liters ?? 20)
   const [efficiency, setEfficiency] = useState(recipe?.efficiency_pct ?? 72)
   const [boilTime, setBoilTime] = useState(60)
@@ -250,7 +256,7 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
     if (!name.trim()) { toast.error('Nombre requerido'); return }
 
     const data: Partial<Recipe> = {
-      name, style, batch_size_liters: batchSize, efficiency_pct: efficiency,
+      name, style, style_code: styleCode || undefined, batch_size_liters: batchSize, efficiency_pct: efficiency,
       og: Math.round(og * 1000) / 1000,
       fg: Math.round(fg * 1000) / 1000,
       abv: Math.round(abv * 10) / 10,
@@ -331,9 +337,11 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
                       className="bg-bg-secondary border-white/10 text-sm" placeholder="West Coast IPA" />
                   </div>
                   <div>
-                    <label className="text-xs text-text-secondary mb-1 block">{t('recipes.style')}</label>
-                    <Input value={style} onChange={e => setStyle(e.target.value)}
-                      className="bg-bg-secondary border-white/10 text-sm" placeholder="American IPA" />
+                    <label className="text-xs text-text-secondary mb-1 block">{t('recipes.style')} (BJCP)</label>
+                    <StyleSelector
+                      value={styleCode}
+                      onChange={(id, name) => { setStyleCode(id); setStyle(name) }}
+                    />
                   </div>
                   <div>
                     <label className="text-xs text-text-secondary mb-1 block">{t('recipes.batch_size')}</label>
@@ -376,7 +384,11 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
                         <motion.div key={g.id} layout
                           className="grid grid-cols-[1fr_80px_60px_28px] gap-2 items-center bg-bg-secondary/50 rounded-lg px-2 py-1.5 group"
                         >
-                          <span className="text-xs text-text-primary truncate" title={g.name}>{g.name}</span>
+                          <IngredientDetailTrigger
+                            detail={MALT_MAP[g.maltId] ? <MaltDetailCard malt={MALT_MAP[g.maltId]!} onClose={() => {}} /> : null}
+                          >
+                            <span className="text-xs text-text-primary truncate" title={g.name}>{g.name}</span>
+                          </IngredientDetailTrigger>
                           <input type="number" value={g.amount_kg} min={0.01} step={0.1}
                             onChange={e => updateGrain(g.id, 'amount_kg', Number(e.target.value))}
                             className="bg-transparent border border-white/10 rounded px-1.5 py-0.5 text-xs text-center text-text-primary w-full"
@@ -421,7 +433,11 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
                       <motion.div key={h.id} layout
                         className="grid grid-cols-[1fr_65px_55px_65px_28px] gap-2 items-center bg-bg-secondary/50 rounded-lg px-2 py-1.5 group"
                       >
-                        <span className="text-xs text-text-primary truncate">{h.name}</span>
+                        <IngredientDetailTrigger
+                          detail={HOP_MAP[h.hopId] ? <HopDetailCard hop={HOP_MAP[h.hopId]!} onClose={() => {}} /> : null}
+                        >
+                          <span className="text-xs text-text-primary truncate">{h.name}</span>
+                        </IngredientDetailTrigger>
                         <input type="number" value={h.amount_g} min={1} step={1}
                           onChange={e => updateHop(h.id, 'amount_g', Number(e.target.value))}
                           className="bg-transparent border border-white/10 rounded px-1 py-0.5 text-xs text-center text-text-primary w-full"
@@ -461,11 +477,15 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
                     )}
                   />
                 ) : (
-                  <div className="bg-bg-secondary/50 rounded-lg p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">{yeast.name}</p>
-                      <p className="text-xs text-text-secondary">{yeast.brand} · Att: {yeast.attenuation}% · {yeast.tempMin}-{yeast.tempMax}°C</p>
-                    </div>
+                  <div className="bg-bg-secondary/50 rounded-lg p-3 flex items-center justify-between group">
+                    <IngredientDetailTrigger
+                      detail={YEAST_MAP[yeast.yeastId] ? <YeastDetailCard yeast={YEAST_MAP[yeast.yeastId]!} onClose={() => {}} /> : null}
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">{yeast.name}</p>
+                        <p className="text-xs text-text-secondary">{yeast.brand} · Att: {yeast.attenuation}% · {yeast.tempMin}-{yeast.tempMax}°C</p>
+                      </div>
+                    </IngredientDetailTrigger>
                     <button onClick={() => setYeast(null)} className="text-accent-danger hover:scale-110 transition-transform">
                       <Trash2 size={14} />
                     </button>
@@ -530,6 +550,11 @@ export function RecipeCreator({ recipe, onClose }: RecipeCreatorProps) {
 
             {/* ─── RIGHT: Live Stats Dashboard ─────────────────── */}
             <div className="space-y-4">
+              {/* Style conformance */}
+              {styleCode && (
+                <StyleConformance styleId={styleCode} og={og} fg={fg} ibu={ibu} srm={srm} abv={abv} />
+              )}
+
               <div className="glass-card rounded-xl border border-white/10 p-4 sticky top-4">
                 <h3 className="font-display font-bold text-sm text-text-primary mb-3">
                   Estadísticas en vivo

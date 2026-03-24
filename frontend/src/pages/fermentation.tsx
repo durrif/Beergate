@@ -22,6 +22,7 @@ import {
   type FermenterStatus,
 } from '@/components/fermentation/fermenter-twin'
 import { FERMENTER_CATALOG, type FermenterSpec } from '@/data/fermenters'
+import { AddFermentationModal } from '@/components/fermentation/add-fermentation-modal'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { BrewSession, ISpindelReading } from '@/lib/types'
@@ -77,12 +78,23 @@ function EmptyState() {
 /* ── Detail Panel ──────────────────────────────────────────────── */
 function DetailPanel({ session, fermenter }: { session: BrewSession; fermenter: FermenterSpec }) {
   const { data: points = [], isLoading } = useFermentationData(session.id)
+  const [liveReading, setLiveReading] = useState<ISpindelReading | null>(null)
+
+  // Wire iSpindel WebSocket for live updates
+  const handleLiveReading = useCallback((reading: ISpindelReading) => {
+    setLiveReading(reading)
+  }, [])
+  useFermentationWebSocket(Number(session.id), handleLiveReading)
+
   const lastPoint = points[points.length - 1]
+  // Prefer live reading over last recorded point
+  const currentGravity = liveReading?.gravity ?? lastPoint?.gravity
+  const currentTemp = liveReading?.temperature ?? lastPoint?.temperature
   const days = session.fermentation_start ? daysBetween(session.fermentation_start) : session.brew_date ? daysBetween(session.brew_date) : 0
 
   const predictedFG = session.planned_fg ?? (session.planned_og ? session.planned_og * 0.75 : null)
-  const estDaysLeft = predictedFG && lastPoint?.gravity
-    ? Math.max(0, Math.round(((lastPoint.gravity - predictedFG) / 0.002) * 1))
+  const estDaysLeft = predictedFG && currentGravity
+    ? Math.max(0, Math.round(((currentGravity - predictedFG) / 0.002) * 1))
     : null
 
   return (
@@ -117,22 +129,22 @@ function DetailPanel({ session, fermenter }: { session: BrewSession; fermenter: 
           {
             icon: Droplets,
             label: 'Densidad',
-            value: lastPoint?.gravity ? lastPoint.gravity.toFixed(3) : '—',
-            sub: 'SG',
+            value: currentGravity ? currentGravity.toFixed(3) : '—',
+            sub: liveReading ? '🔴 LIVE' : 'SG',
             color: 'text-amber-400',
           },
           {
             icon: Thermometer,
             label: 'Temperatura',
-            value: lastPoint?.temperature?.toFixed(1) ?? '—',
+            value: currentTemp?.toFixed(1) ?? '—',
             sub: '°C',
             color: 'text-blue-400',
           },
           {
             icon: TrendingDown,
             label: 'ABV estimada',
-            value: session.actual_og && lastPoint?.gravity
-              ? ((session.actual_og - lastPoint.gravity) * 131.25).toFixed(1)
+            value: session.actual_og && currentGravity
+              ? ((session.actual_og - currentGravity) * 131.25).toFixed(1)
               : '—',
             sub: '%',
             color: 'text-accent-hop',
@@ -152,18 +164,24 @@ function DetailPanel({ session, fermenter }: { session: BrewSession; fermenter: 
       </div>
 
       {/* AI Analysis placeholder */}
-      {lastPoint && (
+      {(lastPoint || liveReading) && (
         <div className="glass-card rounded-xl border border-accent-hop/15 p-4 space-y-2">
           <div className="flex items-center gap-2">
             <Activity size={14} className="text-accent-hop" />
             <span className="text-xs font-semibold text-accent-hop uppercase tracking-wider">
               Análisis AI
             </span>
+            {liveReading && (
+              <span className="ml-auto flex items-center gap-1 text-[10px] text-accent-hop">
+                <Wifi size={10} />
+                iSpindel en vivo
+              </span>
+            )}
           </div>
           <p className="text-sm text-text-secondary leading-relaxed">
-            {lastPoint.gravity && lastPoint.gravity > 1.020
+            {currentGravity && currentGravity > 1.020
               ? 'La fermentación está activa. La densidad desciende a buen ritmo. Mantén la temperatura estable.'
-              : lastPoint.gravity && lastPoint.gravity > 1.010
+              : currentGravity && currentGravity > 1.010
               ? 'Fermentación avanzada. Considera un descanso de diacetilo subiendo 2°C durante 48h.'
               : 'La densidad está cerca del objetivo. Toma una lectura manual para confirmar FG.'}
             {predictedFG && (
@@ -202,6 +220,7 @@ export default function FermentationPage() {
 
   const { data: sessions = [], isLoading } = useBrewSessions('fermenting')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   const activeId = selectedId ?? sessions[0]?.id ?? null
   const selectedSession = sessions.find((s: BrewSession) => s.id === activeId)
@@ -259,6 +278,7 @@ export default function FermentationPage() {
         </div>
         <Button
           size="sm"
+          onClick={() => setShowAddModal(true)}
           className="bg-accent-amber/10 text-accent-amber border border-accent-amber/20 hover:bg-accent-amber/20"
         >
           <Plus size={14} className="mr-1.5" />
@@ -316,6 +336,13 @@ export default function FermentationPage() {
           </div>
         </div>
       )}
+
+      {/* Add Manual Reading Modal */}
+      <AddFermentationModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        session={selectedSession}
+      />
     </div>
   )
 }

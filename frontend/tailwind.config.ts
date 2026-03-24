@@ -1,4 +1,4 @@
-// frontend/tailwind.config.ts — Beergate Design System v3
+// frontend/tailwind.config.ts — Beergate Design System v4
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -8,25 +8,28 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          primary: '#0A0E14',
-          secondary: '#111820',
-          tertiary: '#1A2233',
+          deep: '#060B12',
+          primary: '#0A1018',
+          secondary: '#111A24',
+          tertiary: '#1A2636',
           hover: '#1E2A3A',
-          card: '#111820',
-          elevated: '#1A2233',
+          card: '#111A24',
+          elevated: '#1A2636',
           surface: '#141A24',
+          glass: 'rgba(255,255,255,0.04)',
         },
         accent: {
           DEFAULT: '#F5A623',
-          foreground: '#0A0E14',
+          foreground: '#0A1018',
           amber: '#F5A623',
           'amber-dim': '#D4A04A',
           copper: '#D4723C',
-          foam: '#FFF8E7',
+          foam: '#FFF3D6',
           hop: '#7CB342',
           malt: '#CB8E4E',
           danger: '#EF5350',
           info: '#42A5F5',
+          purple: '#9C6ADE',
         },
         text: {
           primary: '#E8E0D4',
@@ -43,16 +46,16 @@ const config: Config = {
         },
         // Shadcn-compatible
         border: 'rgba(255,255,255,0.06)',
-        input: '#1A2233',
+        input: '#1A2636',
         ring: '#F5A623',
-        background: '#0A0E14',
+        background: '#0A1018',
         foreground: '#E8E0D4',
         primary: {
           DEFAULT: '#F5A623',
-          foreground: '#0A0E14',
+          foreground: '#0A1018',
         },
         secondary: {
-          DEFAULT: '#1A2233',
+          DEFAULT: '#1A2636',
           foreground: '#E8E0D4',
         },
         destructive: {
@@ -60,22 +63,23 @@ const config: Config = {
           foreground: '#E8E0D4',
         },
         muted: {
-          DEFAULT: '#111820',
+          DEFAULT: '#111A24',
           foreground: '#8B9BB4',
         },
         popover: {
-          DEFAULT: '#1A2233',
+          DEFAULT: '#1A2636',
           foreground: '#E8E0D4',
         },
         card: {
-          DEFAULT: '#111820',
+          DEFAULT: '#111A24',
           foreground: '#E8E0D4',
         },
       },
       backgroundImage: {
         'brew-gradient': 'linear-gradient(135deg, #F5A623 0%, #D4723C 100%)',
-        'card-gradient': 'linear-gradient(145deg, #111820 0%, #1A2233 100%)',
-        'glass': 'linear-gradient(145deg, rgba(17,24,32,0.85) 0%, rgba(26,34,51,0.6) 100%)',
+        'magic-gradient': 'linear-gradient(135deg, #9C6ADE 0%, #F5A623 100%)',
+        'card-gradient': 'linear-gradient(145deg, #111A24 0%, #1A2636 100%)',
+        'glass': 'linear-gradient(145deg, rgba(17,26,36,0.85) 0%, rgba(26,38,54,0.6) 100%)',
         'surface-gradient': 'linear-gradient(180deg, rgba(245,166,35,0.03) 0%, transparent 40%)',
       },
       backdropBlur: {
@@ -88,8 +92,8 @@ const config: Config = {
         xl: 'var(--radius-xl)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'sans-serif'],
+        sans: ['Satoshi', 'system-ui', 'sans-serif'],
+        display: ['Cabinet Grotesk', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {

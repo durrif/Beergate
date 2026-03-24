@@ -1,18 +1,20 @@
-/* frontend/src/index.css — Beergate Design System v3 */
+/* frontend/src/index.css — Beergate Design System v4 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* ── Surface palette ────────────────────────────── */
-    --bg-primary: #0A0E14;
-    --bg-secondary: #111820;
-    --bg-tertiary: #1A2233;
+    /* ── Surface palette (v4 — Industrial-Premium Dark) ── */
+    --bg-deep: #060B12;
+    --bg-primary: #0A1018;
+    --bg-secondary: #111A24;
+    --bg-tertiary: #1A2636;
     --bg-hover: #1E2A3A;
-    --bg-card: #111820;
-    --bg-elevated: #1A2233;
+    --bg-card: #111A24;
+    --bg-elevated: #1A2636;
     --bg-surface: #141A24;
+    --bg-glass: rgba(255,255,255,0.04);
     --surface-glass: rgba(255,255,255,0.03);
 
     /* ── Accent palette ─────────────────────────────── */
@@ -20,12 +22,13 @@
     --accent-amber-dim: #D4A04A;
     --accent-copper: #D4723C;
     --accent-hop: #7CB342;
-    --accent-foam: #FFF8E7;
+    --accent-foam: #FFF3D6;
     --accent-malt: #CB8E4E;
     --accent-danger: #EF5350;
     --accent-info: #42A5F5;
+    --accent-purple: #9C6ADE;
 
-    /* ── Text ───────────────────────────────────────── */
+    /* ── Text (warm off-whites, never pure white) ───── */
     --text-primary: #E8E0D4;
     --text-secondary: #8B9BB4;
     --text-tertiary: #5A6B80;
@@ -40,7 +43,8 @@
 
     /* ── Gradients ──────────────────────────────────── */
     --gradient-brew: linear-gradient(135deg, #F5A623 0%, #D4723C 100%);
-    --gradient-glass: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+    --gradient-magic: linear-gradient(135deg, #9C6ADE 0%, #F5A623 100%);
+    --gradient-glass: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
 
     /* ── Glass ──────────────────────────────────────── */
     --glass-border: rgba(255, 255, 255, 0.06);
@@ -76,24 +80,24 @@
     --space-12: 3rem;
 
     /* ── Shadcn CSS variables ───────────────────────── */
-    --background: 210 27% 5%;
+    --background: 213 33% 6%;
     --foreground: 30 17% 90%;
-    --card: 210 27% 10%;
+    --card: 213 28% 10%;
     --card-foreground: 30 17% 90%;
-    --popover: 213 27% 14%;
+    --popover: 213 25% 15%;
     --popover-foreground: 30 17% 90%;
     --primary: 36 90% 55%;
-    --primary-foreground: 210 27% 5%;
-    --secondary: 213 27% 14%;
+    --primary-foreground: 213 33% 6%;
+    --secondary: 213 25% 15%;
     --secondary-foreground: 30 17% 90%;
-    --muted: 210 27% 10%;
+    --muted: 213 28% 10%;
     --muted-foreground: 215 15% 55%;
     --accent: 36 90% 55%;
-    --accent-foreground: 210 27% 5%;
+    --accent-foreground: 213 33% 6%;
     --destructive: 2 81% 63%;
     --destructive-foreground: 30 17% 90%;
     --border: 213 20% 15%;
-    --input: 213 27% 14%;
+    --input: 213 25% 15%;
     --ring: 36 90% 55%;
     --radius: 0.75rem;
 
@@ -102,9 +106,9 @@
     --sidebar-collapsed-width: 60px;
     --header-height: 56px;
 
-    /* ── Typography ─────────────────────────────────── */
-    --font-display: 'Space Grotesk', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    /* ── Typography (v4 — bunny.net GDPR-friendly) ─── */
+    --font-display: 'Cabinet Grotesk', sans-serif;
+    --font-body: 'Satoshi', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
@@ -353,4 +357,40 @@
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 15px rgba(245,166,35,0.1); }
   50% { box-shadow: 0 0 25px rgba(245,166,35,0.25); }
+}
+
+/* ── Avatar / Genie animations ──────────────────────────────── */
+@keyframes barrel-idle {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+
+@keyframes smoke-rise {
+  0% { transform: scale(0) translateY(0); opacity: 1; }
+  100% { transform: scale(3) translateY(-120px); opacity: 0; }
+}
+
+@keyframes magic-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes avatar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.avatar-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(156, 106, 222, 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: magic-shimmer 3s ease-in-out infinite;
+}
+
+.avatar-float {
+  animation: avatar-float 4s ease-in-out infinite;
 }

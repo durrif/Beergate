@@ -1,9 +1,11 @@
-// src/data/suppliers.ts — Spanish & European homebrew supplier database
+// src/data/suppliers.ts — European homebrew supplier database (Beergate v4)
+
+export type SupplierCountry = 'ES' | 'UK' | 'BE' | 'DE' | 'FR' | 'NL' | 'IT' | 'IE' | 'PL' | 'SE'
 
 export interface SupplierInfo {
   id: string
   name: string
-  country: 'ES' | 'UK' | 'BE' | 'DE' | 'FR' | 'NL' | 'IT'
+  country: SupplierCountry
   url: string
   logo?: string
   /** Free shipping threshold in € (null = never free) */
@@ -13,7 +15,7 @@ export interface SupplierInfo {
   /** Estimated delivery days */
   deliveryDays: [number, number]
   /** Currency used */
-  currency: 'EUR' | 'GBP'
+  currency: 'EUR' | 'GBP' | 'PLN' | 'SEK'
   /** Specialty categories */
   specialties: string[]
   /** Overall rating 1-5 */
@@ -22,6 +24,8 @@ export interface SupplierInfo {
   scraperActive: boolean
   /** Color for UI display */
   color: string
+  /** Second-hand / marketplace flag */
+  marketplace?: boolean
 }
 
 export const SUPPLIER_DATABASE: SupplierInfo[] = [
@@ -97,21 +101,7 @@ export const SUPPLIER_DATABASE: SupplierInfo[] = [
     color: '#E74C3C',
   },
 
-  // ── European Suppliers ──
-  {
-    id: 'themaltmiller',
-    name: 'The Malt Miller',
-    country: 'UK',
-    url: 'https://www.themaltmiller.co.uk',
-    freeShippingThreshold: null,
-    baseShipping: 12.00,
-    deliveryDays: [5, 10],
-    currency: 'GBP',
-    specialties: ['maltas', 'lúpulos', 'levaduras', 'equipamiento'],
-    rating: 4.7,
-    scraperActive: true,
-    color: '#1ABC9C',
-  },
+  // ── Belgium ──
   {
     id: 'brouwland',
     name: 'Brouwland',
@@ -126,6 +116,38 @@ export const SUPPLIER_DATABASE: SupplierInfo[] = [
     scraperActive: true,
     color: '#F39C12',
   },
+  {
+    id: 'castlemalting',
+    name: 'Castle Malting',
+    country: 'BE',
+    url: 'https://www.castlemalting.com',
+    freeShippingThreshold: null,
+    baseShipping: 15.00,
+    deliveryDays: [7, 14],
+    currency: 'EUR',
+    specialties: ['maltas', 'maltas especiales', 'granel'],
+    rating: 4.5,
+    scraperActive: false,
+    color: '#D35400',
+  },
+
+  // ── UK ──
+  {
+    id: 'themaltmiller',
+    name: 'The Malt Miller',
+    country: 'UK',
+    url: 'https://www.themaltmiller.co.uk',
+    freeShippingThreshold: null,
+    baseShipping: 12.00,
+    deliveryDays: [5, 10],
+    currency: 'GBP',
+    specialties: ['maltas', 'lúpulos', 'levaduras', 'equipamiento'],
+    rating: 4.7,
+    scraperActive: true,
+    color: '#1ABC9C',
+  },
+
+  // ── Germany ──
   {
     id: 'hobbybrauerversand',
     name: 'Hobbybrauerversand',
@@ -155,18 +177,170 @@ export const SUPPLIER_DATABASE: SupplierInfo[] = [
     color: '#16A085',
   },
   {
-    id: 'castlemalting',
-    name: 'Castle Malting',
-    country: 'BE',
-    url: 'https://www.castlemalting.com',
-    freeShippingThreshold: null,
-    baseShipping: 15.00,
-    deliveryDays: [7, 14],
+    id: 'braupartner',
+    name: 'Braupartner',
+    country: 'DE',
+    url: 'https://www.braupartner.de',
+    freeShippingThreshold: 75,
+    baseShipping: 7.90,
+    deliveryDays: [4, 8],
     currency: 'EUR',
-    specialties: ['maltas', 'maltas especiales', 'granel'],
-    rating: 4.5,
+    specialties: ['equipamiento', 'maltas', 'levaduras'],
+    rating: 4.2,
+    scraperActive: false,
+    color: '#2C3E50',
+  },
+  {
+    id: 'braumarkt',
+    name: 'Braumarkt',
+    country: 'DE',
+    url: 'https://www.braumarkt.com',
+    freeShippingThreshold: 99,
+    baseShipping: 6.90,
+    deliveryDays: [3, 7],
+    currency: 'EUR',
+    specialties: ['maltas', 'lúpulos', 'equipamiento', 'granel'],
+    rating: 4.1,
+    scraperActive: false,
+    color: '#7F8C8D',
+  },
+  {
+    id: 'hops2brew',
+    name: 'Hops2Brew',
+    country: 'DE',
+    url: 'https://www.hops2brew.de',
+    freeShippingThreshold: 60,
+    baseShipping: 5.90,
+    deliveryDays: [4, 7],
+    currency: 'EUR',
+    specialties: ['lúpulos', 'levaduras', 'adjuntos'],
+    rating: 4.0,
+    scraperActive: false,
+    color: '#229954',
+  },
+
+  // ── France ──
+  {
+    id: 'lecomptoirdubrasseur',
+    name: 'Le Comptoir du Brasseur',
+    country: 'FR',
+    url: 'https://www.lecomptoirdubrasseur.fr',
+    freeShippingThreshold: 69,
+    baseShipping: 7.50,
+    deliveryDays: [4, 8],
+    currency: 'EUR',
+    specialties: ['maltas', 'lúpulos', 'equipamiento'],
+    rating: 4.2,
+    scraperActive: false,
+    color: '#2980B9',
+  },
+  {
+    id: 'rollingbeers',
+    name: 'Rolling Beers',
+    country: 'FR',
+    url: 'https://www.rolling-beers.fr',
+    freeShippingThreshold: 80,
+    baseShipping: 6.90,
+    deliveryDays: [4, 8],
+    currency: 'EUR',
+    specialties: ['ingredientes', 'kits', 'maltas'],
+    rating: 4.0,
+    scraperActive: false,
+    color: '#E74C3C',
+  },
+
+  // ── Ireland ──
+  {
+    id: 'geterbrewed',
+    name: 'Get Er Brewed',
+    country: 'IE',
+    url: 'https://www.geterbrewed.com',
+    freeShippingThreshold: 75,
+    baseShipping: 9.00,
+    deliveryDays: [5, 10],
+    currency: 'EUR',
+    specialties: ['maltas', 'lúpulos', 'equipamiento', 'fermentación'],
+    rating: 4.4,
+    scraperActive: false,
+    color: '#27AE60',
+  },
+
+  // ── Netherlands ──
+  {
+    id: 'brouwstore',
+    name: 'Brouwstore.nl',
+    country: 'NL',
+    url: 'https://www.brouwstore.nl',
+    freeShippingThreshold: 75,
+    baseShipping: 8.50,
+    deliveryDays: [4, 8],
+    currency: 'EUR',
+    specialties: ['equipamiento', 'maltas', 'lúpulos'],
+    rating: 4.1,
+    scraperActive: false,
+    color: '#FF6348',
+  },
+
+  // ── Italy ──
+  {
+    id: 'polsinelli',
+    name: 'Polsinelli',
+    country: 'IT',
+    url: 'https://www.polsinelli.it',
+    freeShippingThreshold: 90,
+    baseShipping: 9.90,
+    deliveryDays: [5, 10],
+    currency: 'EUR',
+    specialties: ['equipamiento', 'maltas', 'botellería'],
+    rating: 4.0,
+    scraperActive: false,
+    color: '#E74C3C',
+  },
+  {
+    id: 'mrmalt',
+    name: 'Mr Malt',
+    country: 'IT',
+    url: 'https://www.mrmalt.it',
+    freeShippingThreshold: 70,
+    baseShipping: 8.00,
+    deliveryDays: [5, 10],
+    currency: 'EUR',
+    specialties: ['maltas', 'kits', 'ingredientes'],
+    rating: 4.2,
     scraperActive: false,
     color: '#D35400',
+  },
+
+  // ── Poland ──
+  {
+    id: 'homebeerpl',
+    name: 'HomeBeer.pl',
+    country: 'PL',
+    url: 'https://www.homebeer.pl',
+    freeShippingThreshold: null,
+    baseShipping: 12.00,
+    deliveryDays: [6, 12],
+    currency: 'PLN',
+    specialties: ['maltas', 'lúpulos', 'equipamiento'],
+    rating: 3.9,
+    scraperActive: false,
+    color: '#E74C3C',
+  },
+
+  // ── Sweden ──
+  {
+    id: 'mrmaltse',
+    name: 'Mr-Malt.se',
+    country: 'SE',
+    url: 'https://www.mr-malt.se',
+    freeShippingThreshold: null,
+    baseShipping: 15.00,
+    deliveryDays: [6, 12],
+    currency: 'SEK',
+    specialties: ['maltas', 'lúpulos', 'equipamiento'],
+    rating: 4.0,
+    scraperActive: false,
+    color: '#3498DB',
   },
 ]
 
@@ -182,6 +356,9 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   FR: '🇫🇷',
   NL: '🇳🇱',
   IT: '🇮🇹',
+  IE: '🇮🇪',
+  PL: '🇵🇱',
+  SE: '🇸🇪',
 }
 
 export const COUNTRY_NAMES: Record<string, string> = {
@@ -192,6 +369,9 @@ export const COUNTRY_NAMES: Record<string, string> = {
   FR: 'Francia',
   NL: 'Países Bajos',
   IT: 'Italia',
+  IE: 'Irlanda',
+  PL: 'Polonia',
+  SE: 'Suecia',
 }
 
 /** Calculate total cost including shipping for a given order total at a supplier */

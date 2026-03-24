@@ -9,8 +9,8 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { useInventory } from '@/hooks/use-inventory'
-import { usePriceSearch } from '@/hooks/use-prices'
-import { SUPPLIER_MAP, calcTotalWithShipping, amountToFreeShipping } from '@/data/suppliers'
+import { useMultiPriceSearch } from '@/hooks/use-prices'
+import { SUPPLIER_MAP } from '@/data/suppliers'
 import type { Ingredient, PriceRecord } from '@/lib/types'
 
 interface ShopperItem {
@@ -159,10 +159,9 @@ export function PersonalShopper() {
   // Analyze what we need
   const needs = useMemo(() => analyzeInventory(items), [items])
 
-  // Search prices for top needs (first 5)
-  const topNeedNames = needs.slice(0, 5).map(n => n.name)
-  const searchQuery = topNeedNames.length > 0 ? topNeedNames[0]! : ''
-  const { data: searchResults = [] } = usePriceSearch(searchQuery)
+  // Search prices for top needs (first 5) — all in parallel
+  const topNeedNames = useMemo(() => needs.slice(0, 5).map(n => n.name), [needs])
+  const { data: searchResults = [] } = useMultiPriceSearch(topNeedNames)
 
   // Build price map
   const priceMap = useMemo(() => {

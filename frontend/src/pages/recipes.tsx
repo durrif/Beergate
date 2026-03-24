@@ -13,6 +13,7 @@ import { useRecipes, useImportBeerXML, useStartBrewFromRecipe } from '@/hooks/us
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { srmToHex } from '@/lib/brew-calc'
 import { toast } from 'sonner'
 import type { Recipe } from '@/lib/types'
 
@@ -66,6 +67,7 @@ export default function RecipesPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [creatorOpen, setCreatorOpen] = useState(false)
   const [editRecipe, setEditRecipe] = useState<Recipe | null>(null)
+  const [dragActive, setDragActive] = useState(false)
 
   // Data
   const { data: recipes = [], isLoading } = useRecipes(search || undefined)
@@ -94,6 +96,20 @@ export default function RecipesPage() {
     e.target.value = ''
   }, [importBeerXML])
 
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(false)
+    const file = e.dataTransfer.files[0]
+    if (!file || !file.name.endsWith('.xml')) {
+      toast.error('Solo archivos BeerXML (.xml)')
+      return
+    }
+    importBeerXML.mutate(file, {
+      onSuccess: (imported: Recipe[]) => toast.success(`${imported.length} ${t('recipes.import_success')}`),
+      onError: () => toast.error(t('recipes.import_error')),
+    })
+  }, [importBeerXML])
+
   const handleStartBrew = (recipeId: string) => {
     startBrew.mutate(Number(recipeId), {
       onSuccess: () => {
@@ -111,7 +127,26 @@ export default function RecipesPage() {
 
   return (
     <>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-5">
+      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-5"
+        onDragOver={e => { e.preventDefault(); setDragActive(true) }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={handleDrop}
+      >
+        {/* Drag overlay */}
+        <AnimatePresence>
+          {dragActive && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur-sm flex items-center justify-center pointer-events-none"
+            >
+              <div className="border-2 border-dashed border-accent-amber/50 rounded-2xl p-12 text-center">
+                <Upload className="w-12 h-12 text-accent-amber mx-auto mb-3" />
+                <p className="text-lg font-display font-bold text-text-primary">Suelta tu BeerXML aquí</p>
+                <p className="text-sm text-text-secondary mt-1">Archivos .xml compatibles con BeerXML 1.0</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* ── Header ────────────────────────────────────────── */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
@@ -338,18 +373,4 @@ export default function RecipesPage() {
       </AnimatePresence>
     </>
   )
-}
-
-/* ── Local SRM helper (inline to avoid circular dep) ───────────── */
-function srmToHex(srm: number): string {
-  const clamp = Math.min(Math.max(Math.round(srm), 1), 40)
-  const palette: Record<number, string> = {
-    1: '#F3F993', 2: '#F5F75C', 3: '#F6F513', 4: '#EAE510',
-    5: '#E0D01B', 6: '#D5BC26', 7: '#CDAA37', 8: '#C1963C',
-    9: '#BE8C3A', 10: '#BE823A', 15: '#BE4E0F', 20: '#5A0F05',
-    25: '#280702', 30: '#080100', 40: '#010000',
-  }
-  const keys = Object.keys(palette).map(Number).sort((a, b) => a - b)
-  const closest = keys.reduce((prev, curr) => Math.abs(curr - srm) < Math.abs(prev - srm) ? curr : prev)
-  return palette[closest] ?? '#A06010'
 }

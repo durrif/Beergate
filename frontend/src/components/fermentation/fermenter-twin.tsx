@@ -7,6 +7,7 @@ import {
   AlertTriangle, CheckCircle2, Activity,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { srmToHex } from '@/lib/brew-calc'
 import type { FermenterSpec } from '@/data/fermenters'
 
 /* ── Types ─────────────────────────────────────────────────────── */
@@ -23,6 +24,8 @@ export interface FermenterTwinData {
   finalGravity?: number
   temperature?: number
   targetTemp?: number
+  /** SRM color value for beer liquid */
+  srm?: number
   deviceOnline?: boolean
   deviceBattery?: number
   deviceRssi?: number
@@ -47,7 +50,10 @@ function statusConfig(status: FermenterStatus) {
   }
 }
 
-function liquidColor(temp?: number): string {
+function liquidColor(srm?: number, temp?: number): string {
+  // Prefer SRM-based color for accurate beer representation
+  if (srm != null && srm > 0) return srmToHex(srm)
+  // Fallback to temperature-based color
   if (!temp) return '#5A6B80'
   if (temp < 10) return '#42A5F5'
   if (temp < 16) return '#26C6DA'
@@ -86,6 +92,10 @@ function TankSVG({ fillPct, color, status, material }: {
           <stop offset="0%" stopColor={color} stopOpacity="0.9" />
           <stop offset="100%" stopColor={color} stopOpacity="0.5" />
         </linearGradient>
+        <linearGradient id={`foam-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFF8E7" stopOpacity="0.6" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.3" />
+        </linearGradient>
         <clipPath id="tank-clip">
           {isConical ? (
             <path d="M15,30 L65,30 L65,120 L55,145 L25,145 L15,120 Z" />
@@ -123,6 +133,20 @@ function TankSVG({ fillPct, color, status, material }: {
             transition={{ duration: 1, ease: 'easeOut' }}
             fill={`url(#liquid-${color.replace('#', '')})`}
           />
+
+          {/* Foam / krausen layer during active fermentation */}
+          {status === 'active' && fillPct > 15 && (
+            <motion.rect
+              x="15"
+              width="50"
+              height="6"
+              fill={`url(#foam-${color.replace('#', '')})`}
+              initial={{ y: fillY }}
+              animate={{ y: [fillY, fillY - 1, fillY + 1, fillY] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
+
           {/* Surface wave */}
           {status === 'active' && (
             <motion.ellipse
@@ -138,18 +162,24 @@ function TankSVG({ fillPct, color, status, material }: {
         </g>
       )}
 
-      {/* Bubbles when active */}
+      {/* Bubbles — more dynamic CO2 simulation */}
       {status === 'active' && fillPct > 10 && (
         <>
-          {[0, 0.5, 1].map((delay, i) => (
+          {[
+            { cx: 28, delay: 0, r: 1.5, dur: 1.8 },
+            { cx: 36, delay: 0.4, r: 2, dur: 2.2 },
+            { cx: 44, delay: 0.8, r: 1.2, dur: 1.5 },
+            { cx: 52, delay: 1.2, r: 1.8, dur: 2.0 },
+            { cx: 32, delay: 0.6, r: 1, dur: 2.5 },
+          ].map((b, i) => (
             <motion.circle
               key={i}
-              cx={32 + i * 8}
-              r="1.5"
+              cx={b.cx}
+              r={b.r}
               fill="white"
-              fillOpacity="0.4"
-              animate={{ cy: [fillY + 10, fillY - 5], opacity: [0.5, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, delay, ease: 'easeOut' }}
+              fillOpacity="0.35"
+              animate={{ cy: [fillY + 15, fillY - 8], opacity: [0.5, 0], r: [b.r, b.r * 0.5] }}
+              transition={{ duration: b.dur, repeat: Infinity, delay: b.delay, ease: 'easeOut' }}
             />
           ))}
         </>
@@ -164,13 +194,13 @@ export function FermenterTwin({ data, selected, onClick }: FermenterTwinProps) {
   const {
     fermenter, beerName, style, dayNumber, totalDays,
     currentGravity, originalGravity, finalGravity,
-    temperature, targetTemp, deviceOnline, deviceBattery,
+    temperature, targetTemp, srm, deviceOnline, deviceBattery,
     deviceRssi, lastSync, status,
   } = data
 
   const sc = statusConfig(status)
   const fillPct = status === 'idle' ? 0 : fermProgress(originalGravity, currentGravity, finalGravity)
-  const liqColor = liquidColor(temperature)
+  const liqColor = liquidColor(srm, temperature)
   const attenuation = fillPct > 0 ? Math.round(fillPct) : null
   const abv = originalGravity && currentGravity
     ? ((originalGravity - currentGravity) * 131.25).toFixed(1)

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 
 interface IngredientCardProps {
   ingredient: Ingredient
+  allInventory?: Ingredient[]
   onEdit?: (ingredient: Ingredient) => void
   onDelete?: (ingredient: Ingredient) => void
   onAdjust?: (ingredient: Ingredient, delta: number) => void
@@ -41,6 +42,7 @@ const CAT_ICON_MAP: Record<string, typeof Wheat> = {
 
 export function IngredientCard({
   ingredient,
+  allInventory,
   onEdit,
   onDelete,
   onAdjust,
@@ -66,7 +68,7 @@ export function IngredientCard({
       {/* Rich tooltip on hover */}
       <AnimatePresence>
         {showTooltip && !expanded && (
-          <IngredientTooltip ingredient={ingredient} />
+          <IngredientTooltip ingredient={ingredient} allInventory={allInventory} />
         )}
       </AnimatePresence>
 

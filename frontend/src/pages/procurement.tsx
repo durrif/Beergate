@@ -286,7 +286,7 @@ export default function ProcurementPage() {
               <Store size={32} className="text-text-tertiary mx-auto mb-3 opacity-40" />
               <p className="text-text-secondary">Escribe al menos 3 caracteres para buscar</p>
               <p className="text-xs text-text-tertiary mt-1">
-                Comparamos precios en {SUPPLIER_DATABASE.filter(s => s.scraperActive).length} tiendas de España y Europa
+                Comparamos precios en {SUPPLIER_DATABASE.length} tiendas de España y Europa ({SUPPLIER_DATABASE.filter(s => s.scraperActive).length} con scraping activo)
               </p>
             </div>
           )}

@@ -1,9 +1,10 @@
-// frontend/src/components/ui/logo.tsx
+// frontend/src/components/ui/logo.tsx — Beergate v4
 import { cn } from '@/lib/utils'
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   showText?: boolean
+  animated?: boolean
   className?: string
 }
 
@@ -21,16 +22,25 @@ const textSizeMap = {
   xl: 'text-3xl',
 }
 
-export function Logo({ size = 'md', showText = true, className }: LogoProps) {
+export function Logo({ size = 'md', showText = true, animated = false, className }: LogoProps) {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2.5', className)}>
       <img
         src="/logo-icon.svg"
         alt="Beergate"
-        className={cn(sizeMap[size], 'shrink-0')}
+        className={cn(
+          sizeMap[size],
+          'shrink-0 transition-transform duration-500',
+          animated && 'hover:rotate-[15deg] hover:scale-110',
+        )}
       />
       {showText && (
-        <span className={cn('font-semibold amber-text whitespace-nowrap', textSizeMap[size])}>
+        <span
+          className={cn(
+            'font-display font-bold amber-text whitespace-nowrap tracking-tight',
+            textSizeMap[size],
+          )}
+        >
           Beergate
         </span>
       )}

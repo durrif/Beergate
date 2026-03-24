@@ -1,5 +1,5 @@
 // src/hooks/use-prices.ts
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
 import type { PriceResult, PriceAlert } from "@/lib/types";
 
@@ -12,6 +12,30 @@ export function usePriceSearch(query: string) {
     enabled: !!query && query.length > 2,
     staleTime: 5 * 60_000, // 5 min - prices don't change that often
   });
+}
+
+/** Search prices for multiple ingredient names in parallel */
+export function useMultiPriceSearch(names: string[]) {
+  const queries = useQueries({
+    queries: names.map((name) => ({
+      queryKey: ["prices-search", name],
+      queryFn: () =>
+        apiClient.get<PriceResult[]>(
+          `/v1/prices/search?q=${encodeURIComponent(name)}`
+        ),
+      enabled: !!name && name.length > 2,
+      staleTime: 5 * 60_000,
+    })),
+  });
+
+  const allResults: PriceResult[] = [];
+  let isLoading = false;
+  for (const q of queries) {
+    if (q.isLoading) isLoading = true;
+    if (q.data) allResults.push(...q.data);
+  }
+
+  return { data: allResults, isLoading };
 }
 
 // ─── Recipe price comparison ──────────────────────────────────────────────────

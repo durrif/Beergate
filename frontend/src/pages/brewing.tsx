@@ -17,13 +17,14 @@ import {
   useCreateSession,
   useRecipes,
 } from '@/hooks/use-brewing'
-import { useStartBrewFromRecipe } from '@/hooks/use-recipes'
+import { useStartBrewFromRecipe, useRecipe } from '@/hooks/use-recipes'
 import { BrewTimeline, type BrewPhase as TimelinePhase } from '@/components/brewing/brew-timeline'
 import { DualTimer } from '@/components/brewing/dual-timer'
 import { KanbanTimeline, BREW_PHASES } from '@/components/brewing/kanban-timeline'
 import { HopSchedule, HopAlertBanner, type HopAddition } from '@/components/brewing/hop-schedule'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { NewBatchModal } from '@/components/brewing/new-batch-modal'
 import type { BrewSession, BrewPhase, Recipe, RecipeIngredient } from '@/lib/types'
 
 /* ── Utilities ─────────────────────────────────────────────────── */
@@ -201,11 +202,16 @@ function ActiveBrewPanel({ session }: { session: BrewSession }) {
   const { timer } = useBrewStore()
   const [hops, setHops] = useState<HopAddition[]>([])
 
-  // Build hop schedule from session recipe if available
-  // (In production this would come from the API/recipe data)
+  // Fetch recipe to build hop schedule from real data
+  const recipeId = session.recipe_id ? Number(session.recipe_id) : null
+  const { data: recipe } = useRecipe(recipeId)
+
+  // Build hop schedule from recipe, fall back to demo hops
   useEffect(() => {
-    // Default demo hops if no recipe data
-    if (hops.length === 0) {
+    const recipeHops = buildHopSchedule(recipe)
+    if (recipeHops.length > 0) {
+      setHops(recipeHops)
+    } else if (hops.length === 0) {
       setHops([
         { name: 'Magnum', amount_g: 25, time_min: 60, alpha_pct: 12.5, added: false, notified: false },
         { name: 'Cascade', amount_g: 20, time_min: 15, alpha_pct: 5.5, added: false, notified: false },
@@ -213,7 +219,7 @@ function ActiveBrewPanel({ session }: { session: BrewSession }) {
         { name: 'Citra', amount_g: 40, time_min: 0, alpha_pct: 12.0, added: false, notified: false },
       ])
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [recipe]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMarkHopAdded = useCallback((index: number) => {
     setHops(prev => prev.map((h, i) => i === index ? { ...h, added: true } : h))
@@ -336,6 +342,7 @@ export default function BrewingPage() {
 
   const { data: sessions = [], isLoading } = useBrewSessions()
   const { data: activeSession } = useActiveSession()
+  const [showNewBatch, setShowNewBatch] = useState(false)
 
   // Split active vs history
   const historySessions = useMemo(
@@ -356,6 +363,7 @@ export default function BrewingPage() {
         {activeSession && (
           <Button
             size="sm"
+            onClick={() => setShowNewBatch(true)}
             className="bg-accent-amber hover:bg-accent-amber-bright text-bg-primary font-semibold"
           >
             <Plus className="h-4 w-4 mr-1" />
@@ -405,6 +413,9 @@ export default function BrewingPage() {
           </div>
         )}
       </div>
+
+      {/* New Batch Modal */}
+      <NewBatchModal open={showNewBatch} onClose={() => setShowNewBatch(false)} />
     </div>
   )
 }
